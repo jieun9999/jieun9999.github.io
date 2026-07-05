@@ -1,0 +1,167 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import { ui, formatDate, type Lang } from '../i18n/ui';
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  pubDate: Date;
+  updatedDate?: Date;
+  tags: string[];
+  headings: MarkdownHeading[];
+  alternates: Record<Lang, string>;
+  hreflang: Partial<Record<Lang, string>>;
+  hasTranslation: boolean;
+}
+
+const {
+  lang,
+  title,
+  description,
+  pubDate,
+  updatedDate,
+  tags,
+  headings,
+  alternates,
+  hreflang,
+  hasTranslation,
+} = Astro.props;
+const t = ui[lang];
+
+// 목차는 h2/h3 만 노출
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+<BaseLayout
+  title={`${title} · ${t.siteTitle}`}
+  description={description}
+  lang={lang}
+  type="article"
+  alternates={alternates}
+  hreflang={hreflang}
+>
+  <a class="back-link" href={`/${lang}/`}>{t.backToList}</a>
+
+  <article class="post">
+    <header class="post-header">
+      <h1>{title}</h1>
+      <p class="meta">
+        <time datetime={pubDate.toISOString()}>{t.publishedOn} {formatDate(pubDate, lang)}</time>
+        {updatedDate && <span> · {t.updatedOn} {formatDate(updatedDate, lang)}</span>}
+      </p>
+      {
+        tags.length > 0 && (
+          <ul class="tags">
+            {tags.map((tag) => <li>#{tag}</li>)}
+          </ul>
+        )
+      }
+      {
+        !hasTranslation && (
+          <p class="translation-note">{ui[lang === 'en' ? 'ko' : 'en'].noTranslation}</p>
+        )
+      }
+    </header>
+
+    <div class="post-body">
+      {
+        toc.length > 1 && (
+          <nav class="toc" aria-label={t.tableOfContents}>
+            <p class="toc-title">{t.tableOfContents}</p>
+            <ul>
+              {toc.map((h) => (
+                <li class:list={[`depth-${h.depth}`]}>
+                  <a href={`#${h.slug}`}>{h.text}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )
+      }
+      <div class="prose">
+        <slot />
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .back-link {
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+  .back-link:hover { color: var(--accent); }
+
+  .post-header h1 {
+    font-size: 2rem;
+    line-height: 1.2;
+    margin: 0 0 0.5rem;
+  }
+  .meta {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin: 0 0 0.75rem;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 0.5rem;
+  }
+  .tags li {
+    font-size: 0.75rem;
+    color: var(--accent);
+    background: var(--surface-hover);
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+  }
+  .translation-note {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    background: var(--surface-hover);
+    border-left: 3px solid var(--accent);
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+  }
+
+  .post-body {
+    display: grid;
+    gap: 2.5rem;
+    margin-top: 2rem;
+  }
+  /* 넓은 화면에서는 본문 옆에 목차 sticky */
+  @media (min-width: 60rem) {
+    .post-body {
+      grid-template-columns: 1fr 14rem;
+    }
+    .toc {
+      order: 2;
+      position: sticky;
+      top: 2rem;
+      align-self: start;
+      font-size: 0.85rem;
+    }
+    .prose { order: 1; min-width: 0; }
+  }
+  .toc-title {
+    font-weight: 600;
+    color: var(--text-muted);
+    margin: 0 0 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.7rem;
+  }
+  .toc ul { list-style: none; margin: 0; padding: 0; }
+  .toc li { margin: 0.25rem 0; }
+  .toc li.depth-3 { padding-left: 0.75rem; }
+  .toc a { color: var(--text-muted); text-decoration: none; }
+  .toc a:hover { color: var(--accent); }
+</style>

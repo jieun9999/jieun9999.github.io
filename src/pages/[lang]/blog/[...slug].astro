@@ -1,0 +1,55 @@
+---
+import { getCollection, render } from 'astro:content';
+import PostLayout from '../../../layouts/PostLayout.astro';
+import { langFromId, keyFromId, otherLang, type Lang } from '../../../i18n/ui';
+
+export async function getStaticPaths() {
+  const posts = (await getCollection('blog')).filter((p) => !p.data.draft);
+
+  // 빠른 조회를 위해 "lang/key" 존재 집합 구성
+  const exists = new Set(posts.map((p) => p.id));
+
+  return posts.map((post) => {
+    const lang = langFromId(post.id);
+    const key = keyFromId(post.id);
+    const other = otherLang(lang);
+    const hasTranslation = exists.has(`${other}/${key}`);
+
+    // 언어 토글용 URL (번역 없으면 상대 언어 홈으로)
+    const alternates = {
+      [lang]: `/${lang}/blog/${key}/`,
+      [other]: hasTranslation ? `/${other}/blog/${key}/` : `/${other}/`,
+    } as Record<Lang, string>;
+
+    // hreflang은 "실제 존재하는 번역"만
+    const hreflang: Partial<Record<Lang, string>> = {
+      [lang]: `/${lang}/blog/${key}/`,
+    };
+    if (hasTranslation) hreflang[other] = `/${other}/blog/${key}/`;
+
+    return {
+      params: { lang, slug: key },
+      props: { post, alternates, hreflang, hasTranslation },
+    };
+  });
+}
+
+const { post, alternates, hreflang, hasTranslation } = Astro.props;
+const lang = langFromId(post.id);
+const { Content, headings } = await render(post);
+---
+
+<PostLayout
+  lang={lang}
+  title={post.data.title}
+  description={post.data.description}
+  pubDate={post.data.pubDate}
+  updatedDate={post.data.updatedDate}
+  tags={post.data.tags}
+  headings={headings}
+  alternates={alternates}
+  hreflang={hreflang}
+  hasTranslation={hasTranslation}
+>
+  <Content />
+</PostLayout>

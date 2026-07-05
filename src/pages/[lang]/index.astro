@@ -1,0 +1,95 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { ui, languages, langFromId, keyFromId, formatDate, type Lang } from '../../i18n/ui';
+
+export function getStaticPaths() {
+  return (Object.keys(languages) as Lang[]).map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params as { lang: Lang };
+const t = ui[lang];
+
+const posts = (await getCollection('blog'))
+  .filter((p) => langFromId(p.id) === lang && !p.data.draft)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<BaseLayout title={t.siteTitle} description={t.tagline} lang={lang}>
+  <section class="intro">
+    <h1>{t.siteTitle}</h1>
+    <p>{t.tagline}</p>
+  </section>
+
+  <h2 class="section-title">{t.posts}</h2>
+  <ul class="post-list">
+    {
+      posts.map((post) => {
+        const key = keyFromId(post.id);
+        return (
+          <li>
+            <a class="post-link" href={`/${lang}/blog/${key}/`}>
+              <h3>{post.data.title}</h3>
+              <time datetime={post.data.pubDate.toISOString()}>
+                {formatDate(post.data.pubDate, lang)}
+              </time>
+              <p>{post.data.description}</p>
+            </a>
+          </li>
+        );
+      })
+    }
+  </ul>
+</BaseLayout>
+
+<style>
+  .intro h1 {
+    font-size: 1.8rem;
+    margin: 0 0 0.5rem;
+  }
+  .intro p {
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .section-title {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin: 2.5rem 0 1rem;
+  }
+  .post-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+  .post-link {
+    display: block;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .post-link:hover {
+    border-color: var(--accent);
+    background: var(--surface-hover);
+  }
+  .post-link h3 {
+    margin: 0 0 0.25rem;
+    font-size: 1.1rem;
+    color: var(--text);
+  }
+  .post-link time {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+  .post-link p {
+    margin: 0.4rem 0 0;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+  }
+</style>

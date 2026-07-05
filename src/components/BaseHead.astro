@@ -1,0 +1,84 @@
+---
+// 모든 페이지의 <head>에 들어가는 SEO 요소를 한 곳에서 관리.
+import type { Lang } from '../i18n/ui';
+
+interface Props {
+  title: string;
+  description: string;
+  lang: Lang;
+  /** 언어별 대체 URL(hreflang용). 실제로 존재하는 번역만 담는다. */
+  alternates?: Partial<Record<Lang, string>>;
+  /** og:type — 글이면 'article', 목록/홈이면 'website' */
+  type?: 'website' | 'article';
+}
+
+const {
+  title,
+  description,
+  lang,
+  alternates = {},
+  type = 'website',
+} = Astro.props;
+
+const site = Astro.site ?? new URL('https://jieun9999.github.io');
+const canonical = new URL(Astro.url.pathname, site).href;
+
+// hreflang 절대 URL 목록 (구글에게 "같은 글의 다른 언어 버전"임을 알림)
+const hreflangs = Object.entries(alternates).map(([l, path]) => ({
+  lang: l,
+  href: new URL(path!, site).href,
+}));
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<meta name="generator" content={Astro.generator} />
+
+<!-- 기본 SEO -->
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+
+<!-- 다국어 SEO: hreflang -->
+{
+  hreflangs.map(({ lang: l, href }) => (
+    <link rel="alternate" hreflang={l} href={href} />
+  ))
+}
+{
+  hreflangs.length > 0 && (
+    <link rel="alternate" hreflang="x-default" href={hreflangs[0].href} />
+  )
+}
+
+<!-- Open Graph (SNS 공유 미리보기) -->
+<meta property="og:type" content={type} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:locale" content={lang === 'ko' ? 'ko_KR' : 'en_US'} />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+
+<!-- RSS 자동발견 -->
+<link
+  rel="alternate"
+  type="application/rss+xml"
+  title={title}
+  href={new URL(`/${lang}/rss.xml`, site).href}
+/>
+
+<!-- 다크모드: 페이지가 그려지기 전에 테마를 결정해 '깜빡임' 방지 -->
+<script is:inline>
+  (() => {
+    const saved = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (saved === 'dark' || (!saved && prefersDark)) {
+      document.documentElement.classList.add('dark');
+    }
+  })();
+</script>

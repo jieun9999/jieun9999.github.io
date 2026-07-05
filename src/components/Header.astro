@@ -1,0 +1,45 @@
+---
+import { ui, type Lang } from '../i18n/ui';
+import LanguageToggle from './LanguageToggle.astro';
+import ThemeToggle from './ThemeToggle.astro';
+
+interface Props {
+  lang: Lang;
+  alternates: Record<Lang, string>;
+}
+const { lang, alternates } = Astro.props;
+const t = ui[lang];
+---
+
+<header class="site-header">
+  <a class="brand" href={`/${lang}/`}>{t.siteTitle}</a>
+  <nav class="actions">
+    <LanguageToggle lang={lang} alternates={alternates} />
+    <ThemeToggle />
+  </nav>
+</header>
+
+<style>
+  .site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem 0;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .brand {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .brand:hover { color: var(--accent); }
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+</style>

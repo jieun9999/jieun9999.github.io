@@ -1,0 +1,52 @@
+---
+// 한/영 전환 버튼. 현재 언어는 강조, 다른 언어는 해당 대체 URL로 링크.
+import { languages, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  /** 각 언어의 현재 페이지 대응 URL */
+  alternates: Record<Lang, string>;
+}
+const { lang, alternates } = Astro.props;
+---
+
+<div class="lang-toggle" role="group" aria-label="Language">
+  {
+    (Object.keys(languages) as Lang[]).map((l) => (
+      <a
+        href={alternates[l]}
+        class:list={['lang-btn', { active: l === lang }]}
+        aria-current={l === lang ? 'true' : undefined}
+        hreflang={l}
+      >
+        {l.toUpperCase()}
+      </a>
+    ))
+  }
+</div>
+
+<style>
+  .lang-toggle {
+    display: inline-flex;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .lang-btn {
+    padding: 0.25rem 0.7rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+  }
+  .lang-btn:hover {
+    color: var(--text);
+    background: var(--surface-hover);
+  }
+  .lang-btn.active {
+    color: var(--bg);
+    background: var(--accent);
+  }
+</style>

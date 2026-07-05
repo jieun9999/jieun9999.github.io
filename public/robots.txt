@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://jieun9999.github.io/sitemap-index.xml

@@ -1,0 +1,55 @@
+---
+import '../styles/global.css';
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import { languages, otherLang, type Lang } from '../i18n/ui';
+
+interface Props {
+  title: string;
+  description: string;
+  lang: Lang;
+  type?: 'website' | 'article';
+  /** 언어별 대응 URL. 없으면 현재 경로의 언어 접두어만 바꿔서 자동 생성. */
+  alternates?: Record<Lang, string>;
+  /** hreflang에 쓸, "실제로 존재하는" 번역만. 없으면 alternates 전체 사용. */
+  hreflang?: Partial<Record<Lang, string>>;
+}
+
+const { title, description, lang, type = 'website' } = Astro.props;
+
+// 기본 alternates 자동 생성: /en/foo <-> /ko/foo
+const path = Astro.url.pathname;
+const autoAlternates = Object.fromEntries(
+  (Object.keys(languages) as Lang[]).map((l) => [
+    l,
+    path.replace(new RegExp(`^/(${Object.keys(languages).join('|')})(/|$)`), `/${l}$2`),
+  ])
+) as Record<Lang, string>;
+
+const alternates = Astro.props.alternates ?? autoAlternates;
+const hreflang = Astro.props.hreflang ?? alternates;
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <BaseHead
+      title={title}
+      description={description}
+      lang={lang}
+      type={type}
+      alternates={hreflang}
+    />
+  </head>
+  <body>
+    <div class="wrapper">
+      <Header lang={lang} alternates={alternates} />
+      <main>
+        <slot />
+      </main>
+      <footer class="site-footer">
+        <p>© {new Date().getFullYear()} jieun9999 · Built with Astro</p>
+      </footer>
+    </div>
+  </body>
+</html>
