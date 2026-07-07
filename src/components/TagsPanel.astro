@@ -16,7 +16,9 @@ const hasMore = tags.length > limit;
   <ul class="tags-list">
     {
       tags.map((tag, i) => (
-        <li class:list={['tag-item', { hidden: i >= limit }]}>#{tag}</li>
+        <li class:list={['tag-item', { hidden: i >= limit }]}>
+          <a href={`/${lang}/tag/${encodeURIComponent(tag)}/`}>#{tag}</a>
+        </li>
       ))
     }
   </ul>
@@ -62,15 +64,15 @@ const hasMore = tags.length > limit;
     gap: 0.55rem;
   }
   /* 모든 태그 동일 크기 */
-  .tag-item {
+  .tag-item.hidden { display: none; }
+  .tag-item a {
     font-size: 0.9rem;
     font-weight: 500;
     color: var(--text-muted);
-    cursor: default;
+    text-decoration: none;
     transition: color 0.15s;
   }
-  .tag-item:hover { color: var(--accent); }
-  .tag-item.hidden { display: none; }
+  .tag-item a:hover { color: var(--accent); }
 
   .tags-more {
     margin-top: 1rem;

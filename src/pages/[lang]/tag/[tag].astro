@@ -1,0 +1,102 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PostCard from '../../../components/PostCard.astro';
+import {
+  ui,
+  languages,
+  langFromId,
+  keyFromId,
+  readingMinutes,
+  postCount,
+  type Lang,
+} from '../../../i18n/ui';
+
+export async function getStaticPaths() {
+  const all = (await getCollection('blog')).filter((p) => !p.data.draft);
+  const paths = [];
+  for (const lang of Object.keys(languages) as Lang[]) {
+    const tags = new Set<string>();
+    all
+      .filter((p) => langFromId(p.id) === lang)
+      .forEach((p) => p.data.tags.forEach((t) => tags.add(t)));
+    for (const tag of tags) {
+      paths.push({ params: { lang, tag } });
+    }
+  }
+  return paths;
+}
+
+const { lang, tag } = Astro.params as { lang: Lang; tag: string };
+const t = ui[lang];
+
+const posts = (await getCollection('blog'))
+  .filter(
+    (p) => langFromId(p.id) === lang && !p.data.draft && p.data.tags.includes(tag)
+  )
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<BaseLayout
+  title={`#${tag} · ${t.siteTitle}`}
+  description={`${t.siteTitle} — #${tag}`}
+  lang={lang}
+>
+  <div class="tag-page">
+    <a class="back-link" href={`/${lang}/`}>{t.backToList}</a>
+    <h1 class="tag-heading">#{tag}</h1>
+    <p class="tag-count">{postCount(lang, posts.length)}</p>
+
+    <ul class="feed-list">
+      {
+        posts.map((post) => (
+          <PostCard
+            lang={lang}
+            slug={keyFromId(post.id)}
+            title={post.data.title}
+            description={post.data.description}
+            pubDate={post.data.pubDate}
+            mins={readingMinutes(post.body ?? '')}
+            category={post.data.category}
+            cover={post.data.cover}
+            coverAlt={post.data.coverAlt}
+          />
+        ))
+      }
+    </ul>
+  </div>
+</BaseLayout>
+
+<style>
+  .tag-page {
+    width: min(100%, 980px);
+    margin-inline: auto;
+    font-size: clamp(17px, 15px + 0.28vw, 20px);
+  }
+  .back-link {
+    display: inline-block;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+  }
+  .back-link:hover { color: var(--accent); }
+  .tag-heading {
+    margin: 1rem 0 0.35rem;
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--accent);
+    line-height: 1.1;
+  }
+  .tag-count {
+    margin: 0 0 0.5rem;
+    font-size: 0.9em;
+    color: var(--text-subtle);
+  }
+  .feed-list {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0 0;
+    display: grid;
+    gap: 1.75rem;
+  }
+</style>
