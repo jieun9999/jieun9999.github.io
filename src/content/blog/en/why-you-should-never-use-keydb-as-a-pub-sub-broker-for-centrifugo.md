@@ -7,6 +7,9 @@ category: fundamentals
 cover: /covers/why-you-should-never-use-keydb-as-a-pub-sub-broker-for-centrifugo.webp
 coverAlt: 'Why You Should Never Use KeyDB as a Pub/Sub Broker for Centrifugo'
 ---
+
+> **Reference:** [Snapchat/KeyDB #883 — KeyDB deadlock](https://github.com/Snapchat/KeyDB/issues/883)
+
 ## Introduction
 
 I was building a real-time chat system designed to handle **100K concurrent WebSocket connections at 25K+ messages per second.** The architecture was a symmetric dual-stack — two identical servers (16 vCPU / 58 GB each) running 5 Centrifugo nodes apiece, with Cloudflare DNS splitting traffic 50/50.

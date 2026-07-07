@@ -7,6 +7,9 @@ category: fundamentals
 cover: /covers/why-you-should-never-use-keydb-as-a-pub-sub-broker-for-centrifugo.webp
 coverAlt: 'Centrifugo의 Pub/Sub 브로커로 KeyDB를 절대 쓰면 안 되는 이유'
 ---
+
+> **출처:** [Snapchat/KeyDB #883 — KeyDB deadlock](https://github.com/Snapchat/KeyDB/issues/883)
+
 ## 들어가며
 
 저는 **10만 개의 동시 WebSocket 연결을 초당 25K 이상의 메시지 처리량으로** 감당하도록 설계된 실시간 채팅 시스템을 구축하고 있었습니다. 아키텍처는 대칭형 듀얼 스택이었습니다 — 동일한 서버 두 대(각 16 vCPU / 58 GB)가 각각 5개의 Centrifugo 노드를 실행하고, Cloudflare DNS가 트래픽을 50 대 50으로 분산하는 구조였습니다.
