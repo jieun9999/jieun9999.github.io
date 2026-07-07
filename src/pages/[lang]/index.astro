@@ -39,40 +39,48 @@ for (const p of posts) {
 ---
 
 <BaseLayout title={t.siteTitle} description={t.tagline} lang={lang}>
-  <div class="feed">
+  <div class="home">
+    <div class="feed">
+      <ProfileCard lang={lang} count={posts.length} />
+
+      <CategoryBar />
+
+      <ul class="feed-list">
+        {
+          posts.map((post) => (
+            <PostCard
+              lang={lang}
+              slug={keyFromId(post.id)}
+              title={post.data.title}
+              description={post.data.description}
+              pubDate={post.data.pubDate}
+              mins={readingMinutes(post.body ?? '')}
+              category={post.data.category}
+              cover={post.data.cover}
+              coverAlt={post.data.coverAlt}
+            />
+          ))
+        }
+      </ul>
+    </div>
+
     <TagsPanel lang={lang} tags={orderedTags} />
-
-    <ProfileCard lang={lang} count={posts.length} />
-
-    <CategoryBar />
-
-    <ul class="feed-list">
-      {
-        posts.map((post) => (
-          <PostCard
-            lang={lang}
-            slug={keyFromId(post.id)}
-            title={post.data.title}
-            description={post.data.description}
-            pubDate={post.data.pubDate}
-            mins={readingMinutes(post.body ?? '')}
-            category={post.data.category}
-            cover={post.data.cover}
-            coverAlt={post.data.coverAlt}
-          />
-        ))
-      }
-    </ul>
   </div>
 </BaseLayout>
 
 <style>
+  /* 홈: 넓은 피드 + 오른쪽 TAGS 사이드바를 하나의 그룹으로 중앙 정렬 */
+  .home {
+    display: flex;
+    gap: 2.5rem;
+    align-items: flex-start;
+    justify-content: center;
+  }
   .feed {
-    position: relative; /* 오른쪽 TAGS 패널 기준점 */
-    /* 해시노드형 단일 컬럼 — 큰 모니터에서 큼직하게 (px 기반) */
-    width: min(100%, 980px);
-    margin-inline: auto;
-    /* 글자 크기 (큰 모니터에서 충분히 크게, 본문 .prose 스케일은 불변) */
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 1180px; /* 홈 콘텐츠 폭 (본문보다 넓게) */
+    /* 글자 크기 (본문 .prose 스케일은 불변) */
     font-size: clamp(17px, 15px + 0.28vw, 20px);
   }
   .feed-list {
@@ -81,5 +89,9 @@ for (const p of posts) {
     margin: 1.5rem 0 0;
     display: grid;
     gap: 1.75rem;
+  }
+  /* 좁은 화면: 사이드바 숨기고 피드만 (오버플로/겹침 방지) */
+  @media (max-width: 64rem) {
+    .home { display: block; }
   }
 </style>

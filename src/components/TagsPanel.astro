@@ -33,18 +33,18 @@ const hasMore = tags.length > limit;
 
 <style>
   .tags-panel {
-    position: absolute;
-    top: 0;
-    left: calc(100% + 1.5rem);
-    width: 190px;
+    flex: 0 0 200px;
+    align-self: flex-start;
+    position: sticky;
+    top: 5.25rem;
     padding: 1.25rem 1.25rem 1.4rem;
     border: 1px solid var(--border);
     border-radius: var(--radius);
     background: var(--card);
     box-shadow: var(--shadow-sm);
   }
-  /* 오른쪽 여백이 좁아지면 숨김 (겹침 방지) */
-  @media (max-width: 1499px) {
+  /* 좁은 화면에선 숨김 (홈이 세로로 스택됨) */
+  @media (max-width: 64rem) {
     .tags-panel { display: none; }
   }
 
