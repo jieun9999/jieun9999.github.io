@@ -14,7 +14,21 @@ const t = ui[lang];
 <header class="site-header">
   <div class="frame bar">
     <a class="brand" href={`/${lang}/`}>
-      <span class="brand-mark">j</span>
+      <span class="brand-mark">
+        <svg width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <rect width="32" height="32" rx="9" fill="url(#brandGrad)" />
+          <path
+            d="M16 5c.9 7 3.1 9.2 11 10-7.9.8-10.1 3-11 10-.9-7-3.1-9.2-11-10 7.9-.8 10.1-3 11-10Z"
+            fill="#fff"
+          />
+          <defs>
+            <linearGradient id="brandGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#2962ff" />
+              <stop offset="1" stop-color="#5b8cff" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </span>
       <span class="brand-name">{t.siteTitle}</span>
     </a>
     <nav class="actions">
@@ -52,7 +66,6 @@ const t = ui[lang];
     letter-spacing: -0.01em;
   }
   .brand:hover { color: var(--text); }
-  .brand-mark { flex: none; }
   .brand-name {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -60,15 +73,8 @@ const t = ui[lang];
   }
   .brand-mark {
     display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.75rem;
-    height: 1.75rem;
-    border-radius: 8px;
-    background: var(--accent);
-    color: #fff;
-    font-weight: 800;
-    font-size: 1.05rem;
+    flex: none;
+    line-height: 0;
   }
   .actions {
     display: flex;
