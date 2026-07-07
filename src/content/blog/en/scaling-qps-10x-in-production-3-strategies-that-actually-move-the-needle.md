@@ -3,7 +3,7 @@ title: 'Scaling QPS 10x in Production: 3 Strategies That Actually Move the Needl
 description: '"Make it faster" sounds like a vague mandate. It isn''t. Performance work turns out to be one of the most learnable parts of backend engineering, because it almost always comes down to the same three m'
 pubDate: 2026-05-29
 tags: ['system-design', 'caching', 'performance', 'optimization']
-category: building
+category: fundamentals
 cover: /covers/scaling-qps-10x-in-production-3-strategies-that-actually-move-the-needle.png
 coverAlt: 'Scaling QPS 10x in Production: 3 Strategies That Actually Move the Needle'
 ---

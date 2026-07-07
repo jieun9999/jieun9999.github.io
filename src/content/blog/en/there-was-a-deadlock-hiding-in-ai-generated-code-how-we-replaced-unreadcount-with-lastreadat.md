@@ -3,7 +3,7 @@ title: 'There Was a Deadlock Hiding in AI-Generated Code — How We Replaced `un
 description: '42.8% HTTP error rate, 9 minutes into a load test. The culprit was a single updateMany line carelessly written during AI-assisted coding. 1. Discovery — "Why are we doing 9.5 TPS when the target is'
 pubDate: 2026-05-11
 tags: ['postgresql', 'prisma', 'databases', 'concurrency', 'node-js', 'debugging']
-category: building
+category: fundamentals
 cover: /covers/there-was-a-deadlock-hiding-in-ai-generated-code-how-we-replaced-unreadcount-with-lastreadat.png
 coverAlt: 'There Was a Deadlock Hiding in AI-Generated Code — How We Replaced `unreadCount` with `lastReadAt`'
 ---

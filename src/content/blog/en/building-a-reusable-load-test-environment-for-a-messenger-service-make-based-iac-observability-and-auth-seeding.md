@@ -402,7 +402,7 @@ The dashboard is read in the three-layer order set up earlier: `(A) k6 / Sender 
 
 _(Continued —_ "I'll dig into the app server logs in the next post and unpack the cause of the 42.8% HTTP error rate\*.)\*
 
-![](https://cdn.hashnode.com/uploads/covers/69c4dd0910e664c5da65b3c8/469c2171-2a30-4c0a-8dd0-373aa02d4bec.png) ![](https://cdn.hashnode.com/uploads/covers/69c4dd0910e664c5da65b3c8/35960873-fdfd-46bc-b73c-31bce2c7f2e3.png) ![](https://cdn.hashnode.com/uploads/covers/69c4dd0910e664c5da65b3c8/c83745e8-8bc4-4fc5-b94e-00045ed3078e.png) ![](https://cdn.hashnode.com/uploads/covers/69c4dd0910e664c5da65b3c8/08dddcc4-0e94-4e9c-9a7c-13c7f4710088.png)
+![](/images/469c2171-2a30-4c0a-8dd0-373aa02d4bec.png) ![](/images/35960873-fdfd-46bc-b73c-31bce2c7f2e3.png) ![](/images/c83745e8-8bc4-4fc5-b94e-00045ed3078e.png) ![](/images/08dddcc4-0e94-4e9c-9a7c-13c7f4710088.png)
 
 * * *
 
