@@ -28,7 +28,7 @@
 
   /* 레이아웃 */
   --width-page: 78rem;   /* 헤더·홈·목록 프레임 */
-  --width-prose: 46rem;  /* 글 본문 (가독성 폭) */
+  --width-prose: 56rem;  /* 글 본문 폭 (더 넓게) */
   --radius: 14px;
   --radius-sm: 9px;
   --gutter: 1.5rem;
