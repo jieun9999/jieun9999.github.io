@@ -21,6 +21,9 @@ export const ui = {
     tableOfContents: 'On this page',
     noTranslation: 'This post is not available in English yet.',
     minRead: 'min read',
+    tags: 'TAGS',
+    showMore: 'Show more',
+    showLess: 'Show less',
     locale: 'en-US',
   },
   ko: {
@@ -34,6 +37,9 @@ export const ui = {
     tableOfContents: '목차',
     noTranslation: '이 글은 아직 한국어 번역이 없습니다.',
     minRead: '분 분량',
+    tags: 'TAGS',
+    showMore: '더보기',
+    showLess: '접기',
     locale: 'ko-KR',
   },
 } as const;

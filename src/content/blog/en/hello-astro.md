@@ -2,7 +2,7 @@
 title: 'Hello, Astro'
 description: 'The first post on my bilingual dev blog — how this site is built and how the language toggle works.'
 pubDate: 2026-07-06
-tags: ['astro', 'blog', 'i18n']
+tags: ['astro', 'i18n', 'typescript', 'frontend', 'blog']
 category: building
 ---
 

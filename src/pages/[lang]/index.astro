@@ -4,6 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProfileCard from '../../components/ProfileCard.astro';
 import PostCard from '../../components/PostCard.astro';
 import CategoryBar from '../../components/CategoryBar.astro';
+import TagsPanel from '../../components/TagsPanel.astro';
 import {
   ui,
   languages,
@@ -23,10 +24,24 @@ const t = ui[lang];
 const posts = (await getCollection('blog'))
   .filter((p) => langFromId(p.id) === lang && !p.data.draft)
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+// 태그 누적 (최신순, 중복 제거) — posts는 이미 최신순 정렬됨
+const seenTags = new Set<string>();
+const orderedTags: string[] = [];
+for (const p of posts) {
+  for (const tag of p.data.tags) {
+    if (!seenTags.has(tag)) {
+      seenTags.add(tag);
+      orderedTags.push(tag);
+    }
+  }
+}
 ---
 
 <BaseLayout title={t.siteTitle} description={t.tagline} lang={lang}>
   <div class="feed">
+    <TagsPanel lang={lang} tags={orderedTags} />
+
     <ProfileCard lang={lang} count={posts.length} />
 
     <CategoryBar />
@@ -53,6 +68,7 @@ const posts = (await getCollection('blog'))
 
 <style>
   .feed {
+    position: relative; /* 오른쪽 TAGS 패널 기준점 */
     /* 해시노드형 단일 컬럼 — 큰 모니터에서 큼직하게 (px 기반) */
     width: min(100%, 980px);
     margin-inline: auto;

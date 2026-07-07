@@ -2,7 +2,7 @@
 title: 'Static Site vs Hosted Blog'
 description: 'Why I moved from a hosted platform to a static site — control, ownership, and no database to babysit.'
 pubDate: 2026-07-05
-tags: ['web', 'seo']
+tags: ['web', 'seo', 'ssg', 'github-pages', 'deployment']
 category: fundamentals
 ---
 

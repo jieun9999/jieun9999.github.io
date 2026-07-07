@@ -2,7 +2,7 @@
 title: '정적 사이트 vs 호스팅형 블로그'
 description: '호스팅 플랫폼에서 정적 사이트로 옮긴 이유 — 통제권, 소유권, 그리고 돌볼 DB가 없다는 것.'
 pubDate: 2026-07-05
-tags: ['web', 'seo']
+tags: ['web', 'seo', 'ssg', 'github-pages', 'deployment']
 category: fundamentals
 ---
 

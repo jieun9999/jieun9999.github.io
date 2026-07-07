@@ -1,0 +1,102 @@
+---
+import { ui, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  tags: string[]; // 최신순으로 이미 정렬·중복제거된 배열
+  limit?: number;
+}
+const { lang, tags, limit = 7 } = Astro.props;
+const t = ui[lang];
+const hasMore = tags.length > limit;
+---
+
+<aside class="tags-panel" aria-label={t.tags}>
+  <p class="tags-title">{t.tags}</p>
+  <ul class="tags-list">
+    {
+      tags.map((tag, i) => (
+        <li class:list={['tag-item', { hidden: i >= limit }]}>#{tag}</li>
+      ))
+    }
+  </ul>
+  {
+    hasMore && (
+      <button class="tags-more" type="button" data-more={t.showMore} data-less={t.showLess}>
+        {t.showMore}
+      </button>
+    )
+  }
+</aside>
+
+<style>
+  .tags-panel {
+    position: absolute;
+    top: 0;
+    left: calc(100% + 1.5rem);
+    width: 190px;
+    padding: 1.25rem 1.25rem 1.4rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+    box-shadow: var(--shadow-sm);
+  }
+  /* 오른쪽 여백이 좁아지면 숨김 (겹침 방지) */
+  @media (max-width: 1499px) {
+    .tags-panel { display: none; }
+  }
+
+  .tags-title {
+    margin: 0 0 0.85rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--text-subtle);
+  }
+  .tags-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+  /* 모든 태그 동일 크기 */
+  .tag-item {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: default;
+    transition: color 0.15s;
+  }
+  .tag-item:hover { color: var(--accent); }
+  .tag-item.hidden { display: none; }
+
+  .tags-more {
+    margin-top: 1rem;
+    padding: 0;
+    border: none;
+    background: none;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--accent);
+    cursor: pointer;
+  }
+  .tags-more:hover { color: var(--accent-hover); }
+</style>
+
+<script is:inline>
+  (() => {
+    const btn = document.querySelector('.tags-more');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const panel = btn.closest('.tags-panel');
+      const expanded = panel.classList.toggle('expanded');
+      panel.querySelectorAll('.tag-item.hidden').forEach((el) => {
+        el.style.display = expanded ? 'block' : '';
+      });
+      btn.textContent = expanded ? btn.dataset.less : btn.dataset.more;
+    });
+  })();
+</script>
