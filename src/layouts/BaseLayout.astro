@@ -13,13 +13,15 @@ interface Props {
   description: string;
   lang: Lang;
   type?: 'website' | 'article';
+  /** SNS 공유 이미지 (없으면 기본 배너) */
+  image?: string;
   /** 언어별 대응 URL. 없으면 현재 경로의 언어 접두어만 바꿔서 자동 생성. */
   alternates?: Record<Lang, string>;
   /** hreflang에 쓸, "실제로 존재하는" 번역만. 없으면 alternates 전체 사용. */
   hreflang?: Partial<Record<Lang, string>>;
 }
 
-const { title, description, lang, type = 'website' } = Astro.props;
+const { title, description, lang, type = 'website', image } = Astro.props;
 
 // 기본 alternates 자동 생성: /en/foo <-> /ko/foo
 const path = Astro.url.pathname;
@@ -42,6 +44,7 @@ const hreflang = Astro.props.hreflang ?? alternates;
       description={description}
       lang={lang}
       type={type}
+      image={image}
       alternates={hreflang}
     />
   </head>

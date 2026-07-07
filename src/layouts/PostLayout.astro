@@ -48,6 +48,11 @@ const {
 } = Astro.props;
 const t = ui[lang];
 
+// SNS 공유 이미지: 커버(/covers/x.webp) → OG용 JPG(/og/x.jpg)
+const ogImage = cover
+  ? cover.replace('/covers/', '/og/').replace(/\.webp$/, '.jpg')
+  : undefined;
+
 // 목차는 h2/h3 만 노출
 const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
 const showToc = toc.length > 1;
@@ -58,6 +63,7 @@ const showToc = toc.length > 1;
   description={description}
   lang={lang}
   type="article"
+  image={ogImage}
   alternates={alternates}
   hreflang={hreflang}
 >
