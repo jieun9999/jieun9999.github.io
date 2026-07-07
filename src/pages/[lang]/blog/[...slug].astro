@@ -1,13 +1,19 @@
 ---
 import { getCollection, render } from 'astro:content';
 import PostLayout from '../../../layouts/PostLayout.astro';
-import { langFromId, keyFromId, otherLang, readingMinutes, type Lang } from '../../../i18n/ui';
+import { langFromId, keyFromId, otherLang, readingMinutes, languages, type Lang } from '../../../i18n/ui';
 
 export async function getStaticPaths() {
   const posts = (await getCollection('blog')).filter((p) => !p.data.draft);
-
-  // 빠른 조회를 위해 "lang/key" 존재 집합 구성
   const exists = new Set(posts.map((p) => p.id));
+
+  // 언어별 최신순 목록 (prev/next·series 계산용)
+  const byLang: Record<string, typeof posts> = {};
+  for (const lang of Object.keys(languages)) {
+    byLang[lang] = posts
+      .filter((p) => langFromId(p.id) === lang)
+      .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+  }
 
   return posts.map((post) => {
     const lang = langFromId(post.id);
@@ -15,26 +21,45 @@ export async function getStaticPaths() {
     const other = otherLang(lang);
     const hasTranslation = exists.has(`${other}/${key}`);
 
-    // 언어 토글용 URL (번역 없으면 상대 언어 홈으로)
     const alternates = {
       [lang]: `/${lang}/blog/${key}/`,
       [other]: hasTranslation ? `/${other}/blog/${key}/` : `/${other}/`,
     } as Record<Lang, string>;
 
-    // hreflang은 "실제 존재하는 번역"만
-    const hreflang: Partial<Record<Lang, string>> = {
-      [lang]: `/${lang}/blog/${key}/`,
-    };
+    const hreflang: Partial<Record<Lang, string>> = { [lang]: `/${lang}/blog/${key}/` };
     if (hasTranslation) hreflang[other] = `/${other}/blog/${key}/`;
+
+    // 이전(더 오래된) / 다음(더 최신) 글
+    const list = byLang[lang];
+    const i = list.findIndex((p) => p.id === post.id);
+    const nav = (p: (typeof posts)[number] | undefined) =>
+      p ? { title: p.data.title, url: `/${lang}/blog/${keyFromId(p.id)}/` } : null;
+    const prev = nav(list[i + 1]); // 이전 글 = 더 오래된 글
+    const next = nav(list[i - 1]); // 다음 글 = 더 최신 글
+
+    // 시리즈
+    let series = null;
+    if (post.data.series) {
+      const parts = list
+        .filter((p) => p.data.series === post.data.series)
+        .sort((a, b) => (a.data.seriesOrder ?? 0) - (b.data.seriesOrder ?? 0))
+        .map((p) => ({
+          title: p.data.title,
+          url: `/${lang}/blog/${keyFromId(p.id)}/`,
+          order: p.data.seriesOrder ?? 0,
+          current: p.id === post.id,
+        }));
+      series = { title: post.data.seriesTitle ?? '', parts };
+    }
 
     return {
       params: { lang, slug: key },
-      props: { post, alternates, hreflang, hasTranslation },
+      props: { post, alternates, hreflang, hasTranslation, prev, next, series },
     };
   });
 }
 
-const { post, alternates, hreflang, hasTranslation } = Astro.props;
+const { post, alternates, hreflang, hasTranslation, prev, next, series } = Astro.props;
 const lang = langFromId(post.id);
 const { Content, headings } = await render(post);
 const mins = readingMinutes(post.body ?? '');
@@ -52,6 +77,9 @@ const mins = readingMinutes(post.body ?? '');
   alternates={alternates}
   hreflang={hreflang}
   hasTranslation={hasTranslation}
+  prev={prev}
+  next={next}
+  series={series}
 >
   <Content />
 </PostLayout>

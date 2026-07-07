@@ -1,6 +1,8 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import expressiveCode from 'astro-expressive-code';
+import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers';
 
 // 배포될 사이트 주소 (User site 이므로 루트)
 const SITE = 'https://jieun9999.github.io';
@@ -23,6 +25,27 @@ export default defineConfig({
   },
 
   integrations: [
+    // 코드블록 업그레이드: 파일명 프레임, 복사 버튼, 줄번호(옵션), 하이라이트, diff
+    // (astro-expressive-code 는 markdown 이전에 등록되어야 하므로 sitemap 앞에 둠)
+    expressiveCode({
+      themes: ['github-light', 'github-dark'],
+      // html.dark 클래스로 다크 전환 (미디어쿼리 대신)
+      useDarkModeMediaQuery: false,
+      themeCssSelector: (theme) => (theme.name === 'github-dark' ? '.dark' : false),
+      plugins: [pluginLineNumbers()],
+      defaultProps: {
+        // 줄번호는 기본 끔 → 원하는 블록에만 showLineNumbers 로 켬
+        showLineNumbers: false,
+        wrap: true,
+      },
+      styleOverrides: {
+        borderRadius: '10px',
+        borderColor: 'var(--border)',
+        codeFontFamily: "'JetBrains Mono Variable', ui-monospace, SFMono-Regular, monospace",
+        codeFontSize: '0.85rem',
+        uiFontFamily: 'inherit',
+      },
+    }),
     sitemap({
       i18n: {
         defaultLocale: 'en',
@@ -30,15 +53,4 @@ export default defineConfig({
       },
     }),
   ],
-
-  markdown: {
-    // 코드블록 문법 강조 — 라이트/다크 두 테마를 동시에 구워두고 CSS로 전환
-    shikiConfig: {
-      themes: {
-        light: 'github-light',
-        dark: 'github-dark',
-      },
-      wrap: true,
-    },
-  },
 });

@@ -20,6 +20,10 @@ const blog = defineCollection({
     // 커버 이미지(선택). 예: "/covers/hello-astro.jpg". 없으면 자동 타일 생성.
     cover: z.string().optional(),
     coverAlt: z.string().optional(),
+    // 시리즈(선택): 같은 series id 를 가진 글들이 묶임
+    series: z.string().optional(),
+    seriesOrder: z.number().optional(),
+    seriesTitle: z.string().optional(),
   }),
 });
 

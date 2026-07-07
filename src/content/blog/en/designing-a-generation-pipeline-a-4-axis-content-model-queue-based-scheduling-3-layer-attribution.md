@@ -6,6 +6,9 @@ tags: ['threads', 'systemdesign', 'fastapi', 'sqlite', 'datamodeling', 'kpi', 'a
 category: building
 cover: /covers/designing-a-generation-pipeline-a-4-axis-content-model-queue-based-scheduling-3-layer-attribution.png
 coverAlt: 'Designing a Generation Pipeline — A 4-Axis Content Model, Queue-Based Scheduling, 3-Layer Attribution'
+series: threads-agent
+seriesOrder: 2
+seriesTitle: 'Building a Threads Marketing Agent'
 ---
 > An engineering log of building a Threads marketing agent, split into two parts.
 > 

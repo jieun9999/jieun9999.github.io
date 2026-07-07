@@ -6,6 +6,9 @@ tags: ['webscraping', 'crawling', 'cloudflare', 'tls', 'systemdesign', 'anti-bot
 category: building
 cover: /covers/designing-a-crawler-that-beats-three-tiers-of-anti-bot-from-tls-fingerprints-to-cdp-detection.png
 coverAlt: 'Designing a Crawler That Beats Three Tiers of Anti-Bot — From TLS Fingerprints to CDP Detection'
+series: threads-agent
+seriesOrder: 1
+seriesTitle: 'Building a Threads Marketing Agent'
 ---
 > An engineering log of building a Threads marketing agent, split into two parts.
 > 

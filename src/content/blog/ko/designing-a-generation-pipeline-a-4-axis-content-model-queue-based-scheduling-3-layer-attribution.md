@@ -6,6 +6,9 @@ tags: ['threads', 'systemdesign', 'fastapi', 'sqlite', 'datamodeling', 'kpi', 'a
 category: building
 cover: /covers/designing-a-generation-pipeline-a-4-axis-content-model-queue-based-scheduling-3-layer-attribution.png
 coverAlt: '생성 파이프라인 설계 — 4축 콘텐츠 모델, 큐 기반 스케줄링, 3계층 어트리뷰션'
+series: threads-agent
+seriesOrder: 2
+seriesTitle: 'Threads 마케팅 에이전트 만들기'
 ---
 > Threads 마케팅 에이전트를 만든 엔지니어링 로그, 두 편으로 나눠 정리했습니다.
 > 
