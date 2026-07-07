@@ -90,3 +90,16 @@ export const social = {
 };
 
 export const avatarSrc = '/avatar.jpg';
+
+// 카테고리 (영어 고정 — 한/영 공통). all은 항상 왼쪽 기본값.
+export const categories = [
+  { id: 'all', label: 'All' },
+  { id: 'building', label: 'Building' },
+  { id: 'open-source', label: 'Open Source' },
+  { id: 'fundamentals', label: 'Fundamentals' },
+  { id: 'career', label: 'Career' },
+] as const;
+
+export function categoryLabel(id: string): string {
+  return categories.find((c) => c.id === id)?.label ?? id;
+}

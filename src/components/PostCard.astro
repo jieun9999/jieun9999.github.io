@@ -1,5 +1,5 @@
 ---
-import { ui, formatDate, type Lang } from '../i18n/ui';
+import { ui, formatDate, categoryLabel, type Lang } from '../i18n/ui';
 
 interface Props {
   lang: Lang;
@@ -8,10 +8,12 @@ interface Props {
   description: string;
   pubDate: Date;
   mins: number;
+  category: string;
   cover?: string;
   coverAlt?: string;
 }
-const { lang, slug, title, description, pubDate, mins, cover, coverAlt } = Astro.props;
+const { lang, slug, title, description, pubDate, mins, category, cover, coverAlt } =
+  Astro.props;
 const t = ui[lang];
 
 // 커버 없을 때: 뉴트럴 타일 + 제목 첫 글자 모노그램 (색 없음)
@@ -19,12 +21,14 @@ const monogram = (title.trim()[0] ?? '·').toUpperCase();
 const href = `/${lang}/blog/${slug}/`;
 ---
 
-<li class="pc-item">
+<li class="pc-item" data-category={category}>
   <a class="pc" href={href}>
     <div class="pc-body">
       <h3 class="pc-title">{title}</h3>
       <p class="pc-desc">{description}</p>
       <div class="pc-meta">
+        <span class="pc-cat">{categoryLabel(category)}</span>
+        <span class="dot">·</span>
         <time datetime={pubDate.toISOString()}>{formatDate(pubDate, lang)}</time>
         <span class="dot">·</span>
         <span>{mins} {t.minRead}</span>
@@ -110,6 +114,10 @@ const href = `/${lang}/blog/${slug}/`;
     color: var(--text-subtle);
   }
   .pc-meta .dot { color: var(--text-subtle); }
+  .pc-cat {
+    font-weight: 600;
+    color: var(--accent);
+  }
 
   /* 오른쪽: 썸네일 / 뉴트럴 타일 */
   .pc-thumb {

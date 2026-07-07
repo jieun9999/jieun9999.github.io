@@ -3,6 +3,7 @@ title: 'Hello, Astro'
 description: 'The first post on my bilingual dev blog — how this site is built and how the language toggle works.'
 pubDate: 2026-07-06
 tags: ['astro', 'blog', 'i18n']
+category: building
 ---
 
 Welcome! This is the first post on my bilingual developer blog. Use the **EN / KO** toggle in the header to read this same post in Korean.

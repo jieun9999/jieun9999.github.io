@@ -3,6 +3,7 @@ title: '안녕하세요, Astro'
 description: '이중언어 개발 블로그의 첫 글 — 이 사이트를 어떻게 만들었고 언어 토글이 어떻게 동작하는지.'
 pubDate: 2026-07-06
 tags: ['astro', 'blog', 'i18n']
+category: building
 ---
 
 반갑습니다! 제 이중언어 개발 블로그의 첫 글입니다. 헤더의 **EN / KO** 토글을 누르면 같은 글을 영어로 읽을 수 있어요.

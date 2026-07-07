@@ -12,6 +12,10 @@ const blog = defineCollection({
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),
     tags: z.array(z.string()).default([]),
+    // 카테고리 필터 (배너 아래 pill). all은 UI 기본값이라 글엔 지정 안 함.
+    category: z
+      .enum(['building', 'open-source', 'fundamentals', 'career'])
+      .default('building'),
     draft: z.boolean().default(false),
     // 커버 이미지(선택). 예: "/covers/hello-astro.jpg". 없으면 자동 타일 생성.
     cover: z.string().optional(),

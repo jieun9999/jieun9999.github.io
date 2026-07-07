@@ -3,6 +3,7 @@ title: 'Static Site vs Hosted Blog'
 description: 'Why I moved from a hosted platform to a static site — control, ownership, and no database to babysit.'
 pubDate: 2026-07-05
 tags: ['web', 'seo']
+category: fundamentals
 ---
 
 Hosted blog platforms are convenient, but they optimize for *their* metrics, not yours. Here is why I switched to a static site.

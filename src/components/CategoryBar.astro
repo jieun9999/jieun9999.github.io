@@ -1,0 +1,71 @@
+---
+import { categories } from '../i18n/ui';
+---
+
+<nav class="cat-bar" aria-label="Categories">
+  {
+    categories.map((c, i) => (
+      <button
+        class:list={['cat-pill', { active: i === 0 }]}
+        data-cat={c.id}
+        type="button"
+        aria-pressed={i === 0 ? 'true' : 'false'}
+      >
+        {c.label}
+      </button>
+    ))
+  }
+</nav>
+
+<style>
+  .cat-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.75rem;
+  }
+  .cat-pill {
+    font-family: inherit;
+    font-size: 0.9em;
+    font-weight: 550;
+    padding: 0.42rem 0.95rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .cat-pill:hover {
+    color: var(--text);
+    background: var(--surface);
+  }
+  .cat-pill.active {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    const bar = document.querySelector('.cat-bar');
+    if (!bar) return;
+    const pills = [...bar.querySelectorAll('.cat-pill')];
+    bar.addEventListener('click', (e) => {
+      const btn = e.target.closest('.cat-pill');
+      if (!btn) return;
+      const cat = btn.dataset.cat;
+      pills.forEach((p) => {
+        const on = p === btn;
+        p.classList.toggle('active', on);
+        p.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      // 클릭 시점에 조회 — 스크립트가 목록보다 먼저 파싱될 수 있으므로
+      document.querySelectorAll('.feed-list .pc-item').forEach((li) => {
+        const show = cat === 'all' || li.dataset.category === cat;
+        li.style.display = show ? '' : 'none';
+      });
+    });
+  })();
+</script>
