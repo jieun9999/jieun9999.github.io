@@ -9,7 +9,7 @@ coverAlt: 'Designing a Generation Pipeline — A 4-Axis Content Model, Queue-Bas
 ---
 > An engineering log of building a Threads marketing agent, split into two parts.
 > 
-> -   [**Part 1:** The data-acquisition layer — a crawler designed around an anti-bot threat model (TLS fingerprint · CDP detection)](https://beckybuilds.hashnode.dev/designing-a-crawler-that-beats-three-tiers-of-anti-bot-from-tls-fingerprints-to-cdp-detection)
+> -   [**Part 1:** The data-acquisition layer — a crawler designed around an anti-bot threat model (TLS fingerprint · CDP detection)](/en/blog/designing-a-crawler-that-beats-three-tiers-of-anti-bot-from-tls-fingerprints-to-cdp-detection/)
 >     
 > -   **Part 2 (this post):** The generation pipeline — iterative content-model design, scheduled publishing, performance attribution
 >     
@@ -239,7 +239,7 @@ This is a record of a well-designed system, not a system with proven marketing o
 
 The one line that runs through both parts: **in bot content, "the smell of automatic generation" is a trust cost.** Part 1 was the anti-bot threat model; Part 2 was content authenticity and measurement integrity. In the end both are the same question — in "a human picks vetted material, the bot transforms it, the system automates publishing and measurement," **where do you draw the boundary?**
 
-> [👈 **Part 1:** "Designing a Crawler That Beats Three Tiers of Anti-Bot — From TLS Fingerprints to CDP Detection"](https://beckybuilds.hashnode.dev/designing-a-crawler-that-beats-three-tiers-of-anti-bot-from-tls-fingerprints-to-cdp-detection)
+> [👈 **Part 1:** "Designing a Crawler That Beats Three Tiers of Anti-Bot — From TLS Fingerprints to CDP Detection"](/en/blog/designing-a-crawler-that-beats-three-tiers-of-anti-bot-from-tls-fingerprints-to-cdp-detection/)
 
 * * *
 

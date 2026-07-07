@@ -9,7 +9,7 @@ coverAlt: '생성 파이프라인 설계 — 4축 콘텐츠 모델, 큐 기반 �
 ---
 > Threads 마케팅 에이전트를 만든 엔지니어링 로그, 두 편으로 나눠 정리했습니다.
 > 
-> -   [**Part 1:** 데이터 수집 계층 — 안티봇 위협 모델(TLS fingerprint · CDP 탐지)을 중심으로 설계한 크롤러](https://beckybuilds.hashnode.dev/designing-a-crawler-that-beats-three-tiers-of-anti-bot-from-tls-fingerprints-to-cdp-detection)
+> -   [**Part 1:** 데이터 수집 계층 — 안티봇 위협 모델(TLS fingerprint · CDP 탐지)을 중심으로 설계한 크롤러](/ko/blog/designing-a-crawler-that-beats-three-tiers-of-anti-bot-from-tls-fingerprints-to-cdp-detection/)
 >     
 > -   **Part 2 (이 글):** 생성 파이프라인 — 반복적인 콘텐츠 모델 설계, 예약 발행, 성과 어트리뷰션
 >     
@@ -239,7 +239,7 @@ age-normalization: ROW_NUMBER() OVER(PARTITION BY short_id ORDER BY ABS(age_hour
 
 두 편을 관통하는 한 줄: **봇 콘텐츠에서 "자동 생성의 냄새"는 신뢰 비용이다.** Part 1은 안티봇 위협 모델이었고, Part 2는 콘텐츠 진정성과 측정 무결성이었습니다. 결국 둘은 같은 질문입니다 — "사람이 검증된 소재를 고르고, 봇이 변환하고, 시스템이 발행과 측정을 자동화한다"에서 **경계를 어디에 그을 것인가?**
 
-> [👈 **Part 1:** "3계층 안티봇을 뚫는 크롤러 설계 — TLS Fingerprint에서 CDP 탐지까지"](https://beckybuilds.hashnode.dev/designing-a-crawler-that-beats-three-tiers-of-anti-bot-from-tls-fingerprints-to-cdp-detection)
+> [👈 **Part 1:** "3계층 안티봇을 뚫는 크롤러 설계 — TLS Fingerprint에서 CDP 탐지까지"](/ko/blog/designing-a-crawler-that-beats-three-tiers-of-anti-bot-from-tls-fingerprints-to-cdp-detection/)
 
 * * *
 

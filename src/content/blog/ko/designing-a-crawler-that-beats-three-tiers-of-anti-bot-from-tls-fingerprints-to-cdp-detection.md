@@ -11,7 +11,7 @@ coverAlt: '3단계 anti-bot을 뚫는 크롤러 설계 — TLS fingerprint부터
 > 
 > -   **1편 (이 글):** 데이터 수집 계층 — anti-bot 위협 모델을 중심으로 설계한 크롤러
 >     
-> -   [**2편:** 생성 파이프라인 — 반복적인 콘텐츠 모델 설계, 예약 발행, 성과 기여도 분석](https://beckybuilds.hashnode.dev/designing-a-generation-pipeline-a-4-axis-content-model-queue-based-scheduling-3-layer-attribution)
+> -   [**2편:** 생성 파이프라인 — 반복적인 콘텐츠 모델 설계, 예약 발행, 성과 기여도 분석](/ko/blog/designing-a-generation-pipeline-a-4-axis-content-model-queue-based-scheduling-3-layer-attribution/)
 >     
 
 * * *
