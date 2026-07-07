@@ -56,28 +56,39 @@ const hreflang = Astro.props.hreflang ?? alternates;
       </div>
     </footer>
 
-    <!-- 본문 이미지 클릭 확대 -->
-    <div id="lightbox" class="lightbox" aria-hidden="true"><img alt="" /></div>
+    <!-- 본문 이미지 클릭 확대 (전체화면 뷰어) -->
+    <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-hidden="true">
+      <button class="lightbox-close" type="button" aria-label="닫기">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <img alt="" />
+    </div>
     <script is:inline>
       (() => {
         const lb = document.getElementById('lightbox');
         if (!lb) return;
         const lbImg = lb.querySelector('img');
+        const open = (src, alt) => {
+          lbImg.src = src;
+          lbImg.alt = alt || '';
+          lb.classList.add('open');
+          lb.setAttribute('aria-hidden', 'false');
+          document.body.style.overflow = 'hidden';
+        };
         const close = () => {
           lb.classList.remove('open');
+          lb.setAttribute('aria-hidden', 'true');
           lbImg.removeAttribute('src');
           document.body.style.overflow = '';
         };
         document.addEventListener('click', (e) => {
           const img = e.target.closest('.prose img');
-          if (img) {
-            lbImg.src = img.currentSrc || img.src;
-            lbImg.alt = img.alt || '';
-            lb.classList.add('open');
-            document.body.style.overflow = 'hidden';
-          }
+          if (img) open(img.currentSrc || img.src, img.alt);
         });
-        lb.addEventListener('click', close);
+        // 배경 또는 X 버튼 클릭 시 닫힘 (이미지 클릭은 유지)
+        lb.addEventListener('click', (e) => {
+          if (e.target === lb || e.target.closest('.lightbox-close')) close();
+        });
         document.addEventListener('keydown', (e) => {
           if (e.key === 'Escape' && lb.classList.contains('open')) close();
         });

@@ -283,7 +283,26 @@ html.dark .markdown-alert-caution { --al: #f85149; }
   max-height: 92vh;
   border-radius: 8px;
   box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+  cursor: default;
 }
+.lightbox-close {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.5rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.lightbox-close:hover { background: rgba(255, 255, 255, 0.28); }
+.lightbox-close:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 
 /* ===========================================================================
    접근성 / 모션
