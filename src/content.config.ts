@@ -13,6 +13,9 @@ const blog = defineCollection({
     updatedDate: z.coerce.date().optional(),
     tags: z.array(z.string()).default([]),
     draft: z.boolean().default(false),
+    // 커버 이미지(선택). 예: "/covers/hello-astro.jpg". 없으면 자동 타일 생성.
+    cover: z.string().optional(),
+    coverAlt: z.string().optional(),
   }),
 });
 

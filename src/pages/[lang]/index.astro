@@ -1,12 +1,13 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProfileCard from '../../components/ProfileCard.astro';
+import PostCard from '../../components/PostCard.astro';
 import {
   ui,
   languages,
   langFromId,
   keyFromId,
-  formatDate,
   readingMinutes,
   type Lang,
 } from '../../i18n/ui';
@@ -24,133 +25,42 @@ const posts = (await getCollection('blog'))
 ---
 
 <BaseLayout title={t.siteTitle} description={t.tagline} lang={lang}>
-  <section class="hero">
-    <h1>{t.siteTitle}</h1>
-    <p>{t.tagline}</p>
-  </section>
+  <div class="feed">
+    <ProfileCard lang={lang} count={posts.length} />
 
-  <h2 class="section-title">{t.posts}</h2>
-  <ul class="post-grid">
-    {
-      posts.map((post) => {
-        const key = keyFromId(post.id);
-        const mins = readingMinutes(post.body ?? '');
-        return (
-          <li class="card">
-            <a class="card-link" href={`/${lang}/blog/${key}/`}>
-              <div class="card-meta">
-                <time datetime={post.data.pubDate.toISOString()}>
-                  {formatDate(post.data.pubDate, lang)}
-                </time>
-                <span class="dot">·</span>
-                <span>{mins} {t.minRead}</span>
-              </div>
-              <h3>{post.data.title}</h3>
-              <p class="card-desc">{post.data.description}</p>
-              {post.data.tags.length > 0 && (
-                <div class="card-tags">
-                  {post.data.tags.map((tag) => (
-                    <span class="tag">#{tag}</span>
-                  ))}
-                </div>
-              )}
-            </a>
-          </li>
-        );
-      })
-    }
-  </ul>
+    <ul class="feed-list">
+      {
+        posts.map((post) => (
+          <PostCard
+            lang={lang}
+            slug={keyFromId(post.id)}
+            title={post.data.title}
+            description={post.data.description}
+            pubDate={post.data.pubDate}
+            mins={readingMinutes(post.body ?? '')}
+            cover={post.data.cover}
+            coverAlt={post.data.coverAlt}
+          />
+        ))
+      }
+    </ul>
+  </div>
 </BaseLayout>
 
 <style>
-  .hero {
-    padding: 1.5rem 0 2.5rem;
-    max-width: 40rem;
+  .feed {
+    /* 아담한 단일 컬럼 — px 기반이라 큰 모니터(2560)에서도 해시노드처럼 좁게 유지.
+       (바깥 main.frame 이 이미 좌우 gutter 패딩을 주므로 여기선 100%만 제한) */
+    width: min(100%, 720px);
+    margin-inline: auto;
+    /* 전역 폰트 스케일(최대 20px) 폭주 방지 — 본문 .prose 스케일은 불변 */
+    font-size: clamp(16px, 0.95rem + 0.1vw, 18px);
   }
-  .hero h1 {
-    font-size: clamp(2rem, 5vw, 2.9rem);
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    line-height: 1.1;
-    margin: 0 0 0.9rem;
-    background: linear-gradient(180deg, var(--text) 60%, var(--text-muted));
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  .hero p {
-    font-size: 1.15rem;
-    color: var(--text-muted);
-    margin: 0;
-    line-height: 1.5;
-  }
-
-  .section-title {
-    font-size: 0.78rem;
-    font-weight: 650;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--text-subtle);
-    margin: 0 0 1.25rem;
-  }
-
-  .post-grid {
+  .feed-list {
     list-style: none;
     padding: 0;
-    margin: 0;
+    margin: 2.25rem 0 0;
     display: grid;
-    /* min(100%, 20rem): 좁은 화면에서 트랙이 뷰포트를 넘지 않도록 (가로 오버플로 방지)
-       auto-fit: 글이 적을 때 카드가 남은 폭을 채우도록 */
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
-    gap: 1.1rem;
-  }
-
-  .card {
-    display: flex;
-  }
-  .card-link {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    padding: 1.4rem 1.5rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    color: inherit;
-    transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
-  }
-  .card-link:hover {
-    border-color: var(--accent);
-    box-shadow: var(--shadow-md);
-    transform: translateY(-3px);
-    color: inherit;
-  }
-  .card-meta {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 0.8rem;
-    color: var(--text-muted);
-  }
-  .card-meta .dot { color: var(--text-subtle); }
-  .card-link h3 {
-    margin: 0.55rem 0 0;
-    font-size: 1.2rem;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-    line-height: 1.3;
-    color: var(--text);
-  }
-  .card-desc {
-    margin: 0.5rem 0 0;
-    color: var(--text-muted);
-    font-size: 0.94rem;
-    line-height: 1.55;
-  }
-  .card-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-    margin-top: 1rem;
+    gap: 1.25rem;
   }
 </style>
