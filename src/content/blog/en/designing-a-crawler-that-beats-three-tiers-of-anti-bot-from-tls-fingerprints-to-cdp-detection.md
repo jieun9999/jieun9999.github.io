@@ -27,9 +27,9 @@ The key insight was to **tier the collection strategy by _which signal the anti-
 
 | Tier | Threat signal | Representative site | Where it blocks | Solution adopted | Cost |
 | --- | --- | --- | --- | --- | --- |
-| **Tier 1** | IP reputation only | Clien, DCInside, Bobaedream | — (effectively none) | direct `urllib` request | lowest |
-| **Tier 2** | IP + **TLS fingerprint (JA3)** | FMKorea | curl/requests blocked (430) | residential IP + real headless Chrome; VPS delegates via Tailscale | medium |
-| **Tier 3** | \+ **CDP automation detection** | Upwork | every automation browser blocked | userscript inside a human session (Tampermonkey) | high (gives up full automation) |
+| **Tier 1** | IP reputation only | Site B, Site C, Site A | — (effectively none) | direct `urllib` request | lowest |
+| **Tier 2** | IP + **TLS fingerprint (JA3)** | Site D | curl/requests blocked (430) | residential IP + real headless Chrome; VPS delegates via Tailscale | medium |
+| **Tier 3** | \+ **CDP automation detection** | Platform U | every automation browser blocked | userscript inside a human session (Tampermonkey) | high (gives up full automation) |
 
 Regardless of how data is fetched, the output is unified into a single normalized schema, and the caller is shielded from per-site complexity. Below, each tier is laid out as **hypothesis → experiment → conclusion.**
 
@@ -41,7 +41,7 @@ The popular image of "AI marketing automation" puts the weight on generation (pr
 
 Two design principles, both learned in operation, governed this whole layer.
 
-**Principle 1 — an extraction API ≠ a structure crawler.** Early on I used a body-extraction API (e.g. Tavily). For one Bobaedream post: raw HTML 95KB → cleaned output 5KB. Clean, but the tags, post date, and comments (the AJAX payload) were all gone. Our pipeline treats comments as a first-class input — they're central to generation quality — so an extraction API was structurally unfit.
+**Principle 1 — an extraction API ≠ a structure crawler.** Early on I used a body-extraction API (e.g. Tavily). For one Site A post: raw HTML 95KB → cleaned output 5KB. Clean, but the tags, post date, and comments (the AJAX payload) were all gone. Our pipeline treats comments as a first-class input — they're central to generation quality — so an extraction API was structurally unfit.
 
 The first fork in tooling, then, is "do I need only body text, or also structure / dynamic content?" The "tidiness" of a cleaning API _is_ information loss.
 
@@ -60,36 +60,36 @@ python3 bin/fetch_source.py "<url>"   # site-agnostic → normalized JSON
 ```
 
 ```plaintext
-detect_site(url)   # domain → {bobaedream, clien, dcinside, fmkorea}
+detect_site(url)   # domain → {Site A, Site B, Site C, Site D}
 derive_board(url)  # derive board code / post id from the URL (never hard-code)
 → single schema: {ok, site, title, body, images[], comments[{nick,text}], recommend_count, comment_count}
 ```
 
-> **Design decision — board identifiers are always derived from the URL.** DCInside gallery ids, Clien board names, and Bobaedream code/No are all encoded in the URL. Baking them in as constants means a code change for every new board. Regex derivation supports any board on the same site with zero changes — in effect, the open–closed principle applied to the data layer.
+> **Design decision — board identifiers are always derived from the URL.** Site C gallery ids, Site B board names, and Site A code/No are all encoded in the URL. Baking them in as constants means a code change for every new board. Regex derivation supports any board on the same site with zero changes — in effect, the open–closed principle applied to the data layer.
 
 Every per-site hell that follows is locked behind this abstraction. The caller's contract is simply "URL in, normalized JSON out."
 
 * * *
 
-## 3\. Tier 1 — direct `urllib` requests (Clien, DCInside, Bobaedream)
+## 3\. Tier 1 — direct `urllib` requests (Site B, Site C, Site A)
 
 What these three share: body and comments are server-rendered HTML, and the anti-bot is only at the IP-reputation level. So a direct `urllib` request (with a CookieJar) suffices. The only variables are the comment-collection path and the selectors.
 
 | Site | Body | Comment strategy | Note |
 | --- | --- | --- | --- |
-| Clien | `post_article` | **inline** (`data-role="autolink"`) | done in a single GET |
-| DCInside | `write_div` | **AJAX + CSRF-style token** | extract `e_s_n_o` from the view → POST to `/board/comment/` with cookie+Referer → JSON |
-| Bobaedream | comment marker → `article-body` priority | **inline, then fallback** | if <3, separate call to `comment_list.php` |
+| Site B | `post_article` | **inline** (`data-role="autolink"`) | done in a single GET |
+| Site C | `write_div` | **AJAX + CSRF-style token** | extract `e_s_n_o` from the view → POST to `/board/comment/` with cookie+Referer → JSON |
+| Site A | comment marker → `article-body` priority | **inline, then fallback** | if <3, separate call to `comment_list.php` |
 
-DCInside is the trickiest. The `e_s_n_o` token is a one-time value refreshed per view page, so it can't be cached — it forces a two-step dance: "extract token → POST for comments with that token." Bobaedream is scraped via the mobile view with a mobile UA, but "best" posts need special handling: re-parse the real code/No from the inline markup to build the comment endpoint.
+Site C is the trickiest. The `e_s_n_o` token is a one-time value refreshed per view page, so it can't be cached — it forces a two-step dance: "extract token → POST for comments with that token." Site A is scraped via the mobile view with a mobile UA, but "best" posts need special handling: re-parse the real code/No from the inline markup to build the comment endpoint.
 
 **Tier 1 conclusion:** bodies are all server-rendered (no JS execution needed) and there's effectively no anti-bot. The only variable is the comment path. But the fourth site breaks that premise.
 
 * * *
 
-## 4\. Tier 2 — FMKorea: IP and TLS fingerprint, a double gate ⭐
+## 4\. Tier 2 — Site D: IP and TLS fingerprint, a double gate ⭐
 
-FMKorea's body is server-rendered too. The variable is the anti-bot. I narrowed the blocking surface with hypothesis-driven experiments.
+Site D's body is server-rendered too. The variable is the anti-bot. I narrowed the blocking surface with hypothesis-driven experiments.
 
 ### 4.1 Experiment log
 
@@ -100,7 +100,7 @@ H1: datacenter IP is the problem
   VPS + curl                              →  HTTP 430 (immediate)
 H2: residential IP fixes it
   residential IP + curl, cold first call  →  200 (passes!)
-  residential IP + curl, subsequent calls →  430 "FMKorea security system"
+  residential IP + curl, subsequent calls →  430 "Site D security system"
 H3: header spoofing gets around it
   residential IP + curl + full browser headers + h2 → 430 (no change)
 H4: a real browser passes
@@ -121,19 +121,19 @@ In short, L7 spoofing can't fake an L6 fingerprint. Passing requires satisfying 
 
 ```plaintext
 [VPS / hermes-agent]  (datacenter IP)
-   ├─ Bobaedream/Clien/DCInside → direct request (Tier 1)
-   └─ fmkorea → delegated call (Tailscale tailnet)
+   ├─ Site A/Site B/Site C → direct request (Tier 1)
+   └─ Site D → delegated call (Tailscale tailnet)
                   │
                   ▼
         [Mac mini fetch service]  (residential IP + real Chrome)
                   │  chrome --headless=new --dump-dom <url>
                   ▼
-              fmkorea.com  → passes IP + TLS fingerprint → 200
+              site-d.example  → passes IP + TLS fingerprint → 200
 ```
 
-An always-on Mac mini runs real Chrome headless to clear both gates at once; the VPS delegates to this node **only for FMKorea** over Tailscale and just receives the result JSON.
+An always-on Mac mini runs real Chrome headless to clear both gates at once; the VPS delegates to this node **only for Site D** over Tailscale and just receives the result JSON.
 
-> **Rejected alternatives:** ① Routing all VPS traffic through a Tailscale exit node → single point of failure, complex policy routing, latency on all traffic. Selective delegation for FMKorea only is far lower-coupling. ② `curl-impersonate` (a build that mimics Chrome's JA3) → works, but with a real Chrome available the operational simplicity wins. ③ An extraction API (Tavily) → its servers do the fetching, so IP evasion is moot (you only get a shell).
+> **Rejected alternatives:** ① Routing all VPS traffic through a Tailscale exit node → single point of failure, complex policy routing, latency on all traffic. Selective delegation for Site D only is far lower-coupling. ② `curl-impersonate` (a build that mimics Chrome's JA3) → works, but with a real Chrome available the operational simplicity wins. ③ An extraction API (Tavily) → its servers do the fetching, so IP evasion is moot (you only get a shell).
 
 ### 4.4 Trade-off — Chrome CLI vs Playwright
 
@@ -146,7 +146,7 @@ First, a common myth: **Playwright is not what beats the anti-bot.** What passes
 | Dependency | none (just Chrome) | runtime + bundled browser |
 | Detection surface | real Chrome as-is | bundled Chromium risks `navigator.webdriver` etc. |
 
-FMKorea posts are server-rendered with title/body/comments all in the initial DOM, so no interaction is needed. A single `--dump-dom` returns 112KB including comments. So I chose the direct CLI: zero dependencies, simple code, minimal detection surface. If dynamic loading (load-more / infinite scroll / login) ever appears, escalating to Playwright then is the rational move. YAGNI.
+Site D posts are server-rendered with title/body/comments all in the initial DOM, so no interaction is needed. A single `--dump-dom` returns 112KB including comments. So I chose the direct CLI: zero dependencies, simple code, minimal detection surface. If dynamic loading (load-more / infinite scroll / login) ever appears, escalating to Playwright then is the rational move. YAGNI.
 
 > **Implementation detail (non-blocking termination):** a fresh-profile Chrome doesn't exit immediately after `--dump-dom` (background tasks), causing a ~45s timeout per request. The fix: stream stdout and kill the process the moment `</html>` appears, clean the profile lock per call, and serialize with a global lock. Response dropped to 3–5s.
 
@@ -154,11 +154,11 @@ FMKorea posts are server-rendered with title/body/comments all in the initial DO
 
 * * *
 
-## 5\. Tier 3 — Upwork: the automation browser itself is the detection target ⭐
+## 5\. Tier 3 — Platform U: the automation browser itself is the detection target ⭐
 
-A separate task required collecting Upwork job data (rate/proposal distribution per keyword = a bidding price dataset). Every Tier-2 weapon was neutralized.
+A separate task required collecting Platform U job data (rate/proposal distribution per keyword = a bidding price dataset). Every Tier-2 weapon was neutralized.
 
-> ℹ️ Upwork collection is a **separate task, unrelated** to this marketing agent's material pipeline. But it presented a **fundamentally different class of anti-bot (detecting automation itself)** and therefore demanded a **completely different crawling paradigm (userscripts)** — so I record it here as the final tier of the threat model.
+> ℹ️ Platform U collection is a **separate task, unrelated** to this marketing agent's material pipeline. But it presented a **fundamentally different class of anti-bot (detecting automation itself)** and therefore demanded a **completely different crawling paradigm (userscripts)** — so I record it here as the final tier of the threat model.
 
 ### 5.1 Failure matrix
 
@@ -190,7 +190,7 @@ The depth of the threat signal is one level different — that's the core.
 -   **Automation detection (Tier 3):** "is this session controlled by code" — _agency_
     
 
-cf\_clearance, real Chrome, and login all satisfy the _identity_ signal, but the _agency_ signal can't be turned off as long as you use an automation tool. → **Practical conclusion: you cannot reliably collect Upwork with Playwright/Selenium-class tools.** It's not about evasion difficulty; the fact of automation _is_ the detection surface.
+cf\_clearance, real Chrome, and login all satisfy the _identity_ signal, but the _agency_ signal can't be turned off as long as you use an automation tool. → **Practical conclusion: you cannot reliably collect Platform U with Playwright/Selenium-class tools.** It's not about evasion difficulty; the fact of automation _is_ the detection surface.
 
 ### 5.3 Paradigm shift — a userscript inside a human session
 
@@ -198,8 +198,8 @@ If what's detected is "a CDP-controlled browser," then run the code inside a bro
 
 ```javascript
 // ==UserScript==
-// @name         Upwork Job Harvester → CSV
-// @match        https://www.upwork.com/nx/search/jobs/*
+// @name         Job Harvester → CSV
+// @match        https://www.example-platform.com/nx/search/jobs/*
 // @grant        GM_getValue
 // @grant        GM_setValue
 // ==/UserScript==
@@ -255,7 +255,7 @@ Also: a hard-reject filter (death/serious injury, legal disputes, politics, hate
 -   **Known limits (honestly):** the Mac mini node is a single point of failure and can't fetch while asleep; Chrome runs serially (3–5s/request), a bottleneck for bulk collection → multi-node / browser-pool is the next task. `--dump-dom` captures only the initial DOM, so exhaustive comment-pagination would require escalating to Playwright.
     
 
-**State reached:** four sites (Bobaedream, Clien, DCInside, FMKorea) collected through a single interface; FMKorea cut from ~45s to 3–5s via the delegate node; Upwork given a collection path through userscripts in an environment where automation is structurally impossible. Every source unifies into one normalized schema.
+**State reached:** four sites (Site A, Site B, Site C, Site D) collected through a single interface; Site D cut from ~45s to 3–5s via the delegate node; Platform U given a collection path through userscripts in an environment where automation is structurally impossible. Every source unifies into one normalized schema.
 
 Part 2 covers turning this normalized material into community-style content without a bot signature (the iterative generation-skill design), plus scheduled publishing and performance attribution.
 

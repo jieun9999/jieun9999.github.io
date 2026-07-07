@@ -111,7 +111,7 @@ secrets-check:
 make dump-pg           # dump current PG VM → data/postgres-dumps/
 make list-dumps        # list saved dumps
 make restore-pg        # auto-restore the latest dump to a fresh PG VM
-make restore-pg DUMP=data/postgres-dumps/workb-XXXX.dump   # pin a specific dump
+make restore-pg DUMP=data/postgres-dumps/app-XXXX.dump   # pin a specific dump
 ```
 
 복원 후에는 스크립트가 `ANALYZE` 결과, 테이블 수, DB 크기, 상위 테이블의 row 수를 자동으로 출력합니다 — 덕분에 누구도 "복원이 실제로 됐나?"를 수동으로 확인할 필요가 없습니다.

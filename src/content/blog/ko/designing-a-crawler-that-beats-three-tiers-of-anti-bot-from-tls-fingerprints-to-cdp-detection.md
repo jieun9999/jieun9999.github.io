@@ -27,9 +27,9 @@ seriesTitle: 'Threads 마케팅 에이전트 만들기'
 
 | 계층 | 위협 신호 | 대표 사이트 | 차단 지점 | 채택한 해법 | 비용 |
 | --- | --- | --- | --- | --- | --- |
-| **Tier 1** | IP 평판만 | 클리앙, 디시인사이드, 보배드림 | — (사실상 없음) | `urllib` 직접 요청 | 가장 낮음 |
-| **Tier 2** | IP + **TLS fingerprint (JA3)** | FM코리아 | curl/requests 차단(430) | residential IP + 실제 headless Chrome; VPS가 Tailscale로 위임 | 중간 |
-| **Tier 3** | \+ **CDP 자동화 탐지** | Upwork | 모든 자동화 브라우저 차단 | 사람 세션 내부의 userscript (Tampermonkey) | 높음(완전 자동화 포기) |
+| **Tier 1** | IP 평판만 | Site B, Site C, Site A | — (사실상 없음) | `urllib` 직접 요청 | 가장 낮음 |
+| **Tier 2** | IP + **TLS fingerprint (JA3)** | Site D | curl/requests 차단(430) | residential IP + 실제 headless Chrome; VPS가 Tailscale로 위임 | 중간 |
+| **Tier 3** | \+ **CDP 자동화 탐지** | Platform U | 모든 자동화 브라우저 차단 | 사람 세션 내부의 userscript (Tampermonkey) | 높음(완전 자동화 포기) |
 
 데이터를 어떻게 가져오든 결과물은 하나의 정규화된 스키마로 통일되고, 호출부는 사이트별 복잡성으로부터 보호됩니다. 아래에서는 각 계층을 **가설 → 실험 → 결론**의 흐름으로 풀어 봅니다.
 
@@ -41,7 +41,7 @@ seriesTitle: 'Threads 마케팅 에이전트 만들기'
 
 이 계층 전체를 지배한 두 가지 설계 원칙이 있는데, 둘 다 운영하면서 배운 것입니다.
 
-**원칙 1 — 추출 API ≠ 구조 크롤러.** 초기에는 본문 추출 API(예: Tavily)를 썼습니다. 보배드림 글 하나 기준으로 원본 HTML 95KB → 정제된 출력 5KB. 깔끔하긴 하지만 태그, 작성 날짜, 그리고 댓글(AJAX 페이로드)이 전부 사라졌습니다. 우리 파이프라인은 댓글을 일급 입력(first-class input)으로 다룹니다 — 생성 품질의 핵심이거든요 — 그래서 추출 API는 구조적으로 맞지 않았습니다.
+**원칙 1 — 추출 API ≠ 구조 크롤러.** 초기에는 본문 추출 API(예: Tavily)를 썼습니다. Site A 글 하나 기준으로 원본 HTML 95KB → 정제된 출력 5KB. 깔끔하긴 하지만 태그, 작성 날짜, 그리고 댓글(AJAX 페이로드)이 전부 사라졌습니다. 우리 파이프라인은 댓글을 일급 입력(first-class input)으로 다룹니다 — 생성 품질의 핵심이거든요 — 그래서 추출 API는 구조적으로 맞지 않았습니다.
 
 그러니 도구 선택의 첫 갈림길은 "본문 텍스트만 필요한가, 아니면 구조/동적 콘텐츠도 필요한가?"입니다. 정제 API의 "깔끔함"은 _곧_ 정보 손실입니다.
 
@@ -60,36 +60,36 @@ python3 bin/fetch_source.py "<url>"   # site-agnostic → normalized JSON
 ```
 
 ```plaintext
-detect_site(url)   # domain → {bobaedream, clien, dcinside, fmkorea}
+detect_site(url)   # domain → {Site A, Site B, Site C, Site D}
 derive_board(url)  # derive board code / post id from the URL (never hard-code)
 → single schema: {ok, site, title, body, images[], comments[{nick,text}], recommend_count, comment_count}
 ```
 
-> **설계 결정 — 게시판 식별자는 항상 URL에서 유도한다.** 디시인사이드 갤러리 id, 클리앙 게시판 이름, 보배드림 code/No는 모두 URL에 인코딩되어 있습니다. 이를 상수로 박아두면 새 게시판마다 코드를 고쳐야 합니다. 정규식으로 유도하면 같은 사이트의 어떤 게시판이든 변경 없이 지원됩니다 — 사실상 데이터 계층에 적용한 개방-폐쇄 원칙(open–closed principle)입니다.
+> **설계 결정 — 게시판 식별자는 항상 URL에서 유도한다.** Site C 갤러리 id, Site B 게시판 이름, Site A code/No는 모두 URL에 인코딩되어 있습니다. 이를 상수로 박아두면 새 게시판마다 코드를 고쳐야 합니다. 정규식으로 유도하면 같은 사이트의 어떤 게시판이든 변경 없이 지원됩니다 — 사실상 데이터 계층에 적용한 개방-폐쇄 원칙(open–closed principle)입니다.
 
 뒤따르는 모든 사이트별 지옥은 이 추상화 뒤에 봉인됩니다. 호출부의 계약은 그저 "URL을 넣으면 정규화된 JSON이 나온다"입니다.
 
 * * *
 
-## 3\. Tier 1 — `urllib` 직접 요청 (클리앙, 디시인사이드, 보배드림)
+## 3\. Tier 1 — `urllib` 직접 요청 (Site B, Site C, Site A)
 
 이 셋의 공통점: 본문과 댓글이 서버 렌더링된 HTML이고, anti-bot은 IP 평판 수준에만 있습니다. 그래서 `urllib` 직접 요청(CookieJar 사용)으로 충분합니다. 변수는 댓글 수집 경로와 셀렉터뿐입니다.
 
 | 사이트 | 본문 | 댓글 전략 | 비고 |
 | --- | --- | --- | --- |
-| 클리앙 | `post_article` | **inline** (`data-role="autolink"`) | 단일 GET으로 완료 |
-| 디시인사이드 | `write_div` | **AJAX + CSRF 방식 토큰** | 뷰에서 `e_s_n_o` 추출 → cookie+Referer와 함께 `/board/comment/`로 POST → JSON |
-| 보배드림 | 댓글 마커 → `article-body` 우선 | **inline, 실패 시 fallback** | 3개 미만이면 `comment_list.php`로 별도 호출 |
+| Site B | `post_article` | **inline** (`data-role="autolink"`) | 단일 GET으로 완료 |
+| Site C | `write_div` | **AJAX + CSRF 방식 토큰** | 뷰에서 `e_s_n_o` 추출 → cookie+Referer와 함께 `/board/comment/`로 POST → JSON |
+| Site A | 댓글 마커 → `article-body` 우선 | **inline, 실패 시 fallback** | 3개 미만이면 `comment_list.php`로 별도 호출 |
 
-디시인사이드가 가장 까다롭습니다. `e_s_n_o` 토큰은 뷰 페이지마다 갱신되는 일회성 값이라 캐싱할 수 없고, "토큰 추출 → 그 토큰으로 댓글 POST"라는 두 단계 춤을 강제합니다. 보배드림은 모바일 UA로 모바일 뷰를 긁는데, "베스트" 글은 특별 처리가 필요합니다. inline 마크업에서 실제 code/No를 다시 파싱해 댓글 엔드포인트를 만들어야 합니다.
+Site C가 가장 까다롭습니다. `e_s_n_o` 토큰은 뷰 페이지마다 갱신되는 일회성 값이라 캐싱할 수 없고, "토큰 추출 → 그 토큰으로 댓글 POST"라는 두 단계 춤을 강제합니다. Site A은 모바일 UA로 모바일 뷰를 긁는데, "베스트" 글은 특별 처리가 필요합니다. inline 마크업에서 실제 code/No를 다시 파싱해 댓글 엔드포인트를 만들어야 합니다.
 
 **Tier 1 결론:** 본문은 전부 서버 렌더링(JS 실행 불필요)이고 anti-bot은 사실상 없습니다. 유일한 변수는 댓글 경로입니다. 하지만 네 번째 사이트가 그 전제를 깹니다.
 
 * * *
 
-## 4\. Tier 2 — FM코리아: IP와 TLS fingerprint, 이중 관문 ⭐
+## 4\. Tier 2 — Site D: IP와 TLS fingerprint, 이중 관문 ⭐
 
-FM코리아의 본문도 서버 렌더링입니다. 변수는 anti-bot입니다. 가설 기반 실험으로 차단 표면을 좁혀 나갔습니다.
+Site D의 본문도 서버 렌더링입니다. 변수는 anti-bot입니다. 가설 기반 실험으로 차단 표면을 좁혀 나갔습니다.
 
 ### 4.1 실험 로그
 
@@ -100,7 +100,7 @@ H1: datacenter IP is the problem
   VPS + curl                              →  HTTP 430 (immediate)
 H2: residential IP fixes it
   residential IP + curl, cold first call  →  200 (passes!)
-  residential IP + curl, subsequent calls →  430 "FMKorea security system"
+  residential IP + curl, subsequent calls →  430 "Site D security system"
 H3: header spoofing gets around it
   residential IP + curl + full browser headers + h2 → 430 (no change)
 H4: a real browser passes
@@ -121,19 +121,19 @@ H2의 cold-pass는 함정이었습니다. "residential IP면 curl로 자동화�
 
 ```plaintext
 [VPS / hermes-agent]  (datacenter IP)
-   ├─ Bobaedream/Clien/DCInside → direct request (Tier 1)
-   └─ fmkorea → delegated call (Tailscale tailnet)
+   ├─ Site A/Site B/Site C → direct request (Tier 1)
+   └─ Site D → delegated call (Tailscale tailnet)
                   │
                   ▼
         [Mac mini fetch service]  (residential IP + real Chrome)
                   │  chrome --headless=new --dump-dom <url>
                   ▼
-              fmkorea.com  → passes IP + TLS fingerprint → 200
+              site-d.example  → passes IP + TLS fingerprint → 200
 ```
 
-항상 켜져 있는 Mac mini가 실제 Chrome headless를 돌려 두 관문을 한 번에 통과합니다. VPS는 **FM코리아에 한해서만** Tailscale로 이 노드에 위임하고, 결과 JSON만 받습니다.
+항상 켜져 있는 Mac mini가 실제 Chrome headless를 돌려 두 관문을 한 번에 통과합니다. VPS는 **Site D에 한해서만** Tailscale로 이 노드에 위임하고, 결과 JSON만 받습니다.
 
-> **기각한 대안들:** ① VPS의 모든 트래픽을 Tailscale exit node로 라우팅 → 단일 장애점, 복잡한 정책 라우팅, 모든 트래픽에 지연. FM코리아만 선택적으로 위임하는 편이 훨씬 결합도가 낮습니다. ② `curl-impersonate`(Chrome의 JA3를 흉내 내도록 빌드한 것) → 작동은 하지만, 실제 Chrome을 쓸 수 있는 상황에서는 운영 단순성이 이깁니다. ③ 추출 API(Tavily) → 그쪽 서버가 fetch를 대신하므로 IP 회피는 무의미합니다(껍데기만 얻습니다).
+> **기각한 대안들:** ① VPS의 모든 트래픽을 Tailscale exit node로 라우팅 → 단일 장애점, 복잡한 정책 라우팅, 모든 트래픽에 지연. Site D만 선택적으로 위임하는 편이 훨씬 결합도가 낮습니다. ② `curl-impersonate`(Chrome의 JA3를 흉내 내도록 빌드한 것) → 작동은 하지만, 실제 Chrome을 쓸 수 있는 상황에서는 운영 단순성이 이깁니다. ③ 추출 API(Tavily) → 그쪽 서버가 fetch를 대신하므로 IP 회피는 무의미합니다(껍데기만 얻습니다).
 
 ### 4.4 트레이드오프 — Chrome CLI vs Playwright
 
@@ -146,7 +146,7 @@ H2의 cold-pass는 함정이었습니다. "residential IP면 curl로 자동화�
 | 의존성 | 없음(Chrome만) | 런타임 + 번들 브라우저 |
 | 탐지 표면 | 실제 Chrome 그대로 | 번들 Chromium이 `navigator.webdriver` 등의 위험을 안음 |
 
-FM코리아 글은 서버 렌더링이라 제목/본문/댓글이 모두 초기 DOM에 들어 있고, 상호작용이 필요 없습니다. `--dump-dom` 한 번이면 댓글 포함 112KB가 반환됩니다. 그래서 직접 CLI를 택했습니다. 의존성 제로, 단순한 코드, 최소 탐지 표면. 만약 동적 로딩(더보기 / 무한 스크롤 / 로그인)이 언젠가 등장하면, 그때 Playwright로 격상하는 것이 합리적인 선택입니다. YAGNI.
+Site D 글은 서버 렌더링이라 제목/본문/댓글이 모두 초기 DOM에 들어 있고, 상호작용이 필요 없습니다. `--dump-dom` 한 번이면 댓글 포함 112KB가 반환됩니다. 그래서 직접 CLI를 택했습니다. 의존성 제로, 단순한 코드, 최소 탐지 표면. 만약 동적 로딩(더보기 / 무한 스크롤 / 로그인)이 언젠가 등장하면, 그때 Playwright로 격상하는 것이 합리적인 선택입니다. YAGNI.
 
 > **구현 디테일(논블로킹 종료):** fresh-profile Chrome은 `--dump-dom` 이후 바로 종료되지 않아(백그라운드 작업 때문에) 요청마다 ~45초 타임아웃이 걸렸습니다. 해법: stdout을 스트리밍하다가 `</html>`가 나타나는 순간 프로세스를 죽이고, 호출마다 프로필 잠금을 정리하며, 전역 락으로 직렬화합니다. 응답이 3~5초로 떨어졌습니다.
 
@@ -154,11 +154,11 @@ FM코리아 글은 서버 렌더링이라 제목/본문/댓글이 모두 초기 
 
 * * *
 
-## 5\. Tier 3 — Upwork: 자동화 브라우저 자체가 탐지 대상 ⭐
+## 5\. Tier 3 — Platform U: 자동화 브라우저 자체가 탐지 대상 ⭐
 
-별도 과제로 Upwork 채용 데이터(키워드별 단가/제안 분포 = 입찰 가격 데이터셋)를 수집해야 했습니다. Tier 2의 모든 무기가 무력화됐습니다.
+별도 과제로 Platform U 채용 데이터(키워드별 단가/제안 분포 = 입찰 가격 데이터셋)를 수집해야 했습니다. Tier 2의 모든 무기가 무력화됐습니다.
 
-> ℹ️ Upwork 수집은 이 마케팅 에이전트의 소재 파이프라인과 **무관한 별도 과제**입니다. 하지만 **근본적으로 다른 부류의 anti-bot(자동화 자체를 탐지)**을 제시했고, 그래서 **완전히 다른 크롤링 패러다임(userscript)**을 요구했기에, 위협 모델의 마지막 계층으로 여기에 기록합니다.
+> ℹ️ Platform U 수집은 이 마케팅 에이전트의 소재 파이프라인과 **무관한 별도 과제**입니다. 하지만 **근본적으로 다른 부류의 anti-bot(자동화 자체를 탐지)**을 제시했고, 그래서 **완전히 다른 크롤링 패러다임(userscript)**을 요구했기에, 위협 모델의 마지막 계층으로 여기에 기록합니다.
 
 ### 5.1 실패 매트릭스
 
@@ -198,8 +198,8 @@ cf\_clearance, 실제 Chrome, 로그인은 모두 _정체성_ 신호를 만족�
 
 ```javascript
 // ==UserScript==
-// @name         Upwork Job Harvester → CSV
-// @match        https://www.upwork.com/nx/search/jobs/*
+// @name         Job Harvester → CSV
+// @match        https://www.example-platform.com/nx/search/jobs/*
 // @grant        GM_getValue
 // @grant        GM_setValue
 // ==/UserScript==
@@ -255,7 +255,7 @@ const MIN_DELAY = 4500, MAX_DELAY = 8000;  // randomized delay between page turn
 -   **알려진 한계(솔직히):** Mac mini 노드는 단일 장애점이고 슬립 상태에서는 fetch할 수 없습니다. Chrome은 직렬로 돌아(요청당 3~5초) 대량 수집에서 병목입니다 → 멀티 노드 / 브라우저 풀이 다음 과제입니다. `--dump-dom`은 초기 DOM만 캡처하므로, 댓글을 남김없이 페이지네이션하려면 Playwright로 격상해야 합니다.
     
 
-**도달한 상태:** 네 사이트(보배드림, 클리앙, 디시인사이드, FM코리아)를 단일 인터페이스로 수집; 위임 노드로 FM코리아를 ~45초에서 3~5초로 단축; 자동화가 구조적으로 불가능한 환경에서도 userscript로 Upwork에 수집 경로를 마련. 모든 소스가 하나의 정규화된 스키마로 통일됩니다.
+**도달한 상태:** 네 사이트(Site A, Site B, Site C, Site D)를 단일 인터페이스로 수집; 위임 노드로 Site D를 ~45초에서 3~5초로 단축; 자동화가 구조적으로 불가능한 환경에서도 userscript로 Upwork에 수집 경로를 마련. 모든 소스가 하나의 정규화된 스키마로 통일됩니다.
 
 2편에서는 이 정규화된 소재를 봇 시그니처 없이 커뮤니티풍 콘텐츠로 바꾸는 과정(반복적인 생성 스킬 설계), 그리고 예약 발행과 성과 기여도 분석을 다룹니다.
 

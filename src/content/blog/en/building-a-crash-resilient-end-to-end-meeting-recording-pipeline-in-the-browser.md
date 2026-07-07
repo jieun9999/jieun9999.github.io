@@ -1,6 +1,6 @@
 ---
 title: 'Building a Crash-Resilient, End-to-End Meeting Recording Pipeline in the Browser'
-description: 'The Problem Our platform, workb, had a straightforward meeting recording feature: hit record in the browser, stop when you''re done, upload the file, click a button to transcribe. Simple — and deeply f'
+description: 'The Problem Our platform had a straightforward meeting recording feature: hit record in the browser, stop when you''re done, upload the file, click a button to transcribe. Simple — and deeply f'
 pubDate: 2026-03-26
 tags: ['web-audio-api', 'cloudflare', 'speech-recognition', 'ai', 'presignedurl', 'bullmq']
 category: building
@@ -9,7 +9,7 @@ coverAlt: 'Building a Crash-Resilient, End-to-End Meeting Recording Pipeline in 
 ---
 ## The Problem
 
-Our platform, **workb**, had a straightforward meeting recording feature: hit record in the browser, stop when you're done, upload the file, click a button to transcribe. Simple — and deeply flawed.
+Our platform had a straightforward meeting recording feature: hit record in the browser, stop when you're done, upload the file, click a button to transcribe. Simple — and deeply flawed.
 
 Three pain points kept surfacing:
 
@@ -132,7 +132,7 @@ Cost dynamics shift significantly across usage volumes (at $1 = ₩1,430):
 
 ### Why We Chose VITO
 
-For workb, Korean meeting transcript quality is the core product value. Our decision came down to three factors:
+For us, Korean meeting transcript quality is the core product value. Our decision came down to three factors:
 
 1.  **Best Korean accuracy** at CER < 8%. In meeting transcription, lower accuracy doesn't just mean more errors — it means higher post-processing cost and user frustration.
 2.  **All-in-one package.** Speaker diarization + ITN + disfluency filtering are built-in. ElevenLabs has lower unit costs in some tiers but requires custom implementations for ITN and disfluency filtering. Google had reported stability issues with diarization.
@@ -269,4 +269,4 @@ All six pipeline stages were completed and deployed as of March 25, 2026.
 
 * * *
 
-_This post documents the recording system overhaul for the workb platform. All benchmarks, cost figures, and architecture decisions reflect the state of things as of March 2026._
+_This post documents the recording system overhaul for our platform. All benchmarks, cost figures, and architecture decisions reflect the state of things as of March 2026._

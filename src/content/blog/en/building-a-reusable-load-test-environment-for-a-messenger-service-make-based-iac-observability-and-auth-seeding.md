@@ -111,7 +111,7 @@ secrets-check:
 make dump-pg           # dump current PG VM → data/postgres-dumps/
 make list-dumps        # list saved dumps
 make restore-pg        # auto-restore the latest dump to a fresh PG VM
-make restore-pg DUMP=data/postgres-dumps/workb-XXXX.dump   # pin a specific dump
+make restore-pg DUMP=data/postgres-dumps/app-XXXX.dump   # pin a specific dump
 ```
 
 After restore, the script automatically prints `ANALYZE` results, table counts, DB size, and row counts for top tables — so nobody has to manually verify "did the restore actually work?"

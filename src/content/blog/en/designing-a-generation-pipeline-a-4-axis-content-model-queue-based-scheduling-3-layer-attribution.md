@@ -115,7 +115,7 @@ Even with the right axes, article-speak sentences mean failure, so the body voic
     
 3.  **No links in the body** — sources go in comment footnotes only (reason in §2)
     
-4.  **No source-community exposure** — banned phrasing like "I saw on Bobaedream…"; rewrite in first person
+4.  **No source-community exposure** — banned phrasing like "I saw on a community forum…"; rewrite in first person
     
 
 Part 1's **comment N<3 DROP gate** operates here too.
