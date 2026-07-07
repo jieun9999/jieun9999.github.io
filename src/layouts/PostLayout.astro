@@ -11,6 +11,7 @@ interface Props {
   updatedDate?: Date;
   tags: string[];
   headings: MarkdownHeading[];
+  readingMinutes: number;
   alternates: Record<Lang, string>;
   hreflang: Partial<Record<Lang, string>>;
   hasTranslation: boolean;
@@ -24,6 +25,7 @@ const {
   updatedDate,
   tags,
   headings,
+  readingMinutes,
   alternates,
   hreflang,
   hasTranslation,
@@ -32,6 +34,7 @@ const t = ui[lang];
 
 // 목차는 h2/h3 만 노출
 const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const showToc = toc.length > 1;
 ---
 
 <BaseLayout
@@ -42,32 +45,10 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
   alternates={alternates}
   hreflang={hreflang}
 >
-  <a class="back-link" href={`/${lang}/`}>{t.backToList}</a>
-
-  <article class="post">
-    <header class="post-header">
-      <h1>{title}</h1>
-      <p class="meta">
-        <time datetime={pubDate.toISOString()}>{t.publishedOn} {formatDate(pubDate, lang)}</time>
-        {updatedDate && <span> · {t.updatedOn} {formatDate(updatedDate, lang)}</span>}
-      </p>
-      {
-        tags.length > 0 && (
-          <ul class="tags">
-            {tags.map((tag) => <li>#{tag}</li>)}
-          </ul>
-        )
-      }
-      {
-        !hasTranslation && (
-          <p class="translation-note">{ui[lang === 'en' ? 'ko' : 'en'].noTranslation}</p>
-        )
-      }
-    </header>
-
-    <div class="post-body">
-      {
-        toc.length > 1 && (
+  <div class:list={['post', { 'has-toc': showToc }]}>
+    {
+      showToc && (
+        <aside class="toc-col">
           <nav class="toc" aria-label={t.tableOfContents}>
             <p class="toc-title">{t.tableOfContents}</p>
             <ul>
@@ -78,90 +59,140 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
               ))}
             </ul>
           </nav>
-        )
-      }
-      <div class="prose">
+        </aside>
+      )
+    }
+
+    <div class="post-main">
+      <a class="back-link" href={`/${lang}/`}>{t.backToList}</a>
+
+      <header class="post-header">
+        <h1>{title}</h1>
+        <div class="meta">
+          <time datetime={pubDate.toISOString()}>{formatDate(pubDate, lang)}</time>
+          <span class="dot">·</span>
+          <span>{readingMinutes} {t.minRead}</span>
+          {updatedDate && (
+            <>
+              <span class="dot">·</span>
+              <span>{t.updatedOn} {formatDate(updatedDate, lang)}</span>
+            </>
+          )}
+        </div>
+        {
+          tags.length > 0 && (
+            <div class="tags">
+              {tags.map((tag) => (
+                <span class="tag">#{tag}</span>
+              ))}
+            </div>
+          )
+        }
+        {!hasTranslation && (
+          <p class="translation-note">{ui[lang === 'en' ? 'ko' : 'en'].noTranslation}</p>
+        )}
+      </header>
+
+      <article class="prose">
         <slot />
-      </div>
+      </article>
     </div>
-  </article>
+  </div>
 </BaseLayout>
 
 <style>
+  .post {
+    display: block;
+    max-width: var(--width-prose);
+    margin-inline: auto;
+  }
+  /* 넓은 화면: 본문(중앙) + 우측 sticky 목차 */
+  @media (min-width: 64rem) {
+    .post.has-toc {
+      display: grid;
+      grid-template-columns: minmax(0, var(--width-prose)) 15rem;
+      gap: 3rem;
+      max-width: none;
+      justify-content: center;
+    }
+    .post.has-toc .post-main { grid-column: 1; grid-row: 1; }
+    .post.has-toc .toc-col { grid-column: 2; grid-row: 1; }
+  }
+
   .back-link {
     display: inline-block;
-    margin-bottom: 1.5rem;
-    font-size: 0.9rem;
+    margin-bottom: 1.75rem;
+    font-size: 0.88rem;
     color: var(--text-muted);
-    text-decoration: none;
   }
   .back-link:hover { color: var(--accent); }
 
   .post-header h1 {
-    font-size: 2rem;
-    line-height: 1.2;
-    margin: 0 0 0.5rem;
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    margin: 0 0 0.85rem;
   }
   .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
     color: var(--text-muted);
-    font-size: 0.85rem;
-    margin: 0 0 0.75rem;
+    font-size: 0.88rem;
   }
+  .meta .dot { color: var(--text-subtle); }
   .tags {
     display: flex;
     flex-wrap: wrap;
     gap: 0.4rem;
-    list-style: none;
-    padding: 0;
-    margin: 0 0 0.5rem;
-  }
-  .tags li {
-    font-size: 0.75rem;
-    color: var(--accent);
-    background: var(--surface-hover);
-    padding: 0.15rem 0.5rem;
-    border-radius: 999px;
+    margin-top: 0.9rem;
   }
   .translation-note {
     font-size: 0.85rem;
     color: var(--text-muted);
-    background: var(--surface-hover);
+    background: var(--accent-soft);
     border-left: 3px solid var(--accent);
-    padding: 0.5rem 0.75rem;
-    border-radius: 4px;
-    margin-top: 1rem;
+    padding: 0.6rem 0.85rem;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    margin-top: 1.1rem;
   }
 
-  .post-body {
-    display: grid;
-    gap: 2.5rem;
-    margin-top: 2rem;
+  .prose { margin-top: 2.5rem; }
+
+  /* 목차 */
+  .toc-col { margin-bottom: 2rem; }
+  .toc {
+    font-size: 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.1rem;
+    background: var(--surface);
   }
-  /* 넓은 화면에서는 본문 옆에 목차 sticky */
-  @media (min-width: 60rem) {
-    .post-body {
-      grid-template-columns: 1fr 14rem;
-    }
+  @media (min-width: 64rem) {
+    .toc-col { margin-bottom: 0; }
     .toc {
-      order: 2;
       position: sticky;
-      top: 2rem;
-      align-self: start;
-      font-size: 0.85rem;
+      top: 5.25rem;
+      border: none;
+      background: transparent;
+      padding: 0;
+      border-left: 1px solid var(--border);
+      padding-left: 1.1rem;
     }
-    .prose { order: 1; min-width: 0; }
   }
   .toc-title {
-    font-weight: 600;
-    color: var(--text-muted);
-    margin: 0 0 0.5rem;
+    font-weight: 650;
+    color: var(--text-subtle);
+    margin: 0 0 0.6rem;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    font-size: 0.68rem;
   }
   .toc ul { list-style: none; margin: 0; padding: 0; }
-  .toc li { margin: 0.25rem 0; }
-  .toc li.depth-3 { padding-left: 0.75rem; }
-  .toc a { color: var(--text-muted); text-decoration: none; }
+  .toc li { margin: 0.35rem 0; line-height: 1.4; }
+  .toc li.depth-3 { padding-left: 0.85rem; }
+  .toc a { color: var(--text-muted); }
   .toc a:hover { color: var(--accent); }
 </style>

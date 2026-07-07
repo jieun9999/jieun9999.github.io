@@ -28,25 +28,29 @@ const { lang, alternates } = Astro.props;
 <style>
   .lang-toggle {
     display: inline-flex;
+    padding: 0.15rem;
+    gap: 0.1rem;
     border: 1px solid var(--border);
     border-radius: 999px;
-    overflow: hidden;
+    background: var(--surface);
   }
   .lang-btn {
-    padding: 0.25rem 0.7rem;
-    font-size: 0.8rem;
+    padding: 0.25rem 0.65rem;
+    font-size: 0.78rem;
     font-weight: 600;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.02em;
     color: var(--text-muted);
     text-decoration: none;
+    border-radius: 999px;
     transition: background 0.15s, color 0.15s;
   }
   .lang-btn:hover {
     color: var(--text);
-    background: var(--surface-hover);
+    background: var(--surface-2);
   }
   .lang-btn.active {
-    color: var(--bg);
+    color: #fff;
     background: var(--accent);
   }
+  .lang-btn.active:hover { color: #fff; background: var(--accent-hover); }
 </style>

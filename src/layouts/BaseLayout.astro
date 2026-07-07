@@ -1,8 +1,12 @@
 ---
+// 자체 호스팅 웹폰트 (외부 CDN 없음 — Vite가 woff2를 번들)
+import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
+import '@fontsource-variable/jetbrains-mono';
 import '../styles/global.css';
+
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
-import { languages, otherLang, type Lang } from '../i18n/ui';
+import { languages, type Lang } from '../i18n/ui';
 
 interface Props {
   title: string;
@@ -42,14 +46,14 @@ const hreflang = Astro.props.hreflang ?? alternates;
     />
   </head>
   <body>
-    <div class="wrapper">
-      <Header lang={lang} alternates={alternates} />
-      <main>
-        <slot />
-      </main>
-      <footer class="site-footer">
+    <Header lang={lang} alternates={alternates} />
+    <main class="frame">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="frame">
         <p>© {new Date().getFullYear()} jieun9999 · Built with Astro</p>
-      </footer>
-    </div>
+      </div>
+    </footer>
   </body>
 </html>

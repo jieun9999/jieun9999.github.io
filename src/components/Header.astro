@@ -12,34 +12,71 @@ const t = ui[lang];
 ---
 
 <header class="site-header">
-  <a class="brand" href={`/${lang}/`}>{t.siteTitle}</a>
-  <nav class="actions">
-    <LanguageToggle lang={lang} alternates={alternates} />
-    <ThemeToggle />
-  </nav>
+  <div class="frame bar">
+    <a class="brand" href={`/${lang}/`}>
+      <span class="brand-mark">j</span>
+      <span class="brand-name">{t.siteTitle}</span>
+    </a>
+    <nav class="actions">
+      <LanguageToggle lang={lang} alternates={alternates} />
+      <ThemeToggle />
+    </nav>
+  </div>
 </header>
 
 <style>
   .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--bg) 80%, transparent);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding: 1.25rem 0;
-    margin-bottom: 2rem;
-    border-bottom: 1px solid var(--border);
-    flex-wrap: wrap;
+    height: 3.75rem;
   }
   .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-width: 0; /* flex 자식 truncate 허용 */
     font-weight: 700;
-    font-size: 1.05rem;
+    font-size: 1rem;
     color: var(--text);
-    text-decoration: none;
+    letter-spacing: -0.01em;
   }
-  .brand:hover { color: var(--accent); }
+  .brand:hover { color: var(--text); }
+  .brand-mark { flex: none; }
+  .brand-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .brand-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 800;
+    font-size: 1.05rem;
+  }
   .actions {
     display: flex;
     align-items: center;
     gap: 0.6rem;
+    flex: none;
+  }
+  @media (max-width: 30rem) {
+    .brand-name { display: none; } /* 아주 좁은 화면에선 로고 마크만 */
   }
 </style>

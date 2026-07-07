@@ -20,6 +20,7 @@ export const ui = {
     publishedOn: 'Published',
     tableOfContents: 'On this page',
     noTranslation: 'This post is not available in English yet.',
+    minRead: 'min read',
     locale: 'en-US',
   },
   ko: {
@@ -32,6 +33,7 @@ export const ui = {
     publishedOn: '작성',
     tableOfContents: '목차',
     noTranslation: '이 글은 아직 한국어 번역이 없습니다.',
+    minRead: '분 분량',
     locale: 'ko-KR',
   },
 } as const;
@@ -61,4 +63,16 @@ export function formatDate(date: Date, lang: Lang): string {
     month: 'long',
     day: 'numeric',
   });
+}
+
+// 읽는 시간(분) 대략 계산 — 원문 마크다운 기준.
+//   한글: 분당 ~500자 / 영어: 분당 ~200단어. CJK 글자 수와 라틴 단어 수를 각각 세서 합산.
+export function readingMinutes(markdown: string): number {
+  const text = markdown
+    .replace(/```[\s\S]*?```/g, ' ') // 코드블록 제거
+    .replace(/[#>*_`~\-\[\]()!]/g, ' '); // 마크다운 기호 제거
+  const cjkChars = (text.match(/[ㄱ-힝一-鿿]/g) || []).length;
+  const latinWords = (text.replace(/[ㄱ-힝一-鿿]/g, ' ').match(/\b\w+\b/g) || []).length;
+  const minutes = cjkChars / 500 + latinWords / 200;
+  return Math.max(1, Math.round(minutes));
 }

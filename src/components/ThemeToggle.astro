@@ -12,19 +12,20 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 2rem;
-    height: 2rem;
+    width: 2.15rem;
+    height: 2.15rem;
     padding: 0;
     border: 1px solid var(--border);
     border-radius: 999px;
-    background: transparent;
+    background: var(--surface);
     color: var(--text-muted);
     cursor: pointer;
-    transition: color 0.15s, background 0.15s;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
   }
   #theme-toggle:hover {
-    color: var(--text);
-    background: var(--surface-hover);
+    color: var(--accent);
+    background: var(--surface-2);
+    border-color: var(--border-strong);
   }
   /* 라이트 모드에서는 달, 다크 모드에서는 해를 보여줌 */
   #theme-toggle .sun { display: none; }

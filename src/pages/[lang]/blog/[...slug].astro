@@ -1,7 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import PostLayout from '../../../layouts/PostLayout.astro';
-import { langFromId, keyFromId, otherLang, type Lang } from '../../../i18n/ui';
+import { langFromId, keyFromId, otherLang, readingMinutes, type Lang } from '../../../i18n/ui';
 
 export async function getStaticPaths() {
   const posts = (await getCollection('blog')).filter((p) => !p.data.draft);
@@ -37,6 +37,7 @@ export async function getStaticPaths() {
 const { post, alternates, hreflang, hasTranslation } = Astro.props;
 const lang = langFromId(post.id);
 const { Content, headings } = await render(post);
+const mins = readingMinutes(post.body ?? '');
 ---
 
 <PostLayout
@@ -47,6 +48,7 @@ const { Content, headings } = await render(post);
   updatedDate={post.data.updatedDate}
   tags={post.data.tags}
   headings={headings}
+  readingMinutes={mins}
   alternates={alternates}
   hreflang={hreflang}
   hasTranslation={hasTranslation}
