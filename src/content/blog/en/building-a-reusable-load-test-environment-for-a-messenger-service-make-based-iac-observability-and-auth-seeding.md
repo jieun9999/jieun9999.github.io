@@ -4,7 +4,7 @@ description: 'I wanted to know exactly how many TPS our messenger''s send API co
 pubDate: 2026-05-11
 tags: ['load-testing', 'k6', 'observability', 'grafana', 'prometheus', 'postgresql', 'terraform', 'websockets', 'devops']
 category: building
-cover: /covers/building-a-reusable-load-test-environment-for-a-messenger-service-make-based-iac-observability-and-auth-seeding.png
+cover: /covers/building-a-reusable-load-test-environment-for-a-messenger-service-make-based-iac-observability-and-auth-seeding.webp
 coverAlt: 'Building a Reusable Load-Test Environment for a Messenger Service — Make-based IaC, Observability, and Auth Seeding'
 ---
 > I wanted to know exactly how many TPS our messenger's send API could survive — and _where_ it would actually break. So I mirrored production into a 7-node load-test environment, and instead of treating it as a one-shot setup, I designed it to be **reproducible on demand**.
@@ -402,7 +402,7 @@ The dashboard is read in the three-layer order set up earlier: `(A) k6 / Sender 
 
 _(Continued —_ "I'll dig into the app server logs in the next post and unpack the cause of the 42.8% HTTP error rate\*.)\*
 
-![](/images/469c2171-2a30-4c0a-8dd0-373aa02d4bec.png) ![](/images/35960873-fdfd-46bc-b73c-31bce2c7f2e3.png) ![](/images/c83745e8-8bc4-4fc5-b94e-00045ed3078e.png) ![](/images/08dddcc4-0e94-4e9c-9a7c-13c7f4710088.png)
+![](/images/469c2171-2a30-4c0a-8dd0-373aa02d4bec.webp) ![](/images/35960873-fdfd-46bc-b73c-31bce2c7f2e3.webp) ![](/images/c83745e8-8bc4-4fc5-b94e-00045ed3078e.webp) ![](/images/08dddcc4-0e94-4e9c-9a7c-13c7f4710088.webp)
 
 * * *
 

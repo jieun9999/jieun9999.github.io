@@ -55,5 +55,33 @@ const hreflang = Astro.props.hreflang ?? alternates;
         <p>© {new Date().getFullYear()} jieun9999 · Built with Astro</p>
       </div>
     </footer>
+
+    <!-- 본문 이미지 클릭 확대 -->
+    <div id="lightbox" class="lightbox" aria-hidden="true"><img alt="" /></div>
+    <script is:inline>
+      (() => {
+        const lb = document.getElementById('lightbox');
+        if (!lb) return;
+        const lbImg = lb.querySelector('img');
+        const close = () => {
+          lb.classList.remove('open');
+          lbImg.removeAttribute('src');
+          document.body.style.overflow = '';
+        };
+        document.addEventListener('click', (e) => {
+          const img = e.target.closest('.prose img');
+          if (img) {
+            lbImg.src = img.currentSrc || img.src;
+            lbImg.alt = img.alt || '';
+            lb.classList.add('open');
+            document.body.style.overflow = 'hidden';
+          }
+        });
+        lb.addEventListener('click', close);
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && lb.classList.contains('open')) close();
+        });
+      })();
+    </script>
   </body>
 </html>

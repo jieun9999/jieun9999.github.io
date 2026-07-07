@@ -4,7 +4,7 @@ description: '문제 상황 우리 플랫폼 workb에는 단순한 회의 녹음
 pubDate: 2026-03-26
 tags: ['web-audio-api', 'cloudflare', 'speech-recognition', 'ai', 'presignedurl', 'bullmq']
 category: building
-cover: /covers/building-a-crash-resilient-end-to-end-meeting-recording-pipeline-in-the-browser.png
+cover: /covers/building-a-crash-resilient-end-to-end-meeting-recording-pipeline-in-the-browser.webp
 coverAlt: '브라우저에서 크래시에 강한 엔드투엔드 회의 녹음 파이프라인 구축하기'
 ---
 ## 문제 상황

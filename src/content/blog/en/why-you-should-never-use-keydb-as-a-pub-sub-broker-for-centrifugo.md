@@ -4,7 +4,7 @@ description: 'Introduction I was building a real-time chat system designed to ha
 pubDate: 2026-03-29
 tags: ['redis', 'websockets', 'docker', 'devops', 'system-design']
 category: fundamentals
-cover: /covers/why-you-should-never-use-keydb-as-a-pub-sub-broker-for-centrifugo.png
+cover: /covers/why-you-should-never-use-keydb-as-a-pub-sub-broker-for-centrifugo.webp
 coverAlt: 'Why You Should Never Use KeyDB as a Pub/Sub Broker for Centrifugo'
 ---
 ## Introduction

@@ -4,7 +4,7 @@ description: 'An engineering log of building a Threads marketing agent, split in
 pubDate: 2026-06-29
 tags: ['threads', 'systemdesign', 'fastapi', 'sqlite', 'datamodeling', 'kpi', 'automation']
 category: building
-cover: /covers/designing-a-generation-pipeline-a-4-axis-content-model-queue-based-scheduling-3-layer-attribution.png
+cover: /covers/designing-a-generation-pipeline-a-4-axis-content-model-queue-based-scheduling-3-layer-attribution.webp
 coverAlt: 'Designing a Generation Pipeline — A 4-Axis Content Model, Queue-Based Scheduling, 3-Layer Attribution'
 series: threads-agent
 seriesOrder: 2

@@ -4,7 +4,7 @@ description: '들어가며 저는 10만 개의 동시 WebSocket 연결을 초당
 pubDate: 2026-03-29
 tags: ['redis', 'websockets', 'docker', 'devops', 'system-design']
 category: fundamentals
-cover: /covers/why-you-should-never-use-keydb-as-a-pub-sub-broker-for-centrifugo.png
+cover: /covers/why-you-should-never-use-keydb-as-a-pub-sub-broker-for-centrifugo.webp
 coverAlt: 'Centrifugo의 Pub/Sub 브로커로 KeyDB를 절대 쓰면 안 되는 이유'
 ---
 ## 들어가며

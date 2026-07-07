@@ -4,7 +4,7 @@ description: '"더 빠르게 만들어라"는 말은 막연한 지시처럼 들�
 pubDate: 2026-05-29
 tags: ['system-design', 'caching', 'performance', 'optimization']
 category: fundamentals
-cover: /covers/scaling-qps-10x-in-production-3-strategies-that-actually-move-the-needle.png
+cover: /covers/scaling-qps-10x-in-production-3-strategies-that-actually-move-the-needle.webp
 coverAlt: '프로덕션에서 QPS를 10배로: 실제로 효과가 있는 3가지 전략'
 ---
 > "더 빠르게 만들어라"는 말은 막연한 지시처럼 들립니다. 하지만 그렇지 않습니다. 성능 작업은 알고 보면 백엔드 엔지니어링에서 가장 _배우기 쉬운_ 영역 중 하나인데, 거의 항상 똑같은 세 가지 수(手)로 귀결되기 때문입니다. 아래는 제가 프로덕션에 실제로 적용했던 세 가지이며, 이 작업으로 QPS를 10배 이상 끌어올렸습니다.

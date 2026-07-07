@@ -4,7 +4,7 @@ description: '우리 메신저의 send API가 정확히 몇 TPS까지 버틸 수
 pubDate: 2026-05-11
 tags: ['load-testing', 'k6', 'observability', 'grafana', 'prometheus', 'postgresql', 'terraform', 'websockets', 'devops']
 category: building
-cover: /covers/building-a-reusable-load-test-environment-for-a-messenger-service-make-based-iac-observability-and-auth-seeding.png
+cover: /covers/building-a-reusable-load-test-environment-for-a-messenger-service-make-based-iac-observability-and-auth-seeding.webp
 coverAlt: '메신저 서비스를 위한 재사용 가능한 부하 테스트 환경 구축 — Make 기반 IaC, Observability, 그리고 Auth Seeding'
 ---
 > 우리 메신저의 send API가 정확히 몇 TPS까지 버틸 수 있는지, 그리고 실제로 _어디서_ 무너지는지 알고 싶었습니다. 그래서 프로덕션을 7-노드 부하 테스트 환경으로 복제했고, 이를 일회성 셋업으로 취급하는 대신 **필요할 때마다 재현 가능하도록** 설계했습니다.
@@ -402,7 +402,7 @@ client CPU pinned at 80–90% AND achieved TPS falling behind target
 
 _(계속 —_ "다음 글에서 앱 서버 로그를 파고들어 42.8% HTTP 에러율\*의 원인을 풀어보겠습니다.)\*
 
-![](/images/469c2171-2a30-4c0a-8dd0-373aa02d4bec.png) ![](/images/35960873-fdfd-46bc-b73c-31bce2c7f2e3.png) ![](/images/c83745e8-8bc4-4fc5-b94e-00045ed3078e.png) ![](/images/08dddcc4-0e94-4e9c-9a7c-13c7f4710088.png)
+![](/images/469c2171-2a30-4c0a-8dd0-373aa02d4bec.webp) ![](/images/35960873-fdfd-46bc-b73c-31bce2c7f2e3.webp) ![](/images/c83745e8-8bc4-4fc5-b94e-00045ed3078e.webp) ![](/images/08dddcc4-0e94-4e9c-9a7c-13c7f4710088.webp)
 
 * * *
 

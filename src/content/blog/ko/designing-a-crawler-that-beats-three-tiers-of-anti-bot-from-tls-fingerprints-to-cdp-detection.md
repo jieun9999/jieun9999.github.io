@@ -4,7 +4,7 @@ description: 'Threads 마케팅 에이전트를 만든 엔지니어링 기록을
 pubDate: 2026-06-29
 tags: ['webscraping', 'crawling', 'cloudflare', 'tls', 'systemdesign', 'anti-bot', 'threads']
 category: building
-cover: /covers/designing-a-crawler-that-beats-three-tiers-of-anti-bot-from-tls-fingerprints-to-cdp-detection.png
+cover: /covers/designing-a-crawler-that-beats-three-tiers-of-anti-bot-from-tls-fingerprints-to-cdp-detection.webp
 coverAlt: '3단계 anti-bot을 뚫는 크롤러 설계 — TLS fingerprint부터 CDP 탐지까지'
 series: threads-agent
 seriesOrder: 1

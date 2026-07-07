@@ -4,7 +4,7 @@ description: '"Make it faster" sounds like a vague mandate. It isn''t. Performan
 pubDate: 2026-05-29
 tags: ['system-design', 'caching', 'performance', 'optimization']
 category: fundamentals
-cover: /covers/scaling-qps-10x-in-production-3-strategies-that-actually-move-the-needle.png
+cover: /covers/scaling-qps-10x-in-production-3-strategies-that-actually-move-the-needle.webp
 coverAlt: 'Scaling QPS 10x in Production: 3 Strategies That Actually Move the Needle'
 ---
 > "Make it faster" sounds like a vague mandate. It isn't. Performance work turns out to be one of the most _learnable_ parts of backend engineering, because it almost always comes down to the same three moves. These are the three I shipped in production — and they took our QPS up more than 10x.

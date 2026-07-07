@@ -4,7 +4,7 @@ description: 'The Problem Our platform, workb, had a straightforward meeting rec
 pubDate: 2026-03-26
 tags: ['web-audio-api', 'cloudflare', 'speech-recognition', 'ai', 'presignedurl', 'bullmq']
 category: building
-cover: /covers/building-a-crash-resilient-end-to-end-meeting-recording-pipeline-in-the-browser.png
+cover: /covers/building-a-crash-resilient-end-to-end-meeting-recording-pipeline-in-the-browser.webp
 coverAlt: 'Building a Crash-Resilient, End-to-End Meeting Recording Pipeline in the Browser'
 ---
 ## The Problem

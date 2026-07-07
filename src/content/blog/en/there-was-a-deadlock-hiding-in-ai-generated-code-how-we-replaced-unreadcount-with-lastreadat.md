@@ -4,9 +4,10 @@ description: '42.8% HTTP error rate, 9 minutes into a load test. The culprit was
 pubDate: 2026-05-11
 tags: ['postgresql', 'prisma', 'databases', 'concurrency', 'node-js', 'debugging']
 category: fundamentals
-cover: /covers/there-was-a-deadlock-hiding-in-ai-generated-code-how-we-replaced-unreadcount-with-lastreadat.png
+cover: /covers/there-was-a-deadlock-hiding-in-ai-generated-code-how-we-replaced-unreadcount-with-lastreadat.webp
 coverAlt: 'There Was a Deadlock Hiding in AI-Generated Code — How We Replaced `unreadCount` with `lastReadAt`'
 ---
+> [!NOTE]
 > 42.8% HTTP error rate, 9 minutes into a load test. The culprit was a single `updateMany` line carelessly written during AI-assisted coding.
 
 * * *

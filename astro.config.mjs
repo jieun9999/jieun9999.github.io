@@ -3,9 +3,53 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import expressiveCode from 'astro-expressive-code';
 import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers';
+import { remarkAlert } from 'remark-github-blockquote-alert';
+import rehypeSlug from 'rehype-slug';
+import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 
 // 배포될 사이트 주소 (User site 이므로 루트)
 const SITE = 'https://jieun9999.github.io';
+
+// 본문 이미지 처리: 단독 이미지 문단을 <figure>+<figcaption>(alt)로 감싸고,
+// 모든 이미지에 lazy 로딩 부여. (unist 의존성 없이 트리 직접 순회)
+function rehypeImages() {
+  const walk = (node) => {
+    if (!node.children) return;
+    node.children = node.children.map((child) => {
+      walk(child);
+      if (child.type === 'element' && child.tagName === 'img') {
+        child.properties = { ...child.properties, loading: 'lazy', decoding: 'async' };
+      }
+      if (child.type === 'element' && child.tagName === 'p') {
+        const kids = child.children.filter(
+          (c) => !(c.type === 'text' && !c.value.trim())
+        );
+        if (kids.length === 1 && kids[0].type === 'element' && kids[0].tagName === 'img') {
+          const img = kids[0];
+          img.properties = { ...img.properties, loading: 'lazy', decoding: 'async' };
+          const alt = img.properties?.alt;
+          const fig = {
+            type: 'element',
+            tagName: 'figure',
+            properties: { className: ['post-figure'] },
+            children: [img],
+          };
+          if (alt && String(alt).trim()) {
+            fig.children.push({
+              type: 'element',
+              tagName: 'figcaption',
+              properties: {},
+              children: [{ type: 'text', value: String(alt) }],
+            });
+          }
+          return fig;
+        }
+      }
+      return child;
+    });
+  };
+  return (tree) => walk(tree);
+}
 
 export default defineConfig({
   site: SITE,
@@ -53,4 +97,27 @@ export default defineConfig({
       },
     }),
   ],
+
+  markdown: {
+    remarkPlugins: [
+      // GitHub 스타일 콜아웃: > [!NOTE] / [!TIP] / [!IMPORTANT] / [!WARNING] / [!CAUTION]
+      remarkAlert,
+    ],
+    rehypePlugins: [
+      // Astro 기본 id 주입보다 먼저 slug(id) 부여 → autolink 가 앵커를 붙일 수 있게
+      rehypeSlug,
+      // 헤딩에 마우스 올리면 나타나는 앵커(#) 링크
+      [
+        rehypeAutolinkHeadings,
+        {
+          behavior: 'append',
+          properties: { className: ['heading-anchor'], ariaHidden: 'true', tabIndex: -1 },
+          // 빈 내용 — 눈에 보이는 '#'는 CSS(::before)로 렌더 → 목차 텍스트 오염 방지
+          content: [],
+        },
+      ],
+      // 단독 이미지 → figure+figcaption, lazy 로딩
+      rehypeImages,
+    ],
+  },
 });

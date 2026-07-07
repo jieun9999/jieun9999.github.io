@@ -4,9 +4,10 @@ description: '부하 테스트 시작 9분 만에 HTTP 오류율 42.8%. 범인�
 pubDate: 2026-05-11
 tags: ['postgresql', 'prisma', 'databases', 'concurrency', 'node-js', 'debugging']
 category: fundamentals
-cover: /covers/there-was-a-deadlock-hiding-in-ai-generated-code-how-we-replaced-unreadcount-with-lastreadat.png
+cover: /covers/there-was-a-deadlock-hiding-in-ai-generated-code-how-we-replaced-unreadcount-with-lastreadat.webp
 coverAlt: 'AI가 생성한 코드에 deadlock이 숨어 있었다 — `unreadCount`를 `lastReadAt`으로 교체한 이야기'
 ---
+> [!NOTE]
 > 부하 테스트 시작 9분 만에 HTTP 오류율 42.8%. 범인은 AI 보조 코딩 중 무심코 작성한 단 한 줄의 `updateMany`였습니다.
 
 * * *
