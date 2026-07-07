@@ -4,7 +4,8 @@
 :root {
   /* 색 — 라이트 */
   --bg: #ffffff;
-  --surface: #fafafa;        /* 카드 배경 */
+  --card: #ffffff;           /* 카드 내부 (흰색) */
+  --surface: #fafafa;        /* 은은한 표면 */
   --surface-2: #f4f4f5;      /* hover / inset */
   --text: #18181b;
   --text-muted: #71717a;
@@ -36,6 +37,7 @@
 /* 색 — 다크 (순검정 아님, 살짝 푸른 계열) */
 html.dark {
   --bg: #0b0e14;
+  --card: #14181f;           /* 카드 내부 (다크에선 살짝 밝게) */
   --surface: #12161f;
   --surface-2: #1a1f2b;
   --text: #e7e9ee;

@@ -49,17 +49,17 @@ const posts = (await getCollection('blog'))
 
 <style>
   .feed {
-    /* 해시노드형 단일 컬럼 — 큰 모니터에서 시원하게 (px 기반) */
-    width: min(100%, 880px);
+    /* 해시노드형 단일 컬럼 — 큰 모니터에서 큼직하게 (px 기반) */
+    width: min(100%, 980px);
     margin-inline: auto;
     /* 글자 크기 (큰 모니터에서 충분히 크게, 본문 .prose 스케일은 불변) */
-    font-size: clamp(17px, 15px + 0.2vw, 19px);
+    font-size: clamp(17px, 15px + 0.28vw, 20px);
   }
   .feed-list {
     list-style: none;
     padding: 0;
     margin: 2.5rem 0 0;
     display: grid;
-    gap: 1.5rem;
+    gap: 1.75rem;
   }
 </style>
