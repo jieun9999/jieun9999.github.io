@@ -26,8 +26,8 @@
     'SF Mono', Menlo, Consolas, monospace;
 
   /* 레이아웃 */
-  --width-page: 72rem;   /* 헤더·홈·목록 프레임 (~1152px) */
-  --width-prose: 44rem;  /* 글 본문 (~700px, 가독성) */
+  --width-page: 78rem;   /* 헤더·홈·목록 프레임 */
+  --width-prose: 46rem;  /* 글 본문 (가독성 폭) */
   --radius: 14px;
   --radius-sm: 9px;
   --gutter: 1.5rem;
@@ -58,6 +58,9 @@ html.dark {
 *, *::before, *::after { box-sizing: border-box; }
 
 html {
+  /* 화면이 클수록 전체 스케일 업 — rem 기반이라 글자와 프레임 폭이 함께 커짐.
+     모바일 16px → 노트북 ~18px → 큰 외장 모니터(2560) 20px */
+  font-size: clamp(16px, 13.5px + 0.4vw, 20px);
   font-family: var(--font-sans);
   line-height: 1.65;
   -webkit-text-size-adjust: 100%;
