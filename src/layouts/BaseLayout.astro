@@ -82,7 +82,7 @@ const hreflang = Astro.props.hreflang ?? alternates;
           document.body.style.overflow = '';
         };
         document.addEventListener('click', (e) => {
-          const img = e.target.closest('.prose img');
+          const img = e.target.closest('.prose img, .post-cover');
           if (img) open(img.currentSrc || img.src, img.alt);
         });
         // 배경 또는 X 버튼 클릭 시 닫힘 (이미지 클릭은 유지)
