@@ -18,6 +18,8 @@ interface Props {
   tags: string[];
   headings: MarkdownHeading[];
   readingMinutes: number;
+  cover?: string;
+  coverAlt?: string;
   alternates: Record<Lang, string>;
   hreflang: Partial<Record<Lang, string>>;
   hasTranslation: boolean;
@@ -35,6 +37,8 @@ const {
   tags,
   headings,
   readingMinutes,
+  cover,
+  coverAlt,
   alternates,
   hreflang,
   hasTranslation,
@@ -107,6 +111,10 @@ const showToc = toc.length > 1;
           <p class="translation-note">{ui[lang === 'en' ? 'ko' : 'en'].noTranslation}</p>
         )}
       </header>
+
+      {cover && (
+        <img class="post-cover" src={cover} alt={coverAlt ?? title} loading="eager" />
+      )}
 
       {
         series && (
@@ -226,6 +234,16 @@ const showToc = toc.length > 1;
     padding: 0.6rem 0.85rem;
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
     margin-top: 1.1rem;
+  }
+
+  /* 커버 히어로 이미지 (해시노드처럼 본문 최상단) */
+  .post-cover {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-top: 1.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
   }
 
   .prose { margin-top: 2.5rem; }
