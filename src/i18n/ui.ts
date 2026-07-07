@@ -90,20 +90,3 @@ export const social = {
 };
 
 export const avatarSrc = '/avatar.jpg';
-
-// 자동 커버 타일용 그라데이션 — 브랜드 톤(인디고/슬레이트) 소수 세트.
-// 무지개/태그별 hue 없이 결정적으로 하나 고름.
-export const coverGradients = [
-  'linear-gradient(135deg, #4f46e5 0%, #7c73f0 100%)',
-  'linear-gradient(135deg, #3730a3 0%, #5b52d4 100%)',
-  'linear-gradient(135deg, #475569 0%, #64748b 100%)',
-  'linear-gradient(135deg, #4338ca 0%, #6366f1 100%)',
-  'linear-gradient(135deg, #1e293b 0%, #475569 100%)',
-];
-
-// 문자열(제목/키)로부터 안정적인 인덱스 — 같은 글은 늘 같은 타일.
-export function stableIndex(seed: string, mod: number): number {
-  let h = 0;
-  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
-  return h % mod;
-}

@@ -49,18 +49,17 @@ const posts = (await getCollection('blog'))
 
 <style>
   .feed {
-    /* 아담한 단일 컬럼 — px 기반이라 큰 모니터(2560)에서도 해시노드처럼 좁게 유지.
-       (바깥 main.frame 이 이미 좌우 gutter 패딩을 주므로 여기선 100%만 제한) */
-    width: min(100%, 720px);
+    /* 해시노드형 단일 컬럼 — 큰 모니터에서 시원하게 (px 기반) */
+    width: min(100%, 880px);
     margin-inline: auto;
-    /* 전역 폰트 스케일(최대 20px) 폭주 방지 — 본문 .prose 스케일은 불변 */
-    font-size: clamp(16px, 0.95rem + 0.1vw, 18px);
+    /* 글자 크기 (큰 모니터에서 충분히 크게, 본문 .prose 스케일은 불변) */
+    font-size: clamp(17px, 15px + 0.2vw, 19px);
   }
   .feed-list {
     list-style: none;
     padding: 0;
-    margin: 2.25rem 0 0;
+    margin: 2.5rem 0 0;
     display: grid;
-    gap: 1.25rem;
+    gap: 1.5rem;
   }
 </style>
