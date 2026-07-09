@@ -1,6 +1,6 @@
 ---
 title: 'Centrifugo의 Pub/Sub 브로커로 KeyDB를 절대 쓰면 안 되는 이유'
-description: '들어가며 저는 10만 개의 동시 WebSocket 연결을 초당 25K 이상의 메시지 처리량으로 감당하도록 설계된 실시간 채팅 시스템을 구축하고 있었습니다. 아키텍처는 대칭형 듀얼 스택이었습니다 — 동일한 서버 두 대'
+description: 'KeyDB의 active-replica 모드는 10만 동시 WebSocket 대칭형 듀얼 스택에 완벽해 보였습니다. 그리고 5년치 hang·deadlock 이슈가, 대부분 열린 채로 쌓여 있는 걸 발견했습니다.'
 pubDate: 2026-03-29
 tags: ['redis', 'websockets', 'docker', 'devops', 'system-design']
 category: fundamentals

@@ -1,6 +1,6 @@
 ---
 title: '브라우저에서 크래시에 강한 엔드투엔드 회의 녹음 파이프라인 구축하기'
-description: '문제 상황 우리 플랫폼에는 단순한 회의 녹음 기능이 있었습니다. 브라우저에서 녹음 버튼을 누르고, 끝나면 정지하고, 파일을 업로드한 뒤, 버튼을 눌러 전사(transcribe)하는 방식이었죠. 단순하지만 — 심각한 결함이 있었습니다.'
+description: '한 시간짜리 브라우저 녹음이 JS 힙을 300MB까지 밀어올렸고, 탭이 죽으면 전부 날아갔습니다. 5분 세이브포인트를 둔 6단계 파이프라인으로 다시 만든 기록.'
 pubDate: 2026-03-26
 tags: ['web-audio-api', 'cloudflare', 'speech-recognition', 'ai', 'presignedurl', 'bullmq']
 category: building

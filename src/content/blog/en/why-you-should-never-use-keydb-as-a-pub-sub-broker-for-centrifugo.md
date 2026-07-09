@@ -1,6 +1,6 @@
 ---
 title: 'Why You Should Never Use KeyDB as a Pub/Sub Broker for Centrifugo'
-description: 'Introduction I was building a real-time chat system designed to handle 100K concurrent WebSocket connections at 25K+ messages per second. The architecture was a symmetric dual-stack — two identical se'
+description: 'KeyDB''s active-replica mode looked perfect for a symmetric dual-stack chat at 100K WebSocket connections. Then I found five years of hang and deadlock issues, most still open.'
 pubDate: 2026-03-29
 tags: ['redis', 'websockets', 'docker', 'devops', 'system-design']
 category: fundamentals

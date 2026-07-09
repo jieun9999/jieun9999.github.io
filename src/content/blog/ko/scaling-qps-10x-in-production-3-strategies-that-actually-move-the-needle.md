@@ -1,6 +1,6 @@
 ---
 title: '프로덕션에서 QPS를 10배로: 실제로 효과가 있는 3가지 전략'
-description: '"더 빠르게 만들어라"는 말은 막연한 지시처럼 들립니다. 하지만 그렇지 않습니다. 성능 작업은 알고 보면 백엔드 엔지니어링에서 가장 _배우기 쉬운_ 영역 중 하나인데, 거의 항상 똑같은 세 가지 수'
+description: '"더 빠르게 만들어라"는 막연해 보이지만 아닙니다. 결국 같은 세 가지 수로 수렴합니다 — 캐싱, 데이터베이스 최적화, 그리고 요청에서 부수적인 일을 들어내기.'
 pubDate: 2026-05-29
 tags: ['system-design', 'caching', 'performance', 'optimization']
 category: fundamentals

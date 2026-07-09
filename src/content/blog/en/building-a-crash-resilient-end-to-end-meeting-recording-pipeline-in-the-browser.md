@@ -1,6 +1,6 @@
 ---
 title: 'Building a Crash-Resilient, End-to-End Meeting Recording Pipeline in the Browser'
-description: 'The Problem Our platform had a straightforward meeting recording feature: hit record in the browser, stop when you''re done, upload the file, click a button to transcribe. Simple — and deeply f'
+description: 'A one-hour browser recording could push the JS heap past 300 MB, and a tab crash meant losing everything. Rebuilding it as a six-stage pipeline with five-minute savepoints.'
 pubDate: 2026-03-26
 tags: ['web-audio-api', 'cloudflare', 'speech-recognition', 'ai', 'presignedurl', 'bullmq']
 category: building

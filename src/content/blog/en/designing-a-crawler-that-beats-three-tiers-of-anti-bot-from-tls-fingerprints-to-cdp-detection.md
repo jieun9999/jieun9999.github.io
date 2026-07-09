@@ -1,6 +1,6 @@
 ---
 title: 'Designing a Crawler That Beats Three Tiers of Anti-Bot — From TLS Fingerprints to CDP Detection'
-description: 'An engineering log of building a Threads marketing agent, split into two parts. Part 1 (this post): The data-acquisition layer — a crawler designed around an anti-bot threat model Part 2: The genera'
+description: 'Part 1 of an engineering log on building a Threads marketing agent: the bottleneck was never LLM generation — it was crawling. Tiering the strategy by which signal the anti-bot actually inspects.'
 pubDate: 2026-06-29
 tags: ['webscraping', 'crawling', 'cloudflare', 'tls', 'systemdesign', 'anti-bot', 'threads']
 category: building

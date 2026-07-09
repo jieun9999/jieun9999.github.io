@@ -1,6 +1,6 @@
 ---
 title: 'AI가 생성한 코드에 deadlock이 숨어 있었다 — `unreadCount`를 `lastReadAt`으로 교체한 이야기'
-description: '부하 테스트 시작 9분 만에 HTTP 오류율 42.8%. 범인은 AI 보조 코딩 중 무심코 작성한 단 한 줄의 updateMany였습니다. 1. 발견 — "목표가 75 TPS인데 왜 9.5 TPS밖에 안 나오지?"'
+description: '부하 테스트 시작 9분 만에 HTTP 오류율 42.8%, 목표 TPS의 12%. 범인은 AI 보조 코딩 중 무심코 작성한 단 한 줄의 updateMany였습니다.'
 pubDate: 2026-05-11
 tags: ['postgresql', 'prisma', 'databases', 'concurrency', 'node-js', 'debugging']
 category: fundamentals

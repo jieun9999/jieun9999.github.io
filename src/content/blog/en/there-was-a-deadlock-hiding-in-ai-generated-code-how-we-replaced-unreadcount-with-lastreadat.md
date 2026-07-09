@@ -1,6 +1,6 @@
 ---
 title: 'There Was a Deadlock Hiding in AI-Generated Code — How We Replaced `unreadCount` with `lastReadAt`'
-description: '42.8% HTTP error rate, 9 minutes into a load test. The culprit was a single updateMany line carelessly written during AI-assisted coding. 1. Discovery — "Why are we doing 9.5 TPS when the target is'
+description: '42.8% HTTP error rate, 9 minutes into a load test, at 12% of the target TPS. The culprit was a single updateMany line written during AI-assisted coding.'
 pubDate: 2026-05-11
 tags: ['postgresql', 'prisma', 'databases', 'concurrency', 'node-js', 'debugging']
 category: fundamentals
