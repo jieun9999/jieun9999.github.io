@@ -4,7 +4,7 @@ description: 'Twenty lines of tone rules, and the bot still wrote news reports. 
 pubDate: 2026-06-29
 tags: ['llm', 'datamodeling', 'refactoring', 'prompt-engineering', 'automation']
 category: building
-draft: true
+draft: false
 ---
 
 > [!NOTE]
@@ -14,15 +14,29 @@ draft: true
 
 ## 1\. Symptom — The More Rules I Added, the More It Read Like a News Article
 
-I built a bot that generates car posts for a community forum. Every output looked like this.
+I built a bot that generates car posts for a Korean community forum. Every output looked like this.
 
-<!-- TODO: paste one real "news-article-voice" generation verbatim. This is the single most important piece of evidence in the post. -->
+> [!NOTE]
+> The two examples below are reconstructions, not verbatim production logs. They show how the same material reads in each state. The Korean originals are kept as-is — the texture is the point, and it doesn't survive translation.
 
 ```plaintext
-(the failed generation, verbatim)
+국산 준중형 전기 SUV의 3년 감가율이 화제다.
+
+중고차 시세 자료에 따르면 해당 모델의 3년 잔존가치는 신차가 대비 약 58%
+수준으로, 동급 내연기관 모델(71%)보다 13%p 낮은 것으로 나타났다.
+
+전문가들은 전기차 감가의 주된 원인으로 ① 배터리 열화에 대한 소비자 불안
+② 신형 모델의 주행거리 개선 ③ 보조금 정책 변화에 따른 신차 가격 하락을 꼽는다.
+
+다만 최근 3개월간 하락폭은 둔화되는 추세다. 전기차 구매를 고려한다면
+감가율과 함께 총 보유 비용(TCO)을 함께 살펴볼 필요가 있다.
 ```
 
+*Roughly: "The three-year depreciation of a domestic compact electric SUV is drawing attention. Used-car data shows a residual value of about 58% versus 71% for comparable combustion models, 13 points lower. Experts cite ① battery-degradation anxiety ② range improvements in newer models ③ subsidy changes. That said, the decline has slowed over the past three months. Buyers should weigh depreciation alongside total cost of ownership."*
+
 Nothing wrong with the grammar. Nothing wrong with the facts. And nobody responded — because there was nothing to respond to.
+
+Look at what's actually in there. The sentences end in `~다`, the declarative register of Korean newspapers. Five numbers. Causes enumerated as `①②③`. And it closes with "buyers should weigh…", offending no one. **That's the skeleton of a news article,** not a forum post.
 
 So I added tone rules. *Write casually. Drop the formal register. Use interjections.* Each rule made the sentences a little more relaxed, but **the skeleton stayed a news report.** Intro, body, wrap-up. Numbers in a row. Neutral closing.
 
@@ -102,13 +116,29 @@ I added a fourth axis, `format` — the **vessel** the body is poured into.
 
 The last row is the whole point. **Take the information-summary format out of the default set.** The default is one of the other five community vessels; `data_brief` opens only when a human explicitly asks for it. News-article voice is no longer a state you can reach by accident.
 
-Same material, different vessel, different post. Sales figures in a table are an article. The same figures dripped through `list_drip` are a post.
-
-<!-- TODO: the same material as §1, regenerated as confession or list_drip. The before/after pair is the post's real conclusion. -->
+Same material, different vessel, different post. Take the depreciation piece from §1, hold the material fixed, and regenerate it with `hook_engine=regret_story` / `format=confession`:
 
 ```plaintext
-(same material, regenerated with a different format)
+3년 타고 팔러 갔다가 딜러 앞에서 말을 잃었습니다.
+
+살 때는 보조금 받아서 싸게 샀다고 좋아했어요. 충전비 아끼는 재미도 있었고.
+
+근데 파는 날 부른 금액이, 산 값의 절반을 조금 넘겼습니다.
+
+딜러가 그러더라고요. "배터리는 멀쩡한데, 요즘 신형이 주행거리가 훨씬 길어서요."
+
+3년간 아낀 충전비가 얼마였더라, 집에 와서 계산해봤습니다.
+감가로 날린 돈 근처에도 못 갔습니다.
+
+전기차 사지 말라는 얘기가 아닙니다.
+"유지비 싸다"는 말만 듣고 계산기를 두드린 거, 그게 제 실수였어요.
+
+3년 뒤에 얼마 받는지부터 알아보고 사세요.
 ```
+
+*Roughly: "Drove it three years, went to sell it, and lost my words in front of the dealer. When I bought it I was thrilled about the subsidy. Loved saving on charging, too. But the number he quoted was barely over half what I paid. He said: 'Battery's fine — it's just that the new ones go so much farther.' I got home and added up three years of charging savings. Didn't come close to what depreciation took. I'm not telling you not to buy an EV. My mistake was running the numbers on 'cheap to run' alone. Find out what it's worth in three years — before you buy."*
+
+Same depreciation. Same battery. Same range story. **Not one fact changed.** Only the vessel did. Five numbers collapsed into "barely over half." The `①②③` became one line of dealer dialogue. The neutral close became regret.
 
 Even with the axes right, article-voice sentences mean failure — so the body voice has hard rules that trigger a reject.
 
