@@ -1,4 +1,5 @@
 ---
+canonicalURL: 'https://beckybuilds.hashnode.dev/there-was-a-deadlock-hiding-in-ai-generated-code-how-we-replaced-unreadcount-with-lastreadat'
 title: 'There Was a Deadlock Hiding in AI-Generated Code — How We Replaced `unreadCount` with `lastReadAt`'
 description: '42.8% HTTP error rate, 9 minutes into a load test, at 12% of the target TPS. The culprit was a single updateMany line written during AI-assisted coding.'
 pubDate: 2026-05-11

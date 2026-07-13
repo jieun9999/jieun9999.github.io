@@ -17,6 +17,9 @@ const blog = defineCollection({
       .enum(['building', 'open-source', 'fundamentals', 'career'])
       .default('building'),
     draft: z.boolean().default(false),
+    // 검색 대표 URL 오버라이드(선택). 값이 있으면 그 글의 canonical을 이 주소로 넘김.
+    //   - 비우면 self-canonical(기본). 영문 글을 해쉬노드로 넘길 때만 채운다.
+    canonicalURL: z.string().url().optional(),
     // 커버 이미지(선택). 예: "/covers/hello-astro.jpg". 없으면 자동 타일 생성.
     cover: z.string().optional(),
     coverAlt: z.string().optional(),

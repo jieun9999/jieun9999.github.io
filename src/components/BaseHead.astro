@@ -12,6 +12,8 @@ interface Props {
   type?: 'website' | 'article';
   /** SNS 공유 이미지 (없으면 기본 브랜드 배너) */
   image?: string;
+  /** 검색 대표 URL 오버라이드. 있으면 canonical을 이 주소로(예: 해쉬노드 원본). 없으면 self. */
+  canonicalURL?: string;
 }
 
 const {
@@ -21,10 +23,14 @@ const {
   alternates = {},
   type = 'website',
   image,
+  canonicalURL,
 } = Astro.props;
 
 const site = Astro.site ?? new URL('https://jieun.dev');
-const canonical = new URL(Astro.url.pathname, site).href;
+// 이 페이지 자신의 URL. og:url·RSS 등 "실제 위치"가 필요한 곳에 쓴다.
+const selfUrl = new URL(Astro.url.pathname, site).href;
+// 검색 대표(canonical): 오버라이드가 있으면 그쪽, 없으면 self.
+const canonical = canonicalURL ?? selfUrl;
 const ogImage = new URL(image ?? '/og-default.jpg', site).href;
 
 // hreflang 절대 URL 목록 (구글에게 "같은 글의 다른 언어 버전"임을 알림)
@@ -62,7 +68,7 @@ const hreflangs = Object.entries(alternates).map(([l, path]) => ({
 <meta property="og:type" content={type} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
-<meta property="og:url" content={canonical} />
+<meta property="og:url" content={selfUrl} />
 <meta property="og:locale" content={lang === 'ko' ? 'ko_KR' : 'en_US'} />
 <meta property="og:image" content={ogImage} />
 <meta property="og:image:width" content="1200" />

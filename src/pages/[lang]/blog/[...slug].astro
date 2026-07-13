@@ -54,12 +54,12 @@ export async function getStaticPaths() {
 
     return {
       params: { lang, slug: key },
-      props: { post, alternates, hreflang, hasTranslation, prev, next, series },
+      props: { post, alternates, hreflang, canonicalURL: post.data.canonicalURL, hasTranslation, prev, next, series },
     };
   });
 }
 
-const { post, alternates, hreflang, hasTranslation, prev, next, series } = Astro.props;
+const { post, alternates, hreflang, canonicalURL, hasTranslation, prev, next, series } = Astro.props;
 const lang = langFromId(post.id);
 const { Content, headings } = await render(post);
 const mins = readingMinutes(post.body ?? '');
@@ -78,6 +78,7 @@ const mins = readingMinutes(post.body ?? '');
   coverAlt={post.data.coverAlt}
   alternates={alternates}
   hreflang={hreflang}
+  canonicalURL={canonicalURL}
   hasTranslation={hasTranslation}
   prev={prev}
   next={next}

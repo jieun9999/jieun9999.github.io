@@ -19,9 +19,11 @@ interface Props {
   alternates?: Record<Lang, string>;
   /** hreflang에 쓸, "실제로 존재하는" 번역만. 없으면 alternates 전체 사용. */
   hreflang?: Partial<Record<Lang, string>>;
+  /** 검색 대표 URL 오버라이드(선택). 있으면 canonical을 이 주소로. */
+  canonicalURL?: string;
 }
 
-const { title, description, lang, type = 'website', image } = Astro.props;
+const { title, description, lang, type = 'website', image, canonicalURL } = Astro.props;
 
 // 기본 alternates 자동 생성: /en/foo <-> /ko/foo
 const path = Astro.url.pathname;
@@ -46,6 +48,7 @@ const hreflang = Astro.props.hreflang ?? alternates;
       type={type}
       image={image}
       alternates={hreflang}
+      canonicalURL={canonicalURL}
     />
   </head>
   <body>
