@@ -1,5 +1,5 @@
 ---
-canonicalURL: 'https://beckybuilds.hashnode.dev/building-a-reusable-load-test-environment-for-a-messenger-service-make-based-iac-observability-and-auth-seeding'
+crosspost: true
 title: 'Building a Reusable Load-Test Environment for a Messenger Service — Make-based IaC, Observability, and Auth Seeding'
 description: 'How many TPS can a messenger''s send API survive, and where exactly does it break? A 7-node mirror of production, rebuilt on demand from a single Makefile target.'
 pubDate: 2026-05-11

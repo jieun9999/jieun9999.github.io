@@ -4,6 +4,8 @@ import PostLayout from '../../../layouts/PostLayout.astro';
 import { langFromId, keyFromId, otherLang, readingMinutes, languages, type Lang } from '../../../i18n/ui';
 
 export async function getStaticPaths() {
+  // 해쉬노드 발행물 주소 (crosspost 글의 canonical 대상 · 교차발행 스크립트와 동일해야 함)
+  const HASHNODE_BASE = 'https://beckybuilds.hashnode.dev';
   const posts = (await getCollection('blog')).filter((p) => !p.data.draft);
   const exists = new Set(posts.map((p) => p.id));
 
@@ -52,9 +54,14 @@ export async function getStaticPaths() {
       series = { title: post.data.seriesTitle ?? '', parts };
     }
 
+    // canonical: 수동 override 우선 → crosspost 영문 글이면 해쉬노드 원본 → 없으면 self
+    const canonicalURL =
+      post.data.canonicalURL ??
+      (post.data.crosspost && lang === 'en' ? `${HASHNODE_BASE}/${key}` : undefined);
+
     return {
       params: { lang, slug: key },
-      props: { post, alternates, hreflang, canonicalURL: post.data.canonicalURL, hasTranslation, prev, next, series },
+      props: { post, alternates, hreflang, canonicalURL, hasTranslation, prev, next, series },
     };
   });
 }

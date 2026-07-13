@@ -7,7 +7,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "crosspost": "node scripts/crosspost-hashnode.mjs"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.11",
@@ -20,5 +21,8 @@
     "rehype-autolink-headings": "^7.1.0",
     "rehype-slug": "^6.0.0",
     "remark-github-blockquote-alert": "^2.1.0"
+  },
+  "devDependencies": {
+    "gray-matter": "^4.0.3"
   }
 }

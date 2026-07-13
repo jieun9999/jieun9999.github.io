@@ -1,5 +1,5 @@
 ---
-canonicalURL: 'https://beckybuilds.hashnode.dev/designing-a-generation-pipeline-a-4-axis-content-model-queue-based-scheduling-3-layer-attribution'
+crosspost: true
 title: 'Designing a Generation Pipeline — A 4-Axis Content Model, Queue-Based Scheduling, 3-Layer Attribution'
 description: 'Part 2 of an engineering log on building a Threads marketing agent: a content model decomposed into four axes, an idempotent publish worker, and 3-layer attribution where 90% of clicks were bots.'
 pubDate: 2026-06-29

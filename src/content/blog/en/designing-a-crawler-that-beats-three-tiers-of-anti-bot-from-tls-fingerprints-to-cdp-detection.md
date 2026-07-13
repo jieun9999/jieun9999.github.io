@@ -1,5 +1,5 @@
 ---
-canonicalURL: 'https://beckybuilds.hashnode.dev/designing-a-crawler-that-beats-three-tiers-of-anti-bot-from-tls-fingerprints-to-cdp-detection'
+crosspost: true
 title: 'Designing a Crawler That Beats Three Tiers of Anti-Bot — From TLS Fingerprints to CDP Detection'
 description: 'Part 1 of an engineering log on building a Threads marketing agent: the bottleneck was never LLM generation — it was crawling. Tiering the strategy by which signal the anti-bot actually inspects.'
 pubDate: 2026-06-29
