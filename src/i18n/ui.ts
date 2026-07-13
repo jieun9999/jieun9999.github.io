@@ -11,7 +11,7 @@ export const defaultLang: Lang = 'en';
 // 화면에 쓰이는 UI 문자열(글 내용이 아니라 버튼/제목 등) -------------------------
 export const ui = {
   en: {
-    siteTitle: 'Becky',
+    siteTitle: 'Jieun',
     tagline: 'deserve what you want',
     posts: 'Posts',
     readMore: 'Read more',
@@ -31,7 +31,7 @@ export const ui = {
     locale: 'en-US',
   },
   ko: {
-    siteTitle: 'Becky',
+    siteTitle: 'Jieun',
     tagline: 'deserve what you want',
     posts: '글 목록',
     readMore: '자세히 보기',
