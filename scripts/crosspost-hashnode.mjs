@@ -34,7 +34,21 @@ async function gql(query, variables) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: TOKEN },
     body: JSON.stringify({ query, variables }),
+    redirect: 'manual',
   });
+  // Hashnode는 2026-05부터 API가 Pro 전용. 비-Pro publication은 공지로 리다이렉트되고,
+  // Cloudflare가 HTML을 돌려주기도 한다. JSON이 아니면 명확히 안내하고 멈춘다.
+  const ctype = res.headers.get('content-type') || '';
+  if (res.status >= 300 && res.status < 400) {
+    throw new Error(
+      `Hashnode API가 리다이렉트(${res.status})됨 → ${res.headers.get('location') || '?'}. ` +
+        `publication이 Hashnode Pro가 아니면 API가 차단됩니다.`
+    );
+  }
+  if (!ctype.includes('application/json')) {
+    const body = (await res.text()).slice(0, 200);
+    throw new Error(`Hashnode API가 JSON이 아닌 응답(${res.status}, ${ctype}). Pro 미구독일 가능성. 앞부분: ${body}`);
+  }
   const json = await res.json();
   if (json.errors) throw new Error(JSON.stringify(json.errors));
   return json.data;
@@ -151,7 +165,14 @@ if (files.length === 0) {
     .map((f) => join(EN_DIR, f));
 }
 
-const publicationId = await getPublicationId();
+let publicationId;
+try {
+  publicationId = await getPublicationId();
+} catch (e) {
+  // Pro 미구독 등으로 API 접근 자체가 막힌 경우: 실패(빨간X) 대신 경고 후 건너뜀.
+  console.log(`::warning::Hashnode 교차발행 건너뜀 — ${e.message}`);
+  process.exit(0);
+}
 console.log(`publicationId=${publicationId} · ${DRY ? 'DRY-RUN' : '실행'} · 대상 ${files.length}개`);
 
 for (const f of files) {
