@@ -7,8 +7,8 @@ import { remarkAlert } from 'remark-github-blockquote-alert';
 import rehypeSlug from 'rehype-slug';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 
-// 배포될 사이트 주소 (User site 이므로 루트)
-const SITE = 'https://jieun9999.github.io';
+// 배포될 사이트 주소 (커스텀 도메인, 루트)
+const SITE = 'https://jieun.dev';
 
 // 본문 이미지 처리: 단독 이미지 문단을 <figure>+<figcaption>(alt)로 감싸고,
 // 모든 이미지에 lazy 로딩 부여. (unist 의존성 없이 트리 직접 순회)

@@ -23,7 +23,7 @@ const {
   image,
 } = Astro.props;
 
-const site = Astro.site ?? new URL('https://jieun9999.github.io');
+const site = Astro.site ?? new URL('https://jieun.dev');
 const canonical = new URL(Astro.url.pathname, site).href;
 const ogImage = new URL(image ?? '/og-default.jpg', site).href;
 
