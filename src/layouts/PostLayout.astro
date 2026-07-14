@@ -20,6 +20,7 @@ interface Props {
   readingMinutes: number;
   cover?: string;
   coverAlt?: string;
+  coverCaption?: string;
   alternates: Record<Lang, string>;
   hreflang: Partial<Record<Lang, string>>;
   canonicalURL?: string;
@@ -40,6 +41,7 @@ const {
   readingMinutes,
   cover,
   coverAlt,
+  coverCaption,
   alternates,
   hreflang,
   canonicalURL,
@@ -122,7 +124,10 @@ const showToc = toc.length > 1;
       </header>
 
       {cover && (
-        <img class="post-cover" src={cover} alt={coverAlt ?? title} loading="eager" />
+        <figure class="post-cover-fig">
+          <img class="post-cover" src={cover} alt={coverAlt ?? title} loading="eager" />
+          {coverCaption && <figcaption class="post-cover-caption">{coverCaption}</figcaption>}
+        </figure>
       )}
 
       {
@@ -246,6 +251,9 @@ const showToc = toc.length > 1;
   }
 
   /* 커버 히어로 이미지 (해시노드처럼 본문 최상단) */
+  .post-cover-fig {
+    margin: 0;
+  }
   .post-cover {
     display: block;
     width: 100%;
@@ -254,6 +262,13 @@ const showToc = toc.length > 1;
     border: 1px solid var(--border);
     border-radius: var(--radius);
     cursor: zoom-in;
+  }
+  .post-cover-caption {
+    margin-top: 0.6rem;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--muted, #6b7280);
+    text-align: center;
   }
 
   .prose { margin-top: 2.5rem; }

@@ -6,6 +6,7 @@ tags: ['fcm', 'bullmq', 'node-js', 'concurrency', 'observability', 'architecture
 category: reliability
 cover: /covers/fcm-push-hiding-in-the-message-send-api-moving-it-to-a-dedicated-worker-queue.webp
 coverAlt: 'There Was FCM Push Hiding in the Message-Send API — Moving It Out of the Request Path into a Dedicated Worker Queue'
+coverCaption: 'The image above is part of a Sentry-based monitoring dashboard.'
 series: messenger-load-test
 seriesOrder: 3
 seriesTitle: 'Load-Testing a Messenger'
