@@ -10,7 +10,7 @@ coverAlt: 'Building a Crash-Resilient, End-to-End Meeting Recording Pipeline in 
 ---
 ## The Problem
 
-Our platform had a straightforward meeting recording feature: hit record in the browser, stop when you're done, upload the file, click a button to transcribe. Simple — and deeply flawed.
+The platform I worked on had a straightforward meeting recording feature: hit record in the browser, stop when you're done, upload the file, click a button to transcribe. Simple — and deeply flawed.
 
 Three pain points kept surfacing:
 
@@ -79,7 +79,7 @@ The result: zero server bandwidth consumption for uploads, regardless of how man
 
 Downloads work the same way: the server performs an auth check, logs the access, and redirects to a presigned download URL. R2 serves the file directly. Server memory usage for file I/O: zero.
 
-We also discovered during code review that the R2 integration layer (provider class, presigned URL generation, storage key management) already existed in our codebase from a previous feature. We only needed to build the savepoint-specific API routes.
+We also discovered during code review that the R2 integration layer (provider class, presigned URL generation, storage key management) already existed in the codebase I worked on from a previous feature. We only needed to build the savepoint-specific API routes.
 
 * * *
 
@@ -133,7 +133,7 @@ Cost dynamics shift significantly across usage volumes (at $1 = ₩1,430):
 
 ### Why We Chose VITO
 
-For us, Korean meeting transcript quality is the core product value. Our decision came down to three factors:
+For the platform I worked on, Korean meeting transcript quality was the core product value. Our decision came down to three factors:
 
 1.  **Best Korean accuracy** at CER < 8%. In meeting transcription, lower accuracy doesn't just mean more errors — it means higher post-processing cost and user frustration.
 2.  **All-in-one package.** Speaker diarization + ITN + disfluency filtering are built-in. ElevenLabs has lower unit costs in some tiers but requires custom implementations for ITN and disfluency filtering. Google had reported stability issues with diarization.
@@ -270,4 +270,4 @@ All six pipeline stages were completed and deployed as of March 25, 2026.
 
 * * *
 
-_This post documents the recording system overhaul for our platform. All benchmarks, cost figures, and architecture decisions reflect the state of things as of March 2026._
+_This post documents the recording system overhaul for the platform I worked on. All benchmarks, cost figures, and architecture decisions reflect the state of things as of March 2026._
