@@ -6,6 +6,7 @@ tags: ['fcm', 'bullmq', 'node-js', 'concurrency', 'observability', 'architecture
 category: reliability
 cover: /covers/fcm-push-hiding-in-the-message-send-api-moving-it-to-a-dedicated-worker-queue.webp
 coverAlt: '메시지 전송 API에 FCM 푸시가 숨어 있었다 — 요청 경로에서 전용 워커 큐로 걷어낸 이야기'
+coverCaption: '위 이미지는 Sentry 기반 모니터링 대시보드의 일부입니다.'
 series: messenger-load-test
 seriesOrder: 3
 seriesTitle: '메신저 부하 테스트 실전기'
