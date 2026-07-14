@@ -1,5 +1,5 @@
 ---
-title: '1편 · 3단계 anti-bot을 뚫는 크롤러 설계 — TLS fingerprint부터 CDP 탐지까지'
+title: '[Threads 마케팅 에이전트 1편] 3단계 anti-bot을 뚫는 크롤러 설계 — TLS fingerprint부터 CDP 탐지까지'
 description: 'Threads 마케팅 에이전트 엔지니어링 로그 1편: 진짜 병목은 LLM 생성이 아니라 크롤링이었습니다. 안티봇이 무엇을 들여다보는지를 기준으로 수집 전략을 3계층으로 나눈 이야기.'
 pubDate: 2026-06-29
 tags: ['webscraping', 'crawling', 'cloudflare', 'tls', 'systemdesign', 'anti-bot', 'threads']

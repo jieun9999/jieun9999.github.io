@@ -1,5 +1,5 @@
 ---
-title: '2편 · 생성 파이프라인 설계 — 4축 콘텐츠 모델, 큐 기반 스케줄링, 3계층 어트리뷰션'
+title: '[Threads 마케팅 에이전트 2편] 생성 파이프라인 설계 — 4축 콘텐츠 모델, 큐 기반 스케줄링, 3계층 어트리뷰션'
 description: 'Threads 마케팅 에이전트 엔지니어링 로그 2편: 생성 파이프라인. 네 개의 축으로 분해한 콘텐츠 모델, SQLite 큐와 멱등 워커로 만든 예약 발행, 그리고 클릭의 90%가 봇이었던 3계층 어트리뷰션.'
 pubDate: 2026-06-29
 tags: ['threads', 'systemdesign', 'fastapi', 'sqlite', 'datamodeling', 'kpi', 'automation']
