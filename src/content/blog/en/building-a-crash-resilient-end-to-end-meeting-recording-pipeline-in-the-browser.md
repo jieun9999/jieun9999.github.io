@@ -10,7 +10,7 @@ coverAlt: 'Building a Crash-Resilient, End-to-End Meeting Recording Pipeline in 
 ---
 ## The Problem
 
-The platform I worked on had a straightforward meeting recording feature: hit record in the browser, stop when you're done, upload the file, click a button to transcribe. Simple — and deeply flawed.
+The platform I worked on had a straightforward meeting recording feature: hit record in the browser, stop when you're done, upload the file, click a button to transcribe. It worked — but was deeply flawed.
 
 Three pain points kept surfacing:
 
