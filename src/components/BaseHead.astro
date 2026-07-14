@@ -31,7 +31,7 @@ const site = Astro.site ?? new URL('https://jieun.dev');
 const selfUrl = new URL(Astro.url.pathname, site).href;
 // 검색 대표(canonical): 오버라이드가 있으면 그쪽, 없으면 self.
 const canonical = canonicalURL ?? selfUrl;
-const ogImage = new URL(image ?? '/og-default.jpg', site).href;
+const ogImage = new URL(image ?? '/og-default-v2.jpg', site).href;
 
 // hreflang 절대 URL 목록 (구글에게 "같은 글의 다른 언어 버전"임을 알림)
 const hreflangs = Object.entries(alternates).map(([l, path]) => ({
