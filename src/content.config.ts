@@ -14,8 +14,8 @@ const blog = defineCollection({
     tags: z.array(z.string()).default([]),
     // 카테고리 필터 (배너 아래 pill). all은 UI 기본값이라 글엔 지정 안 함.
     category: z
-      .enum(['building', 'open-source', 'fundamentals', 'career'])
-      .default('building'),
+      .enum(['systems', 'scaling', 'reliability', 'cost'])
+      .default('systems'),
     draft: z.boolean().default(false),
     // 해쉬노드 교차발행 스위치(영문 글용). true면:
     //   ① GitHub Actions가 이 글을 해쉬노드에 자동 발행/수정 (slug 동일)

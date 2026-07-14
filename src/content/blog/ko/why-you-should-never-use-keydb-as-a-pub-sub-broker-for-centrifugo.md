@@ -3,7 +3,7 @@ title: 'Centrifugo의 Pub/Sub 브로커로 KeyDB를 절대 쓰면 안 되는 이
 description: 'KeyDB의 active-replica 모드는 10만 동시 WebSocket 대칭형 듀얼 스택에 완벽해 보였습니다. 그리고 5년치 hang·deadlock 이슈가, 대부분 열린 채로 쌓여 있는 걸 발견했습니다.'
 pubDate: 2026-03-29
 tags: ['redis', 'websockets', 'docker', 'devops', 'system-design']
-category: fundamentals
+category: reliability
 cover: /covers/why-you-should-never-use-keydb-as-a-pub-sub-broker-for-centrifugo.webp
 coverAlt: 'Centrifugo의 Pub/Sub 브로커로 KeyDB를 절대 쓰면 안 되는 이유'
 ---
