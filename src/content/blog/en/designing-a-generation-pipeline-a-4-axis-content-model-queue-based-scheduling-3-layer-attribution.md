@@ -11,14 +11,6 @@ series: threads-agent
 seriesOrder: 2
 seriesTitle: 'Building a Threads Marketing Agent'
 ---
-> An engineering log of building a Threads marketing agent, split into two parts.
-> 
-> -   [**Part 1:** The data-acquisition layer — a crawler designed around an anti-bot threat model (TLS fingerprint · CDP detection)](/en/blog/designing-a-crawler-that-beats-three-tiers-of-anti-bot-from-tls-fingerprints-to-cdp-detection/)
->     
-> -   **Part 2 (this post):** The generation pipeline — iterative content-model design, scheduled publishing, performance attribution
->     
-
-* * *
 
 ## TL;DR
 

@@ -11,14 +11,6 @@ series: messenger-load-test
 seriesOrder: 1
 seriesTitle: 'Load-Testing a Messenger'
 ---
-> A two-part series on load-testing our messenger.
-> 
-> -   **Part 1 (this post):** Building the load-test environment — Make-based IaC, observability, auth seeding
->     
-> -   [**Part 2:** The deadlock hiding in AI-generated code — replacing `unreadCount` with `lastReadAt`](/en/blog/there-was-a-deadlock-hiding-in-ai-generated-code-how-we-replaced-unreadcount-with-lastreadat/)
->     
-
-* * *
 
 > I wanted to know exactly how many TPS our messenger's send API could survive — and _where_ it would actually break. So I mirrored production into a 7-node load-test environment, and instead of treating it as a one-shot setup, I designed it to be **reproducible on demand**.
 

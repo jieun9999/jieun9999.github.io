@@ -10,14 +10,6 @@ series: messenger-load-test
 seriesOrder: 1
 seriesTitle: '메신저 부하 테스트 실전기'
 ---
-> 메신저 부하 테스트를 다룬 두 편짜리 시리즈입니다.
-> 
-> -   **1편 (이 글):** 부하 테스트 환경 구축 — Make 기반 IaC, Observability, Auth Seeding
->     
-> -   [**2편:** AI 생성 코드에 숨어 있던 deadlock — `unreadCount`를 `lastReadAt`으로 교체하기](/ko/blog/there-was-a-deadlock-hiding-in-ai-generated-code-how-we-replaced-unreadcount-with-lastreadat/)
->     
-
-* * *
 
 > 우리 메신저의 send API가 정확히 몇 TPS까지 버틸 수 있는지, 그리고 실제로 _어디서_ 무너지는지 알고 싶었습니다. 그래서 프로덕션을 7-노드 부하 테스트 환경으로 복제했고, 이를 일회성 셋업으로 취급하는 대신 **필요할 때마다 재현 가능하도록** 설계했습니다.
 

@@ -10,14 +10,6 @@ series: messenger-load-test
 seriesOrder: 2
 seriesTitle: '메신저 부하 테스트 실전기'
 ---
-> 메신저 부하 테스트를 다룬 두 편짜리 시리즈입니다.
-> 
-> -   [**1편:** 부하 테스트 환경 구축 — Make 기반 IaC, Observability, Auth Seeding](/ko/blog/building-a-reusable-load-test-environment-for-a-messenger-service-make-based-iac-observability-and-auth-seeding/)
->     
-> -   **2편 (이 글):** AI 생성 코드에 숨어 있던 deadlock — `unreadCount`를 `lastReadAt`으로 교체하기
->     
-
-* * *
 
 > [!NOTE]
 > 부하 테스트 시작 9분 만에 HTTP 오류율 42.8%. 범인은 AI 보조 코딩 중 무심코 작성한 단 한 줄의 `updateMany`였습니다.

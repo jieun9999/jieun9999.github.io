@@ -11,14 +11,6 @@ series: messenger-load-test
 seriesOrder: 2
 seriesTitle: 'Load-Testing a Messenger'
 ---
-> A two-part series on load-testing our messenger.
-> 
-> -   [**Part 1:** Building the load-test environment — Make-based IaC, observability, auth seeding](/en/blog/building-a-reusable-load-test-environment-for-a-messenger-service-make-based-iac-observability-and-auth-seeding/)
->     
-> -   **Part 2 (this post):** The deadlock hiding in AI-generated code — replacing `unreadCount` with `lastReadAt`
->     
-
-* * *
 
 > [!NOTE]
 > 42.8% HTTP error rate, 9 minutes into a load test. The culprit was a single `updateMany` line carelessly written during AI-assisted coding.
