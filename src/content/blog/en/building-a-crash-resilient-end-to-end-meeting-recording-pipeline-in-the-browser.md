@@ -215,7 +215,7 @@ The primary update channel is now **Centrifugo WebSocket**. Each pipeline stage 
 
 We still maintain a **safety-net poll** — but at 30-second intervals instead of 5. If the WebSocket connection drops, the client falls back to aggressive 5–15 second polling based on the current pipeline state.
 
-Result: API calls dropped from ~300 to ~50 per transcription cycle.
+Result: API calls dropped from around 300 to around 50 per transcription cycle.
 
 ### Notification Routing
 
