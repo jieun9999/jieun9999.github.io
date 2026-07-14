@@ -10,14 +10,6 @@ series: threads-agent
 seriesOrder: 2
 seriesTitle: 'Threads 마케팅 에이전트 만들기'
 ---
-> Threads 마케팅 에이전트를 만든 엔지니어링 로그, 두 편으로 나눠 정리했습니다.
-> 
-> -   [**Part 1:** 데이터 수집 계층 — 안티봇 위협 모델(TLS fingerprint · CDP 탐지)을 중심으로 설계한 크롤러](/ko/blog/designing-a-crawler-that-beats-three-tiers-of-anti-bot-from-tls-fingerprints-to-cdp-detection/)
->     
-> -   **Part 2 (이 글):** 생성 파이프라인 — 반복적인 콘텐츠 모델 설계, 예약 발행, 성과 어트리뷰션
->     
-
-* * *
 
 ## TL;DR
 

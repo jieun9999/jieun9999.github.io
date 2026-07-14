@@ -11,14 +11,6 @@ series: threads-agent
 seriesOrder: 1
 seriesTitle: 'Building a Threads Marketing Agent'
 ---
-> An engineering log of building a Threads marketing agent, split into two parts.
-> 
-> -   **Part 1 (this post):** The data-acquisition layer — a crawler designed around an anti-bot threat model
->     
-> -   [**Part 2:** The generation pipeline — iterative content-model design, scheduled publishing, and performance attribution](/en/blog/designing-a-generation-pipeline-a-4-axis-content-model-queue-based-scheduling-3-layer-attribution/)
->     
-
-* * *
 
 ## TL;DR
 
