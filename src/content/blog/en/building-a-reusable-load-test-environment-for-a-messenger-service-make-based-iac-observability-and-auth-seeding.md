@@ -7,7 +7,19 @@ tags: ['load-testing', 'k6', 'observability', 'grafana', 'prometheus', 'postgres
 category: building
 cover: /covers/building-a-reusable-load-test-environment-for-a-messenger-service-make-based-iac-observability-and-auth-seeding.webp
 coverAlt: 'Building a Reusable Load-Test Environment for a Messenger Service — Make-based IaC, Observability, and Auth Seeding'
+series: messenger-load-test
+seriesOrder: 1
+seriesTitle: 'Load-Testing a Messenger'
 ---
+> A two-part series on load-testing our messenger.
+> 
+> -   **Part 1 (this post):** Building the load-test environment — Make-based IaC, observability, auth seeding
+>     
+> -   [**Part 2:** The deadlock hiding in AI-generated code — replacing `unreadCount` with `lastReadAt`](/en/blog/there-was-a-deadlock-hiding-in-ai-generated-code-how-we-replaced-unreadcount-with-lastreadat/)
+>     
+
+* * *
+
 > I wanted to know exactly how many TPS our messenger's send API could survive — and _where_ it would actually break. So I mirrored production into a 7-node load-test environment, and instead of treating it as a one-shot setup, I designed it to be **reproducible on demand**.
 
 This post is a record of that process — what we wanted to measure, what had to be prepared first, and how the environment itself was wrapped so anyone can re-run the whole thing.

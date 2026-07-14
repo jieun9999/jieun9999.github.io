@@ -6,9 +6,23 @@ tags: ['postgresql', 'prisma', 'databases', 'concurrency', 'node-js', 'debugging
 category: fundamentals
 cover: /covers/there-was-a-deadlock-hiding-in-ai-generated-code-how-we-replaced-unreadcount-with-lastreadat.webp
 coverAlt: 'AI가 생성한 코드에 deadlock이 숨어 있었다 — `unreadCount`를 `lastReadAt`으로 교체한 이야기'
+series: messenger-load-test
+seriesOrder: 2
+seriesTitle: '메신저 부하 테스트 실전기'
 ---
+> 메신저 부하 테스트를 다룬 두 편짜리 시리즈입니다.
+> 
+> -   [**1편:** 부하 테스트 환경 구축 — Make 기반 IaC, Observability, Auth Seeding](/ko/blog/building-a-reusable-load-test-environment-for-a-messenger-service-make-based-iac-observability-and-auth-seeding/)
+>     
+> -   **2편 (이 글):** AI 생성 코드에 숨어 있던 deadlock — `unreadCount`를 `lastReadAt`으로 교체하기
+>     
+
+* * *
+
 > [!NOTE]
 > 부하 테스트 시작 9분 만에 HTTP 오류율 42.8%. 범인은 AI 보조 코딩 중 무심코 작성한 단 한 줄의 `updateMany`였습니다.
+
+앞서 **1편**에서 세운 부하 테스트 환경으로, 이제 send API가 **실제로 몇 TPS까지 버티는지** 처음 측정할 차례였습니다. 목표는 채팅 전송 **75 TPS** — 그리 무리한 숫자도 아니었습니다. 그런데 테스트를 켜자마자 수치가 무너졌고, 이 글은 그 원인을 끝까지 파고든 기록입니다.
 
 * * *
 
@@ -235,3 +249,7 @@ Phase 2가 끝나는 시점이면 **이미 deadlock 유발 지점은 사라진 �
     
 
 한 가지 교훈이 더 있습니다. **부하 테스트는 프로덕션 이후가 아니라 이전에 해야 합니다.** 격리된 부하 테스트 환경이 없었다면 이 문제는 100K CCU 트래픽 아래에서 터졌을 것입니다. 우리는 프로덕션에서 deadlock 사이클이 일으키는 5xx 폭풍을 쫓아다니고 있었겠죠. 그 환경 자체가 하나의 장애를 막아준 셈입니다.
+
+* * *
+
+> [👈 **1편:** "메신저 서비스를 위한 재사용 가능한 부하 테스트 환경 구축 — Make 기반 IaC, Observability, 그리고 Auth Seeding"](/ko/blog/building-a-reusable-load-test-environment-for-a-messenger-service-make-based-iac-observability-and-auth-seeding/)

@@ -6,7 +6,19 @@ tags: ['load-testing', 'k6', 'observability', 'grafana', 'prometheus', 'postgres
 category: building
 cover: /covers/building-a-reusable-load-test-environment-for-a-messenger-service-make-based-iac-observability-and-auth-seeding.webp
 coverAlt: '메신저 서비스를 위한 재사용 가능한 부하 테스트 환경 구축 — Make 기반 IaC, Observability, 그리고 Auth Seeding'
+series: messenger-load-test
+seriesOrder: 1
+seriesTitle: '메신저 부하 테스트 실전기'
 ---
+> 메신저 부하 테스트를 다룬 두 편짜리 시리즈입니다.
+> 
+> -   **1편 (이 글):** 부하 테스트 환경 구축 — Make 기반 IaC, Observability, Auth Seeding
+>     
+> -   [**2편:** AI 생성 코드에 숨어 있던 deadlock — `unreadCount`를 `lastReadAt`으로 교체하기](/ko/blog/there-was-a-deadlock-hiding-in-ai-generated-code-how-we-replaced-unreadcount-with-lastreadat/)
+>     
+
+* * *
+
 > 우리 메신저의 send API가 정확히 몇 TPS까지 버틸 수 있는지, 그리고 실제로 _어디서_ 무너지는지 알고 싶었습니다. 그래서 프로덕션을 7-노드 부하 테스트 환경으로 복제했고, 이를 일회성 셋업으로 취급하는 대신 **필요할 때마다 재현 가능하도록** 설계했습니다.
 
 이 글은 그 과정에 대한 기록입니다 — 무엇을 측정하고 싶었는지, 무엇을 먼저 준비해야 했는지, 그리고 누구나 전체 과정을 다시 실행할 수 있도록 환경 자체를 어떻게 감쌌는지에 대한 이야기입니다.

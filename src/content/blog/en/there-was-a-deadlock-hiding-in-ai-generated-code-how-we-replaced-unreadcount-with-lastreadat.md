@@ -7,9 +7,23 @@ tags: ['postgresql', 'prisma', 'databases', 'concurrency', 'node-js', 'debugging
 category: fundamentals
 cover: /covers/there-was-a-deadlock-hiding-in-ai-generated-code-how-we-replaced-unreadcount-with-lastreadat.webp
 coverAlt: 'There Was a Deadlock Hiding in AI-Generated Code — How We Replaced `unreadCount` with `lastReadAt`'
+series: messenger-load-test
+seriesOrder: 2
+seriesTitle: 'Load-Testing a Messenger'
 ---
+> A two-part series on load-testing our messenger.
+> 
+> -   [**Part 1:** Building the load-test environment — Make-based IaC, observability, auth seeding](/en/blog/building-a-reusable-load-test-environment-for-a-messenger-service-make-based-iac-observability-and-auth-seeding/)
+>     
+> -   **Part 2 (this post):** The deadlock hiding in AI-generated code — replacing `unreadCount` with `lastReadAt`
+>     
+
+* * *
+
 > [!NOTE]
 > 42.8% HTTP error rate, 9 minutes into a load test. The culprit was a single `updateMany` line carelessly written during AI-assisted coding.
+
+With the load-test environment from **Part 1** now in place, it was finally time to measure **how many TPS the send API could actually survive**. The target was a modest **75 TPS** of chat traffic. The moment the test started, the numbers fell apart — and this post is the story of tracking down why.
 
 * * *
 
@@ -236,3 +250,7 @@ This incident wasn't a one-line bug. It was **a thinking-pattern trap**.
     
 
 One more lesson. **Load testing belongs before production, not after.** Without an isolated load-test environment, this would have detonated under 100K CCU traffic. We'd have been chasing a 5xx storm caused by deadlock cycles in production. The environment itself prevented one incident.
+
+* * *
+
+> [👈 **Part 1:** "Building a Reusable Load-Test Environment for a Messenger Service — Make-based IaC, Observability, and Auth Seeding"](/en/blog/building-a-reusable-load-test-environment-for-a-messenger-service-make-based-iac-observability-and-auth-seeding/)
