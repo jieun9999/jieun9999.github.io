@@ -319,67 +319,45 @@ Note that `--force-recreate` **comes back** in step 3. My first instinct was "de
 
 ## 4\. Bonus debugging — I thought we were at zero, and 12 seconds were still hiding
 
-The switchover window really did measure zero. But **11–14 seconds** remained near the start of every deploy.
+The switchover window really did measure zero, but 11–14 seconds remained near the start of every deploy. **It reproduced on a deploy that changed zero lines of code** — even though Caddy had been taken out of the recreate set.
 
-```plaintext
-16:34:17  ✗ landing, superadmin, blog all DOWN (523)   ← ~22s after the deploy began
-16:34:31  ✓ everything recovered                        total 11–14s
-16:35~    ✓ 24 samples all OK                           ◀── the blue→green switch is clean
-```
-
-**It reproduced on a deploy that changed zero lines of code** — even though Caddy had been taken out of the recreate set.
-
-The container's `Created` timestamp matched this deploy, which means it was a **recreation**, not a restart. The trigger was the image:
+The container's `Created` timestamp matched the deploy, so it was a recreation, not a restart. The trigger was the image:
 
 | Point in time     | Image ID       | CreatedAt  |
 | ----------------- | -------------- | ---------- |
 | **Before** deploy | `a24f5a31f34d` | 2026-07-08 |
 | **After** deploy  | `19dc2184f202` | 2026-07-08 |
 
-**`CreatedAt` is unchanged while the ID moved.** `docker compose build` reuses every layer from cache and _still_ mints a fresh image ID, and compose folds the image ID into the service config hash. So **merely building makes the following `up -d` recreate Caddy.** We'd taken Caddy out of the recreate set, and a build line had quietly opened a side door.
+**`CreatedAt` is unchanged while the ID moved.** `docker compose build` reuses every layer from cache and _still_ mints a fresh image ID, and compose folds that ID into the config hash. So **merely building makes the following `up -d` recreate Caddy.** We'd taken Caddy out of the recreate set, and a build line had quietly opened a side door.
 
-That left the question of why it took 12 seconds — Caddy parses a config and binds ports, and that's it. **Startup was two seconds. Shutdown was the slow part.**
-
-```plaintext
-SIGTERM ─ caddy closes its listeners → 521/523 starts here
-   │  ◀── ~10s: docker waits for the process to exit   ← most of the downtime
-SIGKILL ─ forced → rm + create + start (~2s)
-```
-
-The log had the answer:
+Why it took a full 12 seconds was the other surprise. **Startup was two seconds. Shutdown was the slow part.**
 
 ```plaintext
 "logger":"http","msg":"servers shutting down with eternal grace period"
 ```
 
-With no `grace_period` set, the default is **infinite**. Caddy waits for in-flight connections to finish, but Cloudflare sits in front holding keep-alive connections, so they never do, and docker's 10-second stop timeout expires and SIGKILLs it. The listeners closed right at SIGTERM, so **those ten seconds are pure dead time that serves nothing but 521s.**
+With no `grace_period` set, the default is **infinite**. Caddy waits forever on the keep-alive connections Cloudflare holds in front of it, until docker's 10-second stop timeout SIGKILLs it. The listeners closed right at SIGTERM, so **those ten seconds are pure dead time that serves nothing but 521s.**
 
-Two fixes. **Hash `Dockerfile.caddy`'s contents, store it on the server, and only build when it changed** — that removes the root cause. Then `grace_period 3s` and `stop_grace_period 5s` as a cushion, so that even when recreation is unavoidable the downtime tops out at 3–5 seconds.
+The fix removed the cause — hash `Dockerfile.caddy` on the server and only build when it changed — and added `grace_period 3s` plus `stop_grace_period 5s` as a cushion, capping any unavoidable recreation at 3–5 seconds.
 
 ---
 
 ## 5\. Results — and the 3–5 seconds that remain
 
-Verification is simple: hit all three domains once a second throughout the deploy.
+Verification was a one-second loop against all three domains, run throughout the deploy.
 
 ```bash
 while :; do printf '%s %s\n' "$(date +%T)" \
   "$(curl -sS -o /dev/null -w '%{http_code}' --max-time 5 https://example.com)"; sleep 1; done
 ```
 
-```plaintext
-deploy started   16:43:18
-observed         16:43:32 ~ 16:45:22   (35 samples)
-DOWN             0
-```
-
-There's an even more conclusive signal — `docker ps` right after the deploy finishes:
+35 samples, **zero DOWN.** The more conclusive signal is `docker ps` right after the deploy finishes:
 
 ```plaintext
 caddy   Up 4 minutes (healthy)
 ```
 
-**Four minutes of uptime at the moment the deploy ended.** The container from the _previous_ deploy survived this one untouched. Had it been recreated, it would read `Up 20 seconds`.
+**Four minutes of uptime** means the container from the _previous_ deploy passed straight through this one. Had it been recreated, it would read `Up 20 seconds`.
 
 | Metric                            | Before             | After                          |
 | --------------------------------- | ------------------ | ------------------------------ |
@@ -388,42 +366,22 @@ caddy   Up 4 minutes (healthy)
 | Shipping a broken commit          | Outage             | **No impact** (never switches) |
 | Rollback                          | Rebuild + redeploy | **One config line, 20–30s**    |
 
-### What blue-green imposes on the code — expand-contract
+### The price — migrations have to be expand-contract
 
-Zero-downtime deploys aren't purely free. **They add a constraint on the code side.**
+From the switch until the old color stops, both versions read **the same database at the same time.** So the question isn't "do I split the merge," it's **does this migration break the old version.**
 
-From the switch (t4) until the old color stops (t6), the old and new versions read **the same database at the same time.** Migrations running before the new code is guaranteed by the deploy script (step 2 → step 3 → step 6). They used to run **after** `up -d`, so new code would query an unmigrated schema for tens of seconds; getting away with it was mostly luck, and it was fixed in the same pass.
+Adding a nullable column is one deploy — the old version doesn't know it exists. Dropping a column, renaming, or applying `NOT NULL` immediately has to split into three deploys: add, switch the code, drop. Old and new overlap for the 30-second drain, so combining an add and a drop in one deploy means blue serves 500s for those 30 seconds. **Zero-downtime machinery doesn't save you: if the schema isn't compatible, you get the downtime anyway.**
 
-The real constraint is that **blue is alive and using that database at step 2.** So the question isn't "do I split the merge," it's **does this migration break the old version.**
+Separately, migrations used to run **after** `up -d` — new code querying an unmigrated schema for tens of seconds. Getting away with it was mostly luck, and it moved ahead of the boot in the same pass.
 
-| Migration                                               | Split across deploys?                                        |
-| ------------------------------------------------------- | ------------------------------------------------------------ |
-| **Add** a nullable column, table, or index              | ✕ One deploy. The old version doesn't know the column exists |
-| **Drop** a column, immediate `NOT NULL`, new constraint | ○ **Must split.** The old version still reads it             |
-| **Rename**                                              | ○ Decompose into three steps                                 |
+### What's left
 
-Destructive changes get merged like this:
-
-```plaintext
-merge 1  add the new column (nullable) + backfill · code handles both old and new
-merge 2  code reads only the new column      ◀── the last reader of the old column disappears
-merge 3  drop the old column
-```
-
-**The rule is that each individual deploy must be backward-compatible on its own.** Old and new overlap for the 30-second drain, so combining an add and a drop in one deploy means blue serves 500s for those 30 seconds. Zero-downtime machinery doesn't save you: **if the schema isn't compatible, you get the downtime anyway.**
-
-### Being honest about what's left
-
-A deploy that **genuinely changes** the caddy block in `compose.yml`, `Dockerfile.caddy`, or an environment variable Caddy reads will still recreate it, and that costs 3–5 seconds. "Rare" is a more accurate word than "solved."
-
-As long as exactly one process holds 80/443, that number is structural. Driving it to zero would need a layer that hands the socket over — a different scale of project.
+A deploy that **genuinely changes** the caddy block in `compose.yml`, `Dockerfile.caddy`, or an environment variable Caddy reads still costs 3–5 seconds. "Rare" is a more accurate word than "solved," and as long as exactly one process holds 80/443, that number is structural.
 
 ### Takeaways
 
 - **The zero-downtime tool was already there.** The `caddy reload` step was in the workflow the whole time; an earlier step killed Caddy and erased its effect. Adopting a tool is easier than **creating the conditions under which it actually works.**
 
-- **`--force-recreate` isn't the villain — a missing target is.** My first diagnosis was "delete the flag," and it was wrong. Blue-green genuinely wants that flag — scoped to one service, alongside `--no-deps`.
-
-- **Error codes tell you the blast radius.** The difference between 502 and 521 decided whether we were looking at a dead backend or a dead entry point, and that one digit set the entire direction of the investigation.
+- **`--force-recreate` isn't the villain — a missing target is.** Blue-green genuinely wants that flag, scoped to one service alongside `--no-deps`.
 
 - **Downtime only starts shrinking once you start measuring it.** Every number in this post came out of a single one-second `curl` loop. "It blips for a moment" and "11–14 seconds, starting 22 seconds into the deploy" are completely different pieces of information.
