@@ -1,5 +1,5 @@
 ---
-title: "From Restarting One Container to Blue-Green Zero-Downtime Deploys — Cutting 100 Seconds of Downtime to Zero"
+title: "From Restarting One Container to Blue-Green Zero-Downtime Deploys — 100 Seconds of Downtime Gone, and the 3 That Stayed"
 description: "Every deploy took the whole stack down for 60–100 seconds. The culprit was a single `--force-recreate` with no service names, and the real design question turned out to be what *not* to run two copies of."
 pubDate: 2026-07-20
 tags:
@@ -342,7 +342,7 @@ The fix removed the cause — hash `Dockerfile.caddy` on the server and only bui
 
 ---
 
-## 5\. Results — and the 3–5 seconds that remain
+## 5\. Results — and the 3 seconds that stayed
 
 Verification was a one-second loop against all three domains, run throughout the deploy.
 
@@ -359,29 +359,35 @@ caddy   Up 4 minutes (healthy)
 
 **Four minutes of uptime** means the container from the _previous_ deploy passed straight through this one. Had it been recreated, it would read `Up 20 seconds`.
 
-| Metric                            | Before             | After                          |
-| --------------------------------- | ------------------ | ------------------------------ |
-| Blog                              | 521 · 5–10s        | **0**                          |
-| Landing / user admin / superadmin | 502 · 60–100s      | **0**                          |
-| Shipping a broken commit          | Outage             | **No impact** (never switches) |
-| Rollback                          | Rebuild + redeploy | **One config line, 20–30s**    |
+| Metric                                   | Before             | After                          |
+| ---------------------------------------- | ------------------ | ------------------------------ |
+| Blog                                     | 521 · 5–10s        | **0**                          |
+| Landing / user admin / superadmin        | 502 · 60–100s      | **0**                          |
+| **Deploys that really change caddy cfg** | 521 · 5–10s        | **3–5s** ← the only one left   |
+| Shipping a broken commit                 | Outage             | **No impact** (never switches) |
+| Rollback                                 | Rebuild + redeploy | **One config line, 20–30s**    |
 
-### The price — migrations have to be expand-contract
+Ordinary deploys are zero. That last row is why this post can't claim it drove downtime to zero outright.
 
-From the switch until the old color stops, both versions read **the same database at the same time.** So the question isn't "do I split the merge," it's **does this migration break the old version.**
+### The price — changing the database gets delicate
 
-Adding a nullable column is one deploy — the old version doesn't know it exists. Dropping a column, renaming, or applying `NOT NULL` immediately has to split into three deploys: add, switch the code, drop. Old and new overlap for the 30-second drain, so combining an add and a drop in one deploy means blue serves 500s for those 30 seconds. **Zero-downtime machinery doesn't save you: if the schema isn't compatible, you get the downtime anyway.**
+Zero downtime works by briefly running two versions at once, which means that for those 30 seconds **the old code and the new code share one database.**
 
-Separately, migrations used to run **after** `up -d` — new code querying an unmigrated schema for tens of seconds. Getting away with it was mostly luck, and it moved ahead of the boot in the same pass.
+If you reshape the database to fit the new code while the old code is still alive, the old code finds a column it knew about missing. That's 500s for 30 seconds. So the rule collapses to one line: **a schema change has to leave the old code working.**
+
+- **Adding** a column is safe. The old code doesn't know it exists.
+- **Dropping or renaming** one is not. The old code is still reading it.
+
+So removals ship across three deploys.
+
+```plaintext
+1st  add the new column and backfill it   (leave the old one alone)
+2nd  switch the code to the new column    ◀── nothing reads the old one now
+3rd  drop the old column
+```
+
+**Zero-downtime machinery doesn't save you from breaking this order.** Changing how we deploy ended up changing how we write code.
 
 ### What's left
 
 A deploy that **genuinely changes** the caddy block in `compose.yml`, `Dockerfile.caddy`, or an environment variable Caddy reads still costs 3–5 seconds. "Rare" is a more accurate word than "solved," and as long as exactly one process holds 80/443, that number is structural.
-
-### Takeaways
-
-- **The zero-downtime tool was already there.** The `caddy reload` step was in the workflow the whole time; an earlier step killed Caddy and erased its effect. Adopting a tool is easier than **creating the conditions under which it actually works.**
-
-- **`--force-recreate` isn't the villain — a missing target is.** Blue-green genuinely wants that flag, scoped to one service alongside `--no-deps`.
-
-- **Downtime only starts shrinking once you start measuring it.** Every number in this post came out of a single one-second `curl` loop. "It blips for a moment" and "11–14 seconds, starting 22 seconds into the deploy" are completely different pieces of information.
