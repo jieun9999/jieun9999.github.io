@@ -184,16 +184,6 @@ There's more shared state beyond db and redis — the `dist` volume (Astro outpu
 
 The worker was a lucky case: being queue-based, **it never needed zero downtime in the first place.** While it's down jobs pile up; when it's back they drain.
 
-I also checked what force-recreating the database actually bought us. Effectively nothing.
-
-| Expectation     | Reality                                                                      |
-| --------------- | ---------------------------------------------------------------------------- |
-| Refreshed data  | ✕ Restored straight from the volume. Redis reloads from AOF                  |
-| Refreshed image | ✕ The workflow only runs `build`, never `pull`. **Same image, recreated**    |
-| Config applied  | ✕ Happens without the flag. A changed config hash triggers recreation anyway |
-
-We were **paying 60–100 seconds and buying nothing.**
-
 > [!NOTE]
 > "Two copies of admin" doesn't mean two are always running. Normally one is up; they overlap for 1–2 minutes per deploy. On a single 2 OCPU / 12GB box that also runs native arm64 builds, keeping two resident would collide head-on with the build's memory peak.
 
