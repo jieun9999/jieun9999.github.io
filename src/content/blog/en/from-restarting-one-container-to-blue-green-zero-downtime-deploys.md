@@ -1,7 +1,8 @@
 ---
-title: "From Restarting One Container to Blue-Green Zero-Downtime Deploys — 100 Seconds of Downtime Gone, and the 3 That Stayed"
-description: "Every deploy took the whole stack down for 60–100 seconds. The culprit was a single `--force-recreate` with no service names, and the real design question turned out to be what *not* to run two copies of."
+title: "Taking Caddy Out of the Deploy Path — the Structural Problem Was Touching a SPOF Automatically"
+description: "Every deploy took the whole stack down for 60–100 seconds. Blue-green removed most of it, but five seconds stayed at the reverse proxy — and the real cost of those five seconds was not five seconds. It was the variance: five seconds, or indefinitely. So we took it out of the deploy path entirely."
 pubDate: 2026-07-20
+updatedDate: 2026-07-22
 tags:
   [
     "docker-compose",
@@ -21,9 +22,7 @@ coverCaption: "The moment the origin disappeared mid-deploy. Cloudflare is Worki
 > [!NOTE]
 > Eight deploys went out in 25 minutes, and the service went down on every one of them. The culprit was a single `docker compose up -d --force-recreate` with no service names.
 
-The blog marketing platform I work on at my company runs its entire stack on a single ARM box (2 OCPU / 12GB) under docker compose. When something merges to `main`, GitHub Actions SSHes into the server and runs `git pull → build → up -d`. A very ordinary setup.
-
-Then two of us started merging back to back, and the problem surfaced. **Every deploy took the service down.** This is the record of chasing that down and rebuilding the deploy as blue-green.
+The blog marketing platform I work on runs its whole stack on a single ARM box (2 OCPU / 12GB) under docker compose. Merges to `main` trigger GitHub Actions to SSH in and run `git pull → build → up -d` — a very ordinary setup. Then two of us started merging back to back and **every deploy took the service down.** This is the record of chasing that down, rebuilding as blue-green, and finally taking the reverse proxy out of the deploy path.
 
 ---
 
@@ -42,9 +41,9 @@ Measurements first. Eight deploys in 25 minutes.
 05:59  #150  3m41s  success
 ```
 
-`#148` being cancelled is `cancel-in-progress: false` working as designed. There is exactly one pending slot, so when a third run arrives the queued one gets cancelled. In other words, **deploys were already being silently dropped.**
+`#148` being cancelled is `cancel-in-progress: false` working as designed: one pending slot, so a third run evicts the queued one. **Deploys were already being silently dropped.**
 
-Then at `05:58:54` the user-facing screens went dark. And something didn't add up: **the static blog went down too, even though it has nothing to do with the app.** On this platform, the blogs served at `{slug}.example.com` never touch the Next.js app — the reverse proxy serves build artifacts directly off disk. There's no reason for an app restart to kill them.
+Then at `05:58:54` the user-facing screens went dark. The odd part: **the static blog went down too, even though it has nothing to do with the app.** The blogs at `{slug}.example.com` never touch the Next.js app — the reverse proxy serves build artifacts directly off disk — so an app restart has no reason to kill them.
 
 ### What died wasn't the app, it was the reverse proxy
 
@@ -55,9 +54,7 @@ The error code was the giveaway. It was **521, not 502**.
 | 502     | Reached the origin, but the backend is down        | Only the app container is gone     |
 | **521** | **Can't even open a TCP connection to the origin** | **Nothing is listening on 80/443** |
 
-Even API paths like `/api/auth/google/start` returned 521. If only the app had died, the proxy would have been alive and answered 502. So what died was not the backend — it was **the entry point (Caddy) itself**.
-
-On this platform Caddy isn't just a router.
+Even API paths like `/api/auth/google/start` returned 521. Had only the app died, the proxy would have answered 502. What died was **the entry point (Caddy) itself** — and on this platform Caddy isn't just a router.
 
 ```plaintext
 example.com          ──► caddy ──► admin:3000     (landing, login)
@@ -89,7 +86,7 @@ docker compose -f deploy/compose.yml up -d --remove-orphans --force-recreate
 | `worker` | Consumes Astro build and scheduled-publish jobs      | Harmless. The queue absorbs it — jobs drain once it's back      |
 | `caddy`  | Binds 80/443 + **serves the static blogs**           | **521.** The entry point disappears                             |
 
-On top of that, `--force-recreate` turns off the "only recreate what changed" decision entirely. Normally compose hashes a service's fully-resolved config, stores it on a container label (`com.docker.compose.config-hash`), and compares on the next `up -d` so it recreates **only what differs**. `--force-recreate` skips that comparison — the docs say it plainly: _"Recreate containers even if their configuration and image haven't changed."_
+On top of that, `--force-recreate` turns off the "only recreate what changed" decision. Compose normally hashes a service's fully-resolved config onto a container label (`com.docker.compose.config-hash`) and compares on the next `up -d` so it recreates **only what differs**; this flag skips that comparison — the docs say it plainly: _"Recreate containers even if their configuration and image haven't changed."_
 
 So a deploy that changed one line of app code was **also destroying the database and the reverse proxy.**
 
@@ -103,7 +100,7 @@ stop  →  rm  →  create  →  start
        in this window the container does not exist at all
 ```
 
-`restart` restarts the process; the container keeps existing. `recreate` deletes it and builds a new one. When Caddy is in that window, **no process is bound to the host's 80/443.** It isn't a firewall drop — the connection is refused outright, and Cloudflare surfaces that as 521.
+`restart` restarts the process; the container keeps existing. `recreate` deletes it and builds a new one. When Caddy is in that window, **no process is bound to the host's 80/443.** The connection is refused outright, and Cloudflare surfaces that as 521.
 
 And `depends_on` stretches this from seconds into minutes.
 
@@ -121,13 +118,13 @@ And `depends_on` stretches this from seconds into minutes.
 | Blog (static)                     | only while caddy is recreated      | **5–10s** (521) |
 | Landing / user admin / superadmin | the whole db→api→admin→caddy chain | **60–100s**     |
 
-Five to ten seconds for the blog is short, but it isn't a number you get to ignore. Eight deploys a day means eight chances for a crawler to be handed a 521 — a number that should be zero.
+Five to ten seconds is short, but eight deploys a day means eight chances for a crawler to be handed a 521 — a number that should be zero.
 
 ---
 
 ## 3\. The design — deciding what _not_ to duplicate
 
-"Blue-green" gets summarized as "run two copies of the app and alternate." In practice, most of the design time went into deciding **where duplication has to stop.**
+"Blue-green" gets summarized as "run two copies and alternate." In practice most of the design time went into deciding **where duplication has to stop.**
 
 ```plaintext
                     ┌──────────────────────────────┐
@@ -153,7 +150,7 @@ Redis here is a queue, not a cache.
 command: ["redis-server", "--maxmemory-policy", "noeviction", "--appendonly", "yes", ...]
 ```
 
-`noeviction` + `appendonly` is a declaration that this data must never be lost — it holds real work: Astro build jobs, scheduled-publish jobs. Split it in two and you get:
+`noeviction` + `appendonly` declares that this data must never be lost — it holds real work: Astro builds, scheduled publishes. Split it in two and you get:
 
 ```plaintext
 blue-redis  [job A, job B, job C]  ← blue-worker is processing these
@@ -165,11 +162,9 @@ green-worker sees an empty queue  →  jobs A/B/C are processed by nobody
 the moment you clean up blue-redis →  permanently lost
 ```
 
-A cache miss just refills itself. A queue can't. **Scheduled posts would quietly vanish, and the user would have no way to know why.**
+A cache miss refills itself. A queue can't. **Scheduled posts would quietly vanish, and the user would never know why.**
 
-The database is the product's single source of truth. One `pgdata` volume holds sites, posts, and schedules, so duplicating it means writes that land during the switchover end up on one side or the other, and rolling back throws away everything written in between. Doing it properly needs streaming replication plus failover — which is **an HA setup**, not blue-green deployment. Not the thing you reach for to fix deploy downtime.
-
-There's more shared state beyond db and redis — the `dist` volume (Astro output), OG images, uploads, per-domain proxy config. All of it is written by the worker and read by Caddy, so none of it is splittable either.
+The database is clearer still. Duplicate it and switchover writes split across both sides; roll back and everything in between is gone. Doing it properly needs streaming replication plus failover — **an HA setup**, not blue-green. Shared state like the `dist` volume is no different.
 
 | Service   | Two copies? | Why                                                                                    |
 | --------- | ----------- | -------------------------------------------------------------------------------------- |
@@ -180,16 +175,14 @@ There's more shared state beyond db and redis — the `dist` volume (Astro outpu
 | redis     | ✕ no        | A queue. Splitting it loses jobs                                                       |
 | caddy     | ✕ no        | A router is something you **reload**, not restart                                      |
 
-The worker was a lucky case: being queue-based, **it never needed zero downtime in the first place.** While it's down jobs pile up; when it's back they drain.
+The worker is queue-based, so **it never needed zero downtime in the first place.** While it's down jobs pile up; when it's back they drain.
 
 > [!NOTE]
-> "Two copies of admin" doesn't mean two are always running. Normally one is up; they overlap for 1–2 minutes per deploy. On a single 2 OCPU / 12GB box that also runs native arm64 builds, keeping two resident would collide head-on with the build's memory peak.
+> "Two copies of admin" doesn't mean two are always running. Normally one is up; they overlap for 1–2 minutes per deploy. On a single 2 OCPU / 12GB box that also runs arm64 builds, keeping two resident would collide with the build's memory peak.
 
 ### ② A router is something you reload, not restart
 
-Taking Caddy out of the recreate set isn't enough on its own, because **something does have to change on every deploy** — proxy config for newly created blogs, plus the blue/green upstream from ③.
-
-Reload is not restart.
+Taking Caddy out of the recreate set isn't enough, because **something does change every deploy** — proxy config for new blogs, plus the blue/green upstream from ③. Reload is not restart.
 
 ```plaintext
    [caddy process — still alive, still holding the socket]
@@ -206,15 +199,28 @@ Reload is not restart.
    [the socket is never released, not for an instant]
 ```
 
-The port is never empty, so **521 becomes structurally impossible.** And because `caddy validate` runs first, pushing a broken config doesn't take the service down. Recreation is the exact opposite: a bad config means the container won't boot, and that's an outage.
+The port is never empty, so **521 becomes structurally impossible**, and `caddy validate` runs first so a broken config never takes the service down. Recreation is the opposite: a bad config means the container won't boot.
 
-Here's the deflating part. **That reload step was already in the workflow.** An earlier step was force-recreating Caddy, so we had the zero-downtime tool in place and were erasing its effect ourselves.
+Here's the deflating part. **That reload step was already in the workflow.** An earlier step force-recreated Caddy, so we had the zero-downtime tool in place and were erasing its effect ourselves.
 
-That said, `caddy validate` only protects you when you're **pushing a new config into an already-running Caddy**. A Caddy that gets recreated and **boots from scratch** is a different story: if the config doesn't even parse, the container fails to start, falls into a restart loop, and 80/443 stays empty the whole time. So there's a second rule:
+But `caddy validate` only protects you when **pushing config into an already-running Caddy**. A Caddy that **boots from scratch** is different: if the config doesn't parse, the container never starts, falls into a restart loop, and 80/443 stays empty. Hence a second rule:
 
 > **Caddy must always hold a config that parses, no matter when it boots.**
 
-Whether the upstream is actually alive is a separate concern. As long as the config parses, Caddy comes up, the static blogs serve fine, and only the app returns 502. **That is a categorically smaller blast radius than 521.** The deploy script got an `--ensure` step that writes the active-color file if it's missing, and it runs _before_ `up -d`. Caddy's `depends_on: admin` is gone too — that was a path for app recreation to propagate into Caddy.
+Whether the upstream is alive is separate. If the config parses, Caddy comes up, the blogs serve, and only the app returns 502 — **a categorically smaller blast radius than 521.** The deploy script got an `--ensure` step that writes the active-color file if missing, running _before_ `up -d`. Caddy's `depends_on: admin` is gone too.
+
+#### Why doesn't Caddy die when the file changes?
+
+Doesn't a config change require rebuilding the container? Compose folds a volume's **mount path** into the config hash, not the **file's contents**.
+
+```plaintext
+./active:/etc/caddy/active:ro     →  in the hash    (change the path and it recreates)
+blue / green inside admin.caddy   →  not in the hash (rewrite it as often as you like)
+```
+
+And a bind mount shares the same file as the host, so the deploy script can rewrite `active/admin.caddy` and compose still concludes "nothing changed." **Everything that changes during normal operation already lives somewhere that needs no recreation.**
+
+Reload doesn't drop connections for the same reason: Caddy **binds the new config's listeners first and only then** tears down the old ones. The create-then-kill ordering we're about to apply to admin in ③, Caddy was already using for its own config swaps.
 
 ### ③ Invert the order — kill-then-create becomes create-then-kill
 
@@ -230,14 +236,14 @@ The app-side downtime has a simple cause: recreation kills first and builds seco
               caddy is alive but has nowhere to send traffic → 502
 ```
 
-One common misconception is worth clearing up. The Caddyfile already had `dynamic a` in it. It's a good mechanism, but **it solves a different problem.**
+One common misconception is worth clearing up. The Caddyfile already had `dynamic a` in it, but **it solves a different problem.**
 
 | `dynamic a`        | What it does                                                                      |
 | ------------------ | --------------------------------------------------------------------------------- |
 | Solves             | Follows the new container **even if its IP changes**, within 5s → faster recovery |
 | **Does not solve** | The 20–40 seconds where the container **doesn't exist at all**                    |
 
-If there's no target, tracking its IP perfectly still gives you a 502. **With one slot, this is unfixable.** So we invert the order.
+With no target, tracking its IP perfectly still gives you a 502. **With one slot this is unfixable.** So we invert the order.
 
 ```plaintext
 before (kill → start)
@@ -251,7 +257,7 @@ blue-green (start → kill)
                    the two overlap → no gap
 ```
 
-The switch is one file. The platform already imported per-domain config files, so we reused the pattern — a single `active/admin.caddy` decides the active color.
+The switch is one file. We reused the existing per-domain `import` pattern — a single `active/admin.caddy` decides the active color.
 
 ```caddy
 # the deploy script rewrites only this file
@@ -263,9 +269,7 @@ The switch is one file. The platform already imported per-domain config files, s
 }
 ```
 
-Manipulating network aliases would also have worked, but a file plus reload makes **the switch point explicit** and makes rollback as simple as a `git checkout`.
-
-The result is that at every point in the process, at least one admin that can serve requests exists.
+At every point in the process, at least one admin that can serve requests exists.
 
 ```plaintext
 t0  blue active, no green      caddy → blue     ✔ can serve
@@ -277,16 +281,16 @@ t5  drain 30s (blue kept up)   caddy → green    ✔ blue's in-flight requests 
 t6  blue stopped               caddy → green    ✔ long after the switch
 ```
 
-The whole thing hinges on **the order of t3 and t4.** Traffic only moves after green reports healthy, so it never lands on something that isn't ready. Two things come along for free:
+The whole thing hinges on **the order of t3 and t4.** Traffic only moves after green reports healthy, so it never lands on something unready. Two things come along for free:
 
-- **A failure at t3 means no switch.** Blue keeps serving, so a commit with a broken build or boot ships without users noticing. Previously, a broken commit _was_ an outage.
-- **At t6 we `stop` but never `rm`.** A stopped container uses no memory, but its config and image are still there, so a `start` plus reload rolls back in 20–30 seconds. **Half the rollback time at zero memory cost.**
+- **A failure at t3 means no switch.** Blue keeps serving, so a broken commit ships without users noticing. Previously, a broken commit _was_ an outage.
+- **At t6 we `stop` but never `rm`.** The config and image are still there, so a `start` plus reload rolls back in 20–30 seconds.
 
-The healthcheck needed work too. The old one was `fetch('http://localhost:3000/')`, which goes through the middleware's host branching and doesn't really prove the app can serve — and under blue-green, **this verdict is the traffic-switch condition.** So we added `/api/healthz`, which also verifies api reachability, and registered it as a middleware-public route: if it hits the auth gate, `fetch` follows the `/login` redirect and **misreads a 200 as healthy.**
+The healthcheck needed work too. The old `fetch('http://localhost:3000/')` goes through the middleware's host branching and doesn't really prove the app can serve — and under blue-green **this verdict is the traffic-switch condition**, so a misread is an outage. We switched to `/api/healthz`, which also verifies api reachability.
 
 ### The three changes aren't independent
 
-Each fixes a different problem, and dropping any one of them means you don't get to zero.
+Drop any one of them and you don't get to zero.
 
 ```plaintext
 ① exclude stateful services  →  breaks the domino chain   (without it, two admins are pointless)
@@ -313,72 +317,142 @@ The final deploy flow:
 9. active/COLOR = TARGET
 ```
 
-Note that `--force-recreate` **comes back** in step 3. My first instinct was "delete this flag," and that was an inaccurate diagnosis. The flag was never the problem — **the missing target was.** In blue-green you actually _want_ to force-recreate the standby color, so it comes up clean with no leftover state. `--no-deps` is what stops the dependency chain from dragging the database along.
+Note that `--force-recreate` **comes back** in step 3. My first instinct was "delete this flag," which was an inaccurate diagnosis — the flag was never the problem, **the missing target was.** You _want_ to force-recreate the standby color so it comes up clean, and `--no-deps` stops the dependency chain from dragging the database along.
 
 ---
 
-## 4\. Bonus debugging — I thought we were at zero, and 12 seconds were still hiding
+## 4\. Isolation — the real cost of five seconds of downtime wasn't five seconds
 
-The switchover window really did measure zero, but 11–14 seconds remained near the start of every deploy. **It reproduced on a deploy that changed zero lines of code** — even though Caddy had been taken out of the recreate set.
-
-The container's `Created` timestamp matched the deploy, so it was a recreation, not a restart. The trigger was the image:
+That held up for a while, but five seconds remained. On a deploy that changed zero lines of code Caddy still got recreated, and the culprit was the image.
 
 | Point in time     | Image ID       | CreatedAt  |
 | ----------------- | -------------- | ---------- |
 | **Before** deploy | `a24f5a31f34d` | 2026-07-08 |
 | **After** deploy  | `19dc2184f202` | 2026-07-08 |
 
-**`CreatedAt` is unchanged while the ID moved.** `docker compose build` reuses every layer from cache and _still_ mints a fresh image ID, and compose folds that ID into the config hash. So **merely building makes the following `up -d` recreate Caddy.** We'd taken Caddy out of the recreate set, and a build line had quietly opened a side door.
+**`CreatedAt` is unchanged while the ID moved.** `docker compose build` reuses every layer from cache and _still_ mints a fresh image ID, which compose folds into the config hash — so merely building makes the following `up -d` recreate Caddy. We hashed the `Dockerfile` and only built when it changed.
 
-Why it took a full 12 seconds was the other surprise. **Startup was two seconds. Shutdown was the slow part.**
+**But that was one trigger.**
+
+The config hash takes more than the image ID — env values, volumes, ports, labels are all inputs. Something like this was still in there:
 
 ```plaintext
-"logger":"http","msg":"servers shutting down with eternal grace period"
+same server, same files, same moment — two different hashes
+
+  computed without the env var exported   →  cf673c18…
+  computed with it (= the live container)  →  a9d8d63e…
 ```
 
-With no `grace_period` set, the default is **infinite**. Caddy waits forever on the keep-alive connections Cloudflare holds in front of it, until docker's 10-second stop timeout SIGKILLs it. The listeners closed right at SIGTERM, so **those ten seconds are pure dead time that serves nothing but 521s.**
+Values containing spaces get truncated at the first token by compose's `${}` interpolation, so the workflow lifted that value into a shell variable to work around it. Run `docker compose up -d` once without that workaround and **the hash differs and Caddy gets recreated.** The workaround was duplicated in three places.
 
-The fix removed the cause — hash `Dockerfile.caddy` on the server and only build when it changed — and added `grace_period 3s` plus `stop_grace_period 5s` as a cushion, capping any unavoidable recreation at 3–5 seconds.
+Every trigger we blocked produced another. That's the signal the approach is wrong.
+
+### Not five seconds — "five seconds, or indefinitely"
+
+Before changing direction I recalculated the cost, finally looking at what happens when a recreation **fails**.
+
+```plaintext
+succeeds  →  80/443 empty for 5 seconds  →  521  →  recovered
+fails     →  config doesn't parse  →  container never boots
+          →  restart: unless-stopped loops forever
+          →  80/443 stays empty  →  full outage until a human fixes it
+```
+
+We lived through it once: Caddy was recreated while the active-color file was missing, `(admin_upstream)` was undefined, parsing failed, and the container fell into a restart loop. **It was resolved in three minutes because a human noticed in three minutes, not because the system recovered.**
+
+> **The cost of a recreation isn't "five seconds." It's the variance between five seconds and indefinitely.**
+> What you manage is not the average. It's the tail.
+
+Framed that way the work changes. Shaving five seconds to four is pointless; the answer is to **reduce how often you're exposed to the tail, and drive the failure probability to zero when you are.**
+
+### From accident to decision
+
+First, Caddy came out of the deploy path.
+
+```bash
+# before — a wobble in the hash recreated it silently
+docker compose up -d --no-deps db redis api worker caddy
+
+# after — it isn't on the list
+docker compose up -d --no-deps db redis api worker
+```
+
+Section 3 ② established why that's safe. The only thing this list uniquely covered was **a change to the Caddy block in the compose file itself**, and instead of removing that we turned it into **detection**.
+
+```bash
+DESIRED=$(docker compose config --hash caddy | awk '{print $2}')
+RUNNING=$(docker inspect -f '{{index .Config.Labels "com.docker.compose.config-hash"}}' caddy)
+
+[ "$DESIRED" != "$RUNNING" ] && echo "::warning::Caddy config changed. The deploy did not touch it."
+```
+
+It only reports into the Actions summary; a human opens the actual apply through `workflow_dispatch` — the same policy db and redis already had. `::warning` rather than `::error` is deliberate: blocking unrelated app deploys because the Caddy config drifted is how **people start routing around the workflow.**
+
+### Prove it boots before taking it down
+
+`caddy validate` was already running. The problem was **where**.
+
+```plaintext
+before   take Caddy down  →  bring it up  →  validate      ◀── too late
+after    validate (throwaway container)  →  take it down only if that passes
+```
+
+A validate running inside a living Caddy only protects you when pushing config into a running process. The path that boots a fresh container was unguarded.
+
+```bash
+docker run --rm --network none \
+  -v "$PWD/caddy:/etc/caddy:ro" \
+  --entrypoint caddy "$IMG" \
+  validate --config /etc/caddy/Caddyfile --adapter caddyfile
+```
+
+`--network none` means it binds no ports and can't collide with the running Caddy. If it fails we never start the recreation, so **user impact is zero.** What made this stronger than expected is that `validate` doesn't just parse — it **provisions modules**. Leaving out the DNS-challenge token surfaced as `API token '' appears invalid`, so **causes of broken certificate issuance** get caught before recreation too.
+
+We also send SIGKILL instead of SIGTERM on the way down, bringing a recreation to 1–2 seconds. Caddy's `grace_period` **closes the listeners first** and then waits, so that wait is **pure dead time serving nothing but 521s.**
+
+> ⚠️ The `grace_period` value itself stayed put. On `reload` the new config binds before the old one goes away, so there's no dead time, and the value does real work as a ceiling on in-flight requests. One setting covers both situations; lowering it only breaks the reload side.
+
+### Know immediately if something touched it
+
+Finally, once a deploy finishes we **assert** that Caddy survived it.
+
+```bash
+STARTED=$(docker inspect -f '{{.State.StartedAt}}' caddy)
+if [ "$(date -d "$STARTED" +%s)" -gt "$JOB_START_EPOCH" ]; then
+  echo "::error::Caddy was recreated during this deploy"
+  exit 1
+fi
+```
+
+A step printing uptime was already there, and its comment was even correct — _"if this resets every deploy, it's being recreated."_ But it **only printed, and nobody compared it.** The regression detector depended on human eyes. Only after adding the assertion did we learn Caddy had been replaced and restarted twice in the preceding two days with no trace in the logs.
 
 ---
 
-## 5\. Results — and the 3 seconds that stayed
+## 5\. Results
 
-Verification was a one-second loop against all three domains, run throughout the deploy.
-
-```bash
-while :; do printf '%s %s\n' "$(date +%T)" \
-  "$(curl -sS -o /dev/null -w '%{http_code}' --max-time 5 https://example.com)"; sleep 1; done
-```
-
-35 samples, **zero DOWN.** The more conclusive signal is `docker ps` right after the deploy finishes:
+So that an upstream cache couldn't paper over a gap at the origin, verification went **straight at the origin's 443, bypassing Cloudflare**, every 0.5 seconds. **Zero failures.** A probe that quietly dies also reports zero, so we cross-checked against the access log for the same window: **437 requests**. The most conclusive signal is the container itself.
 
 ```plaintext
-caddy   Up 4 minutes (healthy)
+before  Created 03:10:58   StartedAt 05:52:26
+after   Created 03:10:58   StartedAt 05:52:26   ◀── same container, not even a restart
 ```
 
-**Four minutes of uptime** means the container from the _previous_ deploy passed straight through this one. Had it been recreated, it would read `Up 20 seconds`.
+It wasn't an empty deploy either. In that same run api and worker were recreated and admin switched to green. **A normal deploy, with Caddy isolated from it.**
 
-| Metric                                   | Before             | After                          |
-| ---------------------------------------- | ------------------ | ------------------------------ |
-| Blog                                     | 521 · 5–10s        | **0**                          |
-| Landing / user admin / superadmin        | 502 · 60–100s      | **0**                          |
-| **Deploys that really change caddy cfg** | 521 · 5–10s        | **3–5s** ← the only one left   |
-| Shipping a broken commit                 | Outage             | **No impact** (never switches) |
-| Rollback                                 | Rebuild + redeploy | **One config line, 20–30s**    |
+| Metric                            | Before             | After                            |
+| --------------------------------- | ------------------ | -------------------------------- |
+| Blog                              | 521 · 5–10s        | **0**                            |
+| Landing / user admin / superadmin | 502 · 60–100s      | **0**                            |
+| Deploys that change caddy config  | 521 · 5–10s        | **0** (the deploy never touches) |
+| When a recreation fails           | Indefinite outage  | **No impact** (never recreates)  |
+| Shipping a broken commit          | Outage             | **No impact** (never switches)   |
+| Rollback                          | Rebuild + redeploy | **One config line, 20–30s**      |
 
-Ordinary deploys are zero. That last row is why this post can't claim it drove downtime to zero outright.
+The fourth row is the point of this work. Five seconds didn't become one second — **the tail got cut off.**
 
 ### The price — changing the database gets delicate
 
-Zero downtime works by briefly running two versions at once, which means that for those 30 seconds **the old code and the new code share one database.**
-
-If you reshape the database to fit the new code while the old code is still alive, the old code finds a column it knew about missing. That's 500s for 30 seconds. So the rule collapses to one line: **a schema change has to leave the old code working.**
-
-- **Adding** a column is safe. The old code doesn't know it exists.
-- **Dropping or renaming** one is not. The old code is still reading it.
-
-So removals ship across three deploys.
+Zero downtime works by briefly running two versions at once, so for 30 seconds **the old and new code share one database.** Drop a column while the old code still reads it and you get 500s for 30 seconds. **A schema change has to leave the old code working.**
 
 ```plaintext
 1st  add the new column and backfill it   (leave the old one alone)
@@ -388,6 +462,6 @@ So removals ship across three deploys.
 
 **Zero-downtime machinery doesn't save you from breaking this order.** Changing how we deploy ended up changing how we write code.
 
-### What's left
+---
 
-A deploy that **genuinely changes** the caddy block in `compose.yml`, `Dockerfile.caddy`, or an environment variable Caddy reads still costs 3–5 seconds. "Rare" is a more accurate word than "solved," and as long as exactly one process holds 80/443, that number is structural.
+That the same word "zero-downtime" called for two different prescriptions is what stayed with me longest. Admin is supposed to change on every deploy, so **running two copies and switching between them** is right. Caddy is supposed to not change, so **detecting changes and validating them up front** is right. Both are zero-downtime, and reaching for the same tool for both would have been a mistake.
