@@ -52,3 +52,64 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  # ── 색인 알림 (IndexNow) ────────────────────────────────────────────────────
+  #   이번 push 에서 실제로 바뀐 글의 URL만 골라 검색엔진에 알린다.
+  #
+  #   ⚠️ Google 은 IndexNow 에 참여하지 않는다. 그리고 예전의 사이트맵 ping
+  #     (google.com/ping?sitemap=)은 2023년에 폐기되어 지금은 404 다.
+  #     Google 쪽 경로는 "Search Console 에 사이트맵 1회 등록 + 정확한 lastmod"
+  #     뿐이고, 그래서 astro.config 의 lastmod 가 이 작업의 본체다.
+  #     여기서 얻는 건 Bing · Naver · Yandex · Seznam 이다.
+  #
+  #   실패해도 배포를 깨뜨리지 않는다. 색인 알림은 부가 기능이고, 알림이 없어도
+  #   사이트맵을 통해 결국 수집된다.
+  indexnow:
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # 직전 커밋과 비교해야 "바뀐 글"을 알 수 있다
+
+      - name: Submit changed posts to IndexNow
+        continue-on-error: true
+        env:
+          INDEXNOW_KEY: 1c52b3ddad0991512608edae172f9ef7
+          SITE_HOST: jieun.dev
+        run: |
+          set -euo pipefail
+
+          # 바뀐 글 파일 → 공개 URL 로 변환
+          #   src/content/blog/<lang>/<slug>.md  →  https://<host>/<lang>/blog/<slug>/
+          URLS=$(git diff --name-only --diff-filter=AM HEAD^ HEAD -- 'src/content/blog/**/*.md' \
+                 | sed -E "s#^src/content/blog/([a-z]+)/(.+)\.md\$#https://${SITE_HOST}/\1/blog/\2/#" \
+                 | sort -u)
+
+          if [ -z "$URLS" ]; then
+            echo "변경된 글 없음 → 색인 알림 건너뜀"
+            exit 0
+          fi
+
+          echo "── 알릴 URL"; echo "$URLS" | sed 's/^/  /'
+
+          PAYLOAD=$(jq -n \
+            --arg host "$SITE_HOST" \
+            --arg key "$INDEXNOW_KEY" \
+            --arg loc "https://${SITE_HOST}/${INDEXNOW_KEY}.txt" \
+            --argjson urls "$(echo "$URLS" | jq -R . | jq -s .)" \
+            '{host: $host, key: $key, keyLocation: $loc, urlList: $urls}')
+
+          CODE=$(curl -sS -o /tmp/indexnow.out -w '%{http_code}' \
+                 -X POST https://api.indexnow.org/indexnow \
+                 -H 'Content-Type: application/json; charset=utf-8' \
+                 --data "$PAYLOAD")
+
+          echo "── 응답 $CODE"; cat /tmp/indexnow.out || true
+          # 200/202 만 성공. 그 외는 로그만 남기고 배포는 성공으로 둔다.
+          case "$CODE" in
+            200|202) echo "✅ 색인 알림 전송" ;;
+            *) echo "::warning title=IndexNow 실패::HTTP $CODE — 사이트맵을 통해 결국 수집된다" ;;
+          esac

@@ -6,9 +6,46 @@ import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers';
 import { remarkAlert } from 'remark-github-blockquote-alert';
 import rehypeSlug from 'rehype-slug';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
+import fs from 'node:fs';
+import matter from 'gray-matter';
 
 // 배포될 사이트 주소 (커스텀 도메인, 루트)
 const SITE = 'https://jieun.dev';
+
+// ── 사이트맵 lastmod 용 글별 최종 수정일 맵 ──────────────────────────────────
+//   @astrojs/sitemap 은 기본적으로 lastmod 를 넣지 않는다. 그러면 크롤러 입장에서
+//   모든 URL 이 "언제 바뀌었는지 모르는" 상태라, 글을 고쳐도 재크롤 우선순위를
+//   판단할 근거가 없다.
+//
+//   ⚠ 값은 updatedDate ?? pubDate 다. 수정하지 않은 글에 빌드 시각을 넣으면
+//     "전부 방금 바뀌었다"는 거짓 신호가 되어, 크롤러가 lastmod 자체를 무시하게 된다.
+//
+//   ⚠ astro.config 는 콘텐츠 컬렉션 API 를 쓸 수 없어 파일을 직접 읽는다.
+//     경로 규칙: src/content/blog/<lang>/<slug>.md → /<lang>/blog/<slug>/
+const POST_LASTMOD = (() => {
+  const map = new Map();
+  const base = new URL('./src/content/blog/', import.meta.url);
+  for (const lang of ['en', 'ko']) {
+    const dir = new URL(`${lang}/`, base);
+    let files;
+    try {
+      files = fs.readdirSync(dir);
+    } catch {
+      continue; // 언어 폴더가 없으면 조용히 건너뜀
+    }
+    for (const file of files) {
+      if (!file.endsWith('.md')) continue;
+      const { data } = matter(fs.readFileSync(new URL(file, dir), 'utf8'));
+      if (data.draft) continue; // 초안은 애초에 빌드되지 않는다
+      const raw = data.updatedDate ?? data.pubDate;
+      if (!raw) continue;
+      const date = new Date(raw);
+      if (Number.isNaN(date.valueOf())) continue;
+      map.set(`/${lang}/blog/${file.replace(/\.md$/, '')}/`, date.toISOString());
+    }
+  }
+  return map;
+})();
 
 // 본문 이미지 처리: 단독 이미지 문단을 <figure>+<figcaption>(alt)로 감싸고,
 // 모든 이미지에 lazy 로딩 부여. (unist 의존성 없이 트리 직접 순회)
@@ -94,6 +131,13 @@ export default defineConfig({
       i18n: {
         defaultLocale: 'en',
         locales: { en: 'en', ko: 'ko' },
+      },
+      // 글 URL 에만 lastmod 를 붙인다. 태그·목록 페이지는 "언제 바뀌었나"를
+      // 정직하게 답할 수 없어 비워둔다(빠진 lastmod 는 크롤러가 그냥 무시한다).
+      serialize(item) {
+        const lastmod = POST_LASTMOD.get(new URL(item.url).pathname);
+        if (lastmod) item.lastmod = lastmod;
+        return item;
       },
     }),
   ],
