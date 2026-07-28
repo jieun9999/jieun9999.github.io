@@ -2,7 +2,7 @@
 title: '[Threads 마케팅 에이전트 3편] 안티디텍트 브라우저로 만든 멀티계정 참여 자동화 — 두뇌·손 분리, CDP 조종, 탐지를 의식한 페이싱'
 description: 'Threads 마케팅 에이전트 엔지니어링 로그 3편: 참여(좋아요·댓글) 자동화. 서브계정을 AdsPower 안티디텍트 브라우저로 격리하고, VPS(두뇌)와 Mac mini(손)를 큐로 잇고, CDP로 브라우저를 조종하며, 탐지를 의식한 랜덤 스케줄로 페이싱한 이야기.'
 pubDate: 2026-07-14
-tags: ['threads', 'automation', 'anti-detect', 'playwright', 'cdp', 'sqlite', 'systemdesign']
+tags: ['threads', 'automation', 'anti-detect', 'playwright', 'cdp', 'sqlite', 'system-design']
 category: systems
 cover: /covers/driving-multi-account-threads-engagement-with-anti-detect-browsers-a-brain-hands-split-cdp-and-detection-aware-pacing.webp
 coverAlt: 'AdsPower 안티디텍트 브라우저의 멀티계정 프로필 목록 — 프로필마다 싱가포르 모바일 프록시로 격리'
