@@ -4,8 +4,6 @@ import PostLayout from '../../../layouts/PostLayout.astro';
 import { langFromId, keyFromId, otherLang, readingMinutes, languages, type Lang } from '../../../i18n/ui';
 
 export async function getStaticPaths() {
-  // 해쉬노드 발행물 주소 (crosspost 글의 canonical 대상 · 교차발행 스크립트와 동일해야 함)
-  const HASHNODE_BASE = 'https://beckybuilds.hashnode.dev';
   const posts = (await getCollection('blog')).filter((p) => !p.data.draft);
   const exists = new Set(posts.map((p) => p.id));
 
@@ -54,10 +52,10 @@ export async function getStaticPaths() {
       series = { title: post.data.seriesTitle ?? '', parts };
     }
 
-    // canonical: 수동 override 우선 → crosspost 영문 글이면 해쉬노드 원본 → 없으면 self
-    const canonicalURL =
-      post.data.canonicalURL ??
-      (post.data.crosspost && lang === 'en' ? `${HASHNODE_BASE}/${key}` : undefined);
+    // canonical: 기본은 self. frontmatter 에 canonicalURL 이 있을 때만 그쪽으로 넘긴다.
+    //   (예전엔 crosspost 영문 글의 canonical 을 해쉬노드로 넘겼다. jieun.dev 단독 운영으로
+    //    돌아서면서 제거 — 한/영 모두 이 레포가 검색 대표다.)
+    const canonicalURL = post.data.canonicalURL;
 
     return {
       params: { lang, slug: key },

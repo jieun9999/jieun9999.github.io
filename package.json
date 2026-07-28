@@ -7,8 +7,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro",
-    "crosspost": "node scripts/crosspost-hashnode.mjs"
+    "astro": "astro"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.11",

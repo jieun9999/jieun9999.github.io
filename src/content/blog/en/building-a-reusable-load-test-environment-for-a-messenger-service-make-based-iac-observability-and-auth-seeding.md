@@ -1,5 +1,4 @@
 ---
-crosspost: true
 title: '[Messenger Load-Testing, Part 1] Building a Reusable Load-Test Environment — Make-based IaC, Observability, and Auth Seeding'
 description: 'How many TPS can a messenger''s send API survive, and where exactly does it break? A 7-node mirror of production, rebuilt on demand from a single Makefile target.'
 pubDate: 2026-05-04

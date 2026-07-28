@@ -1,5 +1,4 @@
 ---
-crosspost: true
 title: 'Why You Should Never Use KeyDB as a Pub/Sub Broker for Centrifugo'
 description: 'KeyDB''s active-replica mode looked perfect for a symmetric dual-stack chat at 100K WebSocket connections. Then I found five years of hang and deadlock issues, most still open.'
 pubDate: 2026-03-29

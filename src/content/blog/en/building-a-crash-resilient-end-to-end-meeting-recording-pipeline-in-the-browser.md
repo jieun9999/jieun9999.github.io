@@ -1,5 +1,4 @@
 ---
-crosspost: true
 title: 'Building a Crash-Resilient, End-to-End Meeting Recording Pipeline in the Browser'
 description: 'A one-hour browser recording could push the JS heap past 300 MB, and a tab crash meant losing everything. Rebuilding it as a six-stage pipeline with five-minute savepoints.'
 pubDate: 2026-03-26
