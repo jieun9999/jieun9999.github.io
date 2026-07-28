@@ -3,35 +3,33 @@
 기술 블로그. Astro + GitHub Pages, 커스텀 도메인 **jieun.dev**, 한/영 i18n(`/en/`·`/ko/`).
 새 글 작성 절차·frontmatter는 `POST_TEMPLATE.md` 참고. 이 문서는 **SEO/교차발행 규칙**을 다룬다.
 
-## 2채널 SEO 전략 (전략 A)
+## 단일 채널 SEO 전략 (jieun.dev 단독)
 
-- **SSOT = jieun.dev(이 레포)** — 콘텐츠 마스터, 완전 소유. 한/영 모두 여기 존재.
-- **Hashnode(`beckybuilds.hashnode.dev`) = 영문 유통 채널** — 높은 DA로 영어권 검색 담당.
-- **canonical 방향**
-  | 글                                    | canonical                          |
-  | ------------------------------------- | ---------------------------------- |
-  | jieun.dev 한글                        | self                               |
-  | jieun.dev 영문 (Hashnode에도 올린 글) | → Hashnode 대응 글                 |
-  | jieun.dev 영문 (Hashnode에 없는 글)   | self                               |
-  | Hashnode 영문                         | self (Canonical URL 필드 **비움**) |
-- 결과: 한국어 검색 = jieun.dev / 영어 검색 = Hashnode. 서로 경쟁 안 함.
-- 장기: authority 붙으면 영문 canonical을 jieun.dev로 회수(전략 B) 재검토.
+- **SSOT = jieun.dev(이 레포)** — 한/영 모두 여기가 콘텐츠 마스터이자 **검색 대표**.
+- **canonical 은 전부 self.** 한글이든 영문이든 예외 없음. 코드에 특별 분기 없음.
+- **교차발행 안 함.** Hashnode 에 새 글을 올리지 않는다.
+
+### Hashnode 는 어떻게 정리됐나 (2026-07)
+
+예전엔 "전략 A" — 영문 canonical 을 `beckybuilds.hashnode.dev` 로 넘겨 영어권 검색을
+Hashnode 에 맡기는 2채널 구조였다. Hashnode 가 GraphQL API 를 Pro 전용으로 돌리면서
+자동화가 죽었고, 운영 채널을 jieun.dev 하나로 좁히기로 하면서 **canonical 을 회수**했다.
+
+- 기존 영문 7편은 Hashnode 에 **그대로 남아 있되**, 각 글의 `Canonical URL` 필드가
+  `https://jieun.dev/en/blog/<slug>/` 를 가리킨다 → 검색 점수는 jieun.dev 로 모인다.
+- 레포에서 제거된 것: `crosspost`·`hashnodeId` frontmatter 필드, `scripts/crosspost-hashnode.mjs`,
+  `.github/workflows/crosspost.yml`, `npm run crosspost`, `HASHNODE_BASE` 상수.
+- **🔴 새 글에 `crosspost:` 를 쓰지 않는다.** 스키마에 없어서 빌드가 깨진다.
+- repo Secret `HASHNODE_PAT` 은 이제 쓰이지 않는다(지워도 무방).
 
 ## 새 글 쓸 때 규칙 (중요)
 
 1. **파일명 = URL slug.** EN↔KO 짝은 **같은 파일명**으로 연결(`en/<slug>.md` ↔ `ko/<slug>.md`).
-   Hashnode에 올릴 때도 **반드시 같은 slug**로 발행해야 canonical이 맞아떨어진다.
-2. **`crosspost: true`는 "이 영문 글이 Hashnode에도 실제로 존재한다"는 뜻.** 이 플래그가 하는 일:
-   - jieun.dev 그 영문 글의 canonical을 `https://beckybuilds.hashnode.dev/<slug>`로 넘김.
-   - (Hashnode Pro 활성 시) GitHub Actions가 자동 발행/수정.
-3. **🔴 절대 규칙: Hashnode에 실제로 발행한 뒤에만 `crosspost: true`를 켠다.**
-   Hashnode에 없는데 켜면 canonical이 404를 가리켜 → 구글이 그 영문 글을 검색에서 뺄 수 있음(SEO에 해).
-   확신 없으면 `crosspost` 생략(=self-canonical, 안전).
-4. **한글 글에는 절대 `crosspost`를 켜지 않는다.** (self-canonical 유지)
-5. **hreflang은 자동.** EN/KO 같은 slug면 상호 링크가 자동 생성됨. 손댈 것 없음.
-6. **이미지**: 본문은 `/covers/`·`/images/` 상대경로로 참조. Hashnode에 **수동** 발행할 땐
-   이미지 URL을 `https://jieun.dev/...` 절대경로로 바꿔서 넣어야 안 깨진다.
-   (자동 발행 스크립트는 이 변환을 자동으로 함.)
+2. **canonical 은 건드리지 않는다.** 기본값 self 가 정답이다. `canonicalURL` 필드는
+   **외부에 먼저 실린 글을 여기로 옮겨 담을 때만** 쓴다 — 평소엔 쓸 일이 없다.
+3. **hreflang은 자동.** EN/KO 같은 slug면 상호 링크가 자동 생성됨. 손댈 것 없음.
+   x-default 는 기본 언어(en)로 고정된다.
+4. **이미지**: 본문은 `/covers/`·`/images/` 상대경로로 참조.
 
 ## 마크다운 함정
 
@@ -81,30 +79,17 @@ prettier가 `11~~14초`처럼 물결표를 붙여 정규화해두면 이 grep에
 - **가상 인용은 예외.** `사람들은 "우리 서비스는 100 MPS를 처리한다"고 말한다`처럼
   일반론을 인용하는 수사적 장치는 전 회사 지칭이 아니므로 그대로 둔다.
 
-## Hashnode 발행: 현재 **수동**
-
-Hashnode가 2026-05부터 **GraphQL API를 Pro 전용**으로 전환. `beckybuilds`는 현재 Pro 아님
-→ **자동 발행 불가, 수동으로 올린다.**
-
-- 수동 발행 순서: Hashnode에서 새 글 → 마크다운 붙여넣기 → **slug를 파일명과 동일하게** →
-  이미지 URL은 `https://jieun.dev/...` 절대경로 → Canonical URL 필드는 **비워둠** →
-  발행 → 그다음 jieun.dev 해당 영문 글 frontmatter에 `crosspost: true` 추가하고 push.
-
-### 자동화(선택, Pro 켜면 부활)
-
-- `scripts/crosspost-hashnode.mjs` + `.github/workflows/crosspost.yml`이 이미 있음.
-  Pro 아니면 워크플로우는 경고 후 스킵(green). Pro로 업그레이드하면 코드 수정 없이 자동 작동.
-- 활성화 시: repo Secret `HASHNODE_PAT` 설정(등록돼 있음) → 먼저
-  `DRY_RUN=1 HASHNODE_PAT=xxx npm run crosspost`로 기존 글이 **UPDATE**로 뜨는지 확인
-  (PUBLISH면 중복 위험 → 중단) → 실제 1회 실행해 `hashnodeId` 시드+커밋 → 이후 Actions 자동.
-- 상수 `HASHNODE_BASE`/`PUBLICATION_HOST`(스크립트·`src/pages/[lang]/blog/[...slug].astro`)가
-  같아야 함. Hashnode에 커스텀 도메인 붙이면 이 값들 갱신.
-
 ## 배포 & 검증
 
 - `main` push → GitHub Actions 자동 빌드·배포(`deploy.yml`). 커스텀 도메인은 `public/CNAME`.
 - 새 글/SEO 변경 후 확인: 빌드된 `dist/en/blog/<slug>/index.html`에서
-  `<link rel="canonical">`이 의도대로(→Hashnode 또는 self)인지, hreflang이 정상인지.
-- **색인 모니터링(팔로업)**: canonical을 Hashnode로 넘긴 영문 글이 Google Search Console에서
-  검색에서 사라지지 않는지 주기적으로 확인. Hashnode 대응 글이 색인돼야 안전.
+  `<link rel="canonical">`이 **self**인지, hreflang이 정상인지.
+  전수 검사: 각 `dist/**/index.html`의 canonical 이 자기 URL 과 같은지 비교하면 된다
+  (다른 게 나오면 `/`(리디렉션 스텁) 하나뿐이어야 정상).
+- **색인 모니터링(팔로업)**: canonical 회수 후 영문 7편이 Google Search Console 에서
+  "대체 페이지"에서 빠지고 색인으로 넘어오는지 확인(수 주 걸림).
+- GSC 의 **"'NOINDEX' 태그에 의해 제외"는 `https://jieun.dev/` 한 건이 정상**이다.
+  `astro.config.mjs` 의 `redirects: {'/': '/en/'}` 가 만드는 meta-refresh 스텁에 Astro 가
+  `noindex` 를 자동으로 넣는다. GitHub Pages 는 서버 301 을 못 써서 이게 유일한 수단 —
+  고장이 아니니 손대지 말 것.
 - Search Console: `jieun.dev` 도메인 속성 등록됨, sitemap `sitemap-index.xml` 제출됨.
