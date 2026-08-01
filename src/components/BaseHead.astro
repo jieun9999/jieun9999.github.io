@@ -56,9 +56,13 @@ const xDefaultHref =
 
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-<meta name="theme-color" content="#0b0e14" media="(prefers-color-scheme: dark)" />
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<!-- 값은 아래 인라인 스크립트가 실제 적용된 테마에 맞춰 덮어쓴다.
+     (OS 설정이 아니라 KST 시각으로 테마가 정해지므로 prefers-color-scheme 을 쓸 수 없다) -->
+<meta name="theme-color" content="#fafafa" />
+<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
 <meta name="generator" content={Astro.generator} />
 
 <!-- 기본 SEO -->
@@ -102,13 +106,45 @@ const xDefaultHref =
   href={new URL(`/${lang}/rss.xml`, site).href}
 />
 
-<!-- 다크모드: 페이지가 그려지기 전에 테마를 결정해 '깜빡임' 방지 -->
+<!-- 다크모드: 페이지가 그려지기 전에 테마를 결정해 '깜빡임' 방지.
+     기본값은 한국 시각(KST) — 06~18시 라이트, 18~06시 다크.
+     수동 토글은 '다음 자동 전환 시점까지'만 유지된다(아래 주석 참고). -->
 <script is:inline>
   (() => {
-    const saved = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    if (saved === 'dark' || (!saved && prefersDark)) {
-      document.documentElement.classList.add('dark');
+    // OS 가 다크를 선호하면 시각과 무관하게 다크. (눈부심 때문에 항상 다크를 쓰는
+    // 사용자를 낮이라고 라이트로 되돌리지 않는다.)
+    // 그 외에는 한국 시각으로 정한다 — KST 는 서머타임이 없어 UTC+9 산술로 정확하고
+    // Intl 타임존 DB 에 의존하지 않는다.
+    const prefersDark =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const kstHour = (new Date().getUTCHours() + 9) % 24;
+    const auto = prefersDark || kstHour < 6 || kstHour >= 18 ? 'dark' : 'light';
+
+    // 수동 선택은 {mode, auto} 로 저장한다. 저장 당시의 auto 와 지금 auto 가 다르면
+    // = 그 사이에 낮/밤이 바뀐 것이므로 수동 선택을 버리고 자동으로 돌아간다.
+    // (안 그러면 한 번 토글한 사람에게 시간 기반 전환이 영원히 안 먹는다.)
+    let mode = auto;
+    try {
+      const raw = localStorage.getItem('theme-override');
+      if (raw) {
+        const o = JSON.parse(raw);
+        if (o && o.auto === auto && (o.mode === 'dark' || o.mode === 'light')) {
+          mode = o.mode;
+        } else {
+          localStorage.removeItem('theme-override');
+        }
+      }
+      localStorage.removeItem('theme'); // 구버전 키 정리
+    } catch (_) {
+      /* localStorage 차단(사생활 보호 모드 등) — 자동값으로 간다 */
     }
+
+    window.__autoTheme = auto; // 토글이 저장할 때 쓴다
+    document.documentElement.classList.toggle('dark', mode === 'dark');
+
+    // 모바일 브라우저 주소창 색을 실제 테마에 맞춘다 (global.css 의 --bg 와 같은 값)
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', mode === 'dark' ? '#0d1310' : '#fafafa');
   })();
 </script>

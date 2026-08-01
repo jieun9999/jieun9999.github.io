@@ -1,24 +1,30 @@
 /* ===========================================================================
-   디자인 토큰 — "모던 개발자" (Linear / GitHub / Vercel 계열)
+   디자인 토큰 — "잔디밭과 구름"
+
+   테두리로 면을 나누지 않는다. 페이지에 옅은 잔디 톤을 깔고 흰 카드를
+   부드러운 그림자로 띄워서 경계를 만든다. 선(--border)은 본문의 표·구분선
+   처럼 정말 선이어야 하는 곳에만 남긴다.
    =========================================================================== */
 :root {
-  /* 색 — 라이트 */
-  --bg: #ffffff;
-  --card: #ffffff;           /* 카드 내부 (흰색) */
-  --surface: #fafafa;        /* 은은한 표면 */
-  --surface-2: #f4f4f5;      /* hover / inset */
+  /* 색 — 라이트 (무채색. 색은 accent 하나로만 쓴다) */
+  --bg: #fafafa;             /* 지면 — 흰 카드가 테두리 없이 떠 보일 만큼만 낮춘다 */
+  --card: #ffffff;
+  --surface: #f2f2f4;        /* 칩·토글 면 */
+  --surface-2: #e8e8eb;      /* hover / inset */
   --text: #18181b;
   --text-muted: #71717a;
   --text-subtle: #a1a1aa;
-  --border: #e4e4e7;
+  --border: #e4e4e7;         /* 본문 표·구분선 전용 (카드 테두리로 쓰지 않는다) */
   --border-strong: #d4d4d8;
-  --accent: #2962ff;         /* Hashnode blue */
-  --accent-hover: #1e4fd6;
-  --accent-soft: rgba(41, 98, 255, 0.1);
-  --code-bg: #f8f8fb;
-  --ring: rgba(41, 98, 255, 0.4);
-  --shadow-sm: 0 1px 2px rgba(24, 24, 27, 0.04), 0 1px 3px rgba(24, 24, 27, 0.06);
-  --shadow-md: 0 4px 12px rgba(24, 24, 27, 0.08), 0 2px 4px rgba(24, 24, 27, 0.04);
+  --accent: #3f7625;         /* 로고 나무의 그린 — 지면 위에서 5.2:1 */
+  --accent-hover: #2f5b1a;
+  --accent-soft: rgba(63, 118, 37, 0.1);
+  --accent-fg: #ffffff;      /* --accent 를 배경으로 깔았을 때의 글자색 */
+  --code-bg: #f5f5f6;
+  --ring: rgba(63, 118, 37, 0.45);
+  /* 테두리를 대신하는 그림자 — 넓고 옅게 */
+  --shadow-sm: 0 1px 2px rgba(24, 24, 27, 0.04), 0 6px 18px rgba(24, 24, 27, 0.06);
+  --shadow-md: 0 2px 6px rgba(24, 24, 27, 0.06), 0 18px 40px rgba(24, 24, 27, 0.1);
 
   /* 타이포 */
   --font-sans: 'Pretendard Variable', -apple-system, BlinkMacSystemFont,
@@ -29,29 +35,32 @@
   /* 레이아웃 */
   --width-page: 78rem;   /* 헤더·홈·목록 프레임 */
   --width-prose: 56rem;  /* 글 본문 폭 (더 넓게) */
-  --radius: 14px;
-  --radius-sm: 9px;
+  --radius: 20px;        /* 각을 죽인다 — 레퍼런스에 직선이 없다 */
+  --radius-sm: 14px;
   --gutter: 1.5rem;
 }
 
-/* 색 — 다크 (순검정 아님, 살짝 푸른 계열) */
+/* 색 — 다크 (순검정 아님, 그늘진 잔디 계열) */
 html.dark {
-  --bg: #0b0e14;
-  --card: #14181f;           /* 카드 내부 (다크에선 살짝 밝게) */
-  --surface: #12161f;
-  --surface-2: #1a1f2b;
-  --text: #e7e9ee;
-  --text-muted: #9ca3af;
-  --text-subtle: #6b7280;
-  --border: #262b36;
-  --border-strong: #333a47;
-  --accent: #5b8cff;         /* Hashnode blue (dark) */
-  --accent-hover: #86a9ff;
-  --accent-soft: rgba(91, 140, 255, 0.18);
-  --code-bg: #12161f;
-  --ring: rgba(91, 140, 255, 0.5);
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.4);
+  --bg: #0d1310;
+  --card: #151d17;           /* 카드 내부 (다크에선 살짝 밝게) */
+  /* 테두리가 없으니 면만으로 구분된다. 지면(#0d1310)과 충분히 벌려둔다. */
+  --surface: #18211a;
+  --surface-2: #212c23;
+  --text: #e6ece7;
+  --text-muted: #9aa89c;
+  --text-subtle: #6b7a6d;
+  --border: #232e26;
+  --border-strong: #31402f;
+  --accent: #86c95a;         /* 볕 든 잔디 — 어두운 지면에서 9.7:1 */
+  --accent-hover: #a2da7c;
+  --accent-soft: rgba(134, 201, 90, 0.16);
+  /* 밝은 그린 위에 흰 글자는 2:1 밖에 안 나온다. 다크에선 글자를 어둡게 뒤집는다. */
+  --accent-fg: #0d1310;
+  --code-bg: #131b15;
+  --ring: rgba(134, 201, 90, 0.5);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.45);
 }
 
 /* ===========================================================================
@@ -131,7 +140,7 @@ main { min-height: 65vh; padding-block: 2.5rem 4rem; }
 .prose ul, .prose ol { padding-left: 1.4rem; margin: 1.1rem 0; }
 .prose li { margin: 0.4rem 0; }
 .prose li::marker { color: var(--text-subtle); }
-.prose img { border-radius: var(--radius-sm); border: 1px solid var(--border); }
+.prose img { border-radius: var(--radius-sm); box-shadow: var(--shadow-sm); }
 .prose a {
   text-decoration: underline;
   text-decoration-color: var(--accent-soft);
@@ -157,8 +166,7 @@ main { min-height: 65vh; padding-block: 2.5rem 4rem; }
   font-size: 0.86em;
   background: var(--surface-2);
   padding: 0.15em 0.42em;
-  border-radius: 5px;
-  border: 1px solid var(--border);
+  border-radius: 6px;
 }
 
 /* 코드 블록은 Expressive Code(figure.expressive-code)가 렌더링·테마전환 담당.
@@ -255,8 +263,8 @@ html.dark .markdown-alert-caution { --al: #f85149; }
 .prose .post-figure img {
   display: block;
   margin-inline: auto;
-  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
 }
 .prose .post-figure figcaption {
   margin-top: 0.55rem;

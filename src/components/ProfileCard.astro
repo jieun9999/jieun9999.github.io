@@ -22,10 +22,13 @@ const t = ui[lang];
     <a href={social.linkedin} target="_blank" rel="me noopener" aria-label="LinkedIn">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29ZM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.8 0 0 .78 0 1.75v20.5C0 23.2.8 24 1.77 24h20.45c.98 0 1.78-.8 1.78-1.75V1.75C24 .78 23.2 0 22.22 0Z"/></svg>
     </a>
-    <a href={`mailto:${social.email}`} aria-label="Email">
+    <a href={`mailto:${social.email}`} title={social.email} aria-label={`Email: ${social.email}`} data-copy-email>
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
     </a>
   </nav>
+  <!-- 메일 앱이 등록돼 있지 않으면 mailto: 는 아무 반응이 없다. 주소를 복사해 주고
+       복사됐다는 사실을 눈에 보이게 알린다. (문구 대신 주소 자체를 띄워 다국어 회피) -->
+  <p class="copied" data-copy-toast aria-live="polite"></p>
 </section>
 
 <style>
@@ -36,7 +39,6 @@ const t = ui[lang];
     text-align: center;
     gap: 0;
     padding: 2.5rem 1.5rem;
-    border: 1px solid var(--border);
     border-radius: var(--radius);
     background: var(--card);
     box-shadow: var(--shadow-sm);
@@ -46,7 +48,8 @@ const t = ui[lang];
     height: 84px;
     border-radius: 999px;
     object-fit: cover;
-    border: 1px solid var(--border);
+    /* 테두리 대신 옅은 그림자 링 */
+    box-shadow: 0 2px 10px rgba(24, 24, 27, 0.14);
   }
   .name {
     margin: 1rem 0 0;
@@ -80,4 +83,50 @@ const t = ui[lang];
     transition: color 0.15s;
   }
   .socials a:hover { color: var(--text); }
+
+  /* 복사 안내 — 자리를 항상 차지해 두어 나타날 때 레이아웃이 밀리지 않게 한다 */
+  .copied {
+    margin: 0.6rem 0 0;
+    min-height: 1.1em;
+    font-size: 0.78em;
+    color: var(--accent);
+    opacity: 0;
+    transition: opacity 0.18s;
+  }
+  .copied.show { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    .copied { transition: none; }
+  }
 </style>
+
+<script is:inline>
+  (() => {
+    const link = document.querySelector('[data-copy-email]');
+    const toast = document.querySelector('[data-copy-toast]');
+    if (!link || !toast) return;
+    let timer;
+
+    // 복사 성공 여부와 무관하게 주소를 띄운다. 복사가 막힌 환경(권한 거부·구형 브라우저)
+    // 에서도 최소한 주소를 눈으로 읽고 직접 긁어갈 수 있어야 한다.
+    const show = (copied, addr) => {
+      toast.textContent = (copied ? '✓ ' : '') + addr;
+      toast.classList.add('show');
+      clearTimeout(timer);
+      timer = setTimeout(() => toast.classList.remove('show'), 2400);
+    };
+
+    link.addEventListener('click', () => {
+      const addr = link.getAttribute('href').replace(/^mailto:/, '');
+      // preventDefault 하지 않는다 — 메일 앱이 있는 사용자는 기존대로 작성창이 열리고,
+      // 없는 사용자는 최소한 주소가 복사된 것을 확인할 수 있다.
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(addr).then(
+          () => show(true, addr),
+          () => show(false, addr)
+        );
+      } else {
+        show(false, addr);
+      }
+    });
+  })();
+</script>

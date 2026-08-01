@@ -30,20 +30,20 @@ import { categories } from '../i18n/ui';
     font-weight: 550;
     padding: 0.42rem 0.95rem;
     border-radius: 999px;
-    border: 1px solid var(--border);
-    background: transparent;
+    /* 테두리 없이 면으로만. 지면(--bg)보다 진한 --surface 라서 칩이 스스로 드러난다. */
+    border: none;
+    background: var(--surface);
     color: var(--text-muted);
     cursor: pointer;
-    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    transition: background 0.15s, color 0.15s;
   }
   .cat-pill:hover {
     color: var(--text);
-    background: var(--surface);
+    background: var(--surface-2);
   }
   .cat-pill.active {
-    background: var(--text);
-    color: var(--bg);
-    border-color: var(--text);
+    background: var(--accent);
+    color: var(--accent-fg);
   }
 </style>
 

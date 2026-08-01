@@ -57,16 +57,20 @@ const href = `/${lang}/blog/${slug}/`;
     align-items: stretch;
     padding: 1.9rem 2.1rem;
     background: var(--card);
-    border: 1px solid var(--border);
     border-radius: var(--radius);
     box-shadow: var(--shadow-sm);
     color: inherit;
-    transition: border-color 0.18s, box-shadow 0.18s;
+    transition: box-shadow 0.22s ease, transform 0.22s ease;
   }
+  /* 테두리 대신 살짝 떠오르게 — 구름이 지면에서 뜨는 느낌 */
   .pc:hover {
-    border-color: var(--border-strong);
     box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
     color: inherit;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pc { transition: none; }
+    .pc:hover { transform: none; }
   }
 
   /* 왼쪽: 텍스트 */
@@ -127,7 +131,6 @@ const href = `/${lang}/blog/${slug}/`;
     aspect-ratio: 16 / 10;
     border-radius: var(--radius-sm);
     overflow: hidden;
-    border: 1px solid var(--border);
     background: var(--accent-soft);
   }
   .pc-thumb img {
