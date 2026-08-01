@@ -103,7 +103,8 @@ export const social = {
   email: 'kindjjee@gmail.com',
 };
 
-export const avatarSrc = '/avatar.jpg';
+// 일러스트 아바타. 실사 사진은 /avatar.jpg 로 남겨둠 (되돌리려면 이 값만 바꾸면 됨)
+export const avatarSrc = '/avatar-illustration.jpg';
 
 // 카테고리 (영어 고정 — 한/영 공통). all은 항상 왼쪽 기본값.
 export const categories = [

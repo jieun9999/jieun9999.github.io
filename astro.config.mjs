@@ -120,11 +120,15 @@ export default defineConfig({
         wrap: true,
       },
       styleOverrides: {
-        borderRadius: '10px',
-        borderColor: 'var(--border)',
+        borderRadius: '14px',
+        // 테두리 대신 그림자로 띄운다 (사이트 전체가 borderless 라 선을 맞춘다)
+        borderColor: 'transparent',
         codeFontFamily: "'JetBrains Mono Variable', ui-monospace, SFMono-Regular, monospace",
         codeFontSize: '0.85rem',
         uiFontFamily: 'inherit',
+        frames: {
+          frameBoxShadowCssValue: 'var(--shadow-sm)',
+        },
       },
     }),
     sitemap({

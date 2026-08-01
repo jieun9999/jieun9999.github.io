@@ -259,8 +259,8 @@ const showToc = toc.length > 1;
     width: 100%;
     height: auto;
     margin-top: 1.75rem;
-    border: 1px solid var(--border);
     border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
     cursor: zoom-in;
   }
   .post-cover-caption {
@@ -277,7 +277,6 @@ const showToc = toc.length > 1;
   .series-box {
     margin-top: 1.75rem;
     padding: 1rem 1.25rem;
-    border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     background: var(--surface);
   }
@@ -317,12 +316,12 @@ const showToc = toc.length > 1;
     flex-direction: column;
     gap: 0.35rem;
     padding: 1rem 1.15rem;
-    border: 1px solid var(--border);
     border-radius: var(--radius-sm);
+    background: var(--surface);
     color: inherit;
-    transition: border-color 0.15s, background 0.15s;
+    transition: background 0.15s;
   }
-  .pn:hover { border-color: var(--accent); background: var(--surface); }
+  .pn:hover { background: var(--surface-2); }
   .pn.next { text-align: right; }
   .pn-label { font-size: 0.78rem; color: var(--text-subtle); }
   .pn-title { font-size: 0.95rem; font-weight: 650; color: var(--text); line-height: 1.35; }
@@ -335,7 +334,6 @@ const showToc = toc.length > 1;
   .toc-col { margin-bottom: 2rem; }
   .toc {
     font-size: 0.85rem;
-    border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     padding: 1rem 1.1rem;
     background: var(--surface);
@@ -408,7 +406,7 @@ const showToc = toc.length > 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid var(--border);
+    border: none;
     border-radius: 999px;
     background: var(--card);
     color: var(--text-muted);

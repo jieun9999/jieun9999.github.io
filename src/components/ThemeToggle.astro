@@ -15,17 +15,16 @@
     width: 2.15rem;
     height: 2.15rem;
     padding: 0;
-    border: 1px solid var(--border);
+    border: none;
     border-radius: 999px;
     background: var(--surface);
     color: var(--text-muted);
     cursor: pointer;
-    transition: color 0.15s, background 0.15s, border-color 0.15s;
+    transition: color 0.15s, background 0.15s;
   }
   #theme-toggle:hover {
     color: var(--accent);
     background: var(--surface-2);
-    border-color: var(--border-strong);
   }
   /* 라이트 모드에서는 달, 다크 모드에서는 해를 보여줌 */
   #theme-toggle .sun { display: none; }
@@ -37,6 +36,17 @@
 <script is:inline>
   document.getElementById('theme-toggle')?.addEventListener('click', () => {
     const isDark = document.documentElement.classList.toggle('dark');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', isDark ? '#0d1310' : '#fafafa');
+    // 지금 시각의 자동값을 함께 남긴다. 낮/밤이 바뀌면 BaseHead 가 이 값을 버리고
+    // 자동 모드로 되돌린다.
+    try {
+      localStorage.setItem(
+        'theme-override',
+        JSON.stringify({ mode: isDark ? 'dark' : 'light', auto: window.__autoTheme })
+      );
+    } catch (_) {
+      /* localStorage 차단 — 이번 페이지에서만 적용되고 끝난다 */
+    }
   });
 </script>
