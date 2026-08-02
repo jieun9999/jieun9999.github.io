@@ -31,7 +31,9 @@ const site = Astro.site ?? new URL('https://jieun.dev');
 const selfUrl = new URL(Astro.url.pathname, site).href;
 // 검색 대표(canonical): 오버라이드가 있으면 그쪽, 없으면 self.
 const canonical = canonicalURL ?? selfUrl;
-const ogImage = new URL(image ?? '/og-default-v2.jpg', site).href;
+// 기본 배너. 브랜드가 바뀌면 파일명의 버전을 올린다 — 링크드인·카톡 등은 이미지를
+// URL 단위로 캐시해서, 같은 경로에 덮어쓰면 예전 그림이 계속 나온다.
+const ogImage = new URL(image ?? '/og-default-v3.jpg', site).href;
 
 // hreflang 절대 URL 목록 (구글에게 "같은 글의 다른 언어 버전"임을 알림)
 const hreflangs = Object.entries(alternates).map(([l, path]) => ({
@@ -63,6 +65,8 @@ const xDefaultHref =
 <link rel="shortcut icon" href="/favicon.ico" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 <link rel="manifest" href="/site.webmanifest" />
+<!-- iOS 홈 화면에 추가했을 때 아이콘 밑에 붙는 이름 (기본값은 <title> 전체라 길다) -->
+<meta name="apple-mobile-web-app-title" content="Jieun" />
 <meta name="generator" content={Astro.generator} />
 
 <!-- 기본 SEO -->
@@ -84,6 +88,7 @@ const xDefaultHref =
 
 <!-- Open Graph (SNS 공유 미리보기) -->
 <meta property="og:type" content={type} />
+<meta property="og:site_name" content="Jieun" />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:url" content={selfUrl} />
@@ -91,6 +96,7 @@ const xDefaultHref =
 <meta property="og:image" content={ogImage} />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content={title} />
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image" />
