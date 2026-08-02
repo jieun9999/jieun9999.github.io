@@ -21,6 +21,8 @@ interface Props {
   cover?: string;
   coverAlt?: string;
   coverCaption?: string;
+  /** 글별 SNS 공유 카드(/og/<lang>/<slug>.jpg). 없으면 기본 배너로 폴백. */
+  ogImage?: string;
   alternates: Record<Lang, string>;
   hreflang: Partial<Record<Lang, string>>;
   canonicalURL?: string;
@@ -42,6 +44,7 @@ const {
   cover,
   coverAlt,
   coverCaption,
+  ogImage,
   alternates,
   hreflang,
   canonicalURL,
@@ -51,11 +54,6 @@ const {
   series = null,
 } = Astro.props;
 const t = ui[lang];
-
-// SNS 공유 이미지: 커버(/covers/x.webp) → OG용 JPG(/og/x.jpg)
-const ogImage = cover
-  ? cover.replace('/covers/', '/og/').replace(/\.webp$/, '.jpg')
-  : undefined;
 
 // 목차는 h2/h3 만 노출
 const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);

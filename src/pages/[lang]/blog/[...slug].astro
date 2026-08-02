@@ -1,4 +1,6 @@
 ---
+import fs from 'node:fs';
+import path from 'node:path';
 import { getCollection, render } from 'astro:content';
 import PostLayout from '../../../layouts/PostLayout.astro';
 import { langFromId, keyFromId, otherLang, readingMinutes, languages, type Lang } from '../../../i18n/ui';
@@ -57,14 +59,20 @@ export async function getStaticPaths() {
     //    돌아서면서 제거 — 한/영 모두 이 레포가 검색 대표다.)
     const canonicalURL = post.data.canonicalURL;
 
+    // 글별 SNS 공유 카드. `node scripts/gen-og.mjs` 로 미리 만들어 커밋해 둔다.
+    // 없으면 og:image 가 404 가 되므로(=미리보기가 빈 카드) 기본 배너로 폴백한다.
+    // 빌드는 Node 에서 프로젝트 루트를 cwd 로 돌기 때문에 여기서 파일 존재를 볼 수 있다.
+    const ogPath = `/og/${lang}/${key}.jpg`;
+    const ogImage = fs.existsSync(path.join('public', ogPath)) ? ogPath : undefined;
+
     return {
       params: { lang, slug: key },
-      props: { post, alternates, hreflang, canonicalURL, hasTranslation, prev, next, series },
+      props: { post, alternates, hreflang, canonicalURL, hasTranslation, prev, next, series, ogImage },
     };
   });
 }
 
-const { post, alternates, hreflang, canonicalURL, hasTranslation, prev, next, series } = Astro.props;
+const { post, alternates, hreflang, canonicalURL, hasTranslation, prev, next, series, ogImage } = Astro.props;
 const lang = langFromId(post.id);
 const { Content, headings } = await render(post);
 const mins = readingMinutes(post.body ?? '');
@@ -82,6 +90,7 @@ const mins = readingMinutes(post.body ?? '');
   cover={post.data.cover}
   coverAlt={post.data.coverAlt}
   coverCaption={post.data.coverCaption}
+  ogImage={ogImage}
   alternates={alternates}
   hreflang={hreflang}
   canonicalURL={canonicalURL}
