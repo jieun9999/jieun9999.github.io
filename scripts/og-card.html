@@ -1,0 +1,178 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      @font-face {
+        font-family: 'Pretendard Variable';
+        src: url('./PretendardVariable.woff2') format('woff2-variations');
+        font-weight: 45 920;
+        font-display: block;
+      }
+
+      /* global.css 의 다크 팔레트와 같은 값. 기본 배너(og-default-v3)와 한 세트다. */
+      :root {
+        --bg: #0d1310;
+        --card: #151d17;
+        --text: #e6ece7;
+        --text-muted: #9aa89c;
+        --text-subtle: #6b7a6d;
+        --accent: #86c95a;
+        --accent-soft: rgba(134, 201, 90, 0.16);
+        --hairline: #232e26;
+      }
+
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        position: relative;
+        background: var(--bg);
+        font-family: 'Pretendard Variable', -apple-system, sans-serif;
+        color: var(--text);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* 지면 — 아래쪽에 옅은 잔디 기운 */
+      .ground {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(120% 70% at 50% 118%, rgba(134, 201, 90, 0.14) 0%, transparent 62%);
+      }
+
+      .card {
+        position: absolute;
+        inset: 46px;
+        border-radius: 40px;
+        background: var(--card);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+        padding: 56px 64px 48px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* 상단 — 로고 + 도메인 / 카테고리 */
+      .top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex: none;
+      }
+      .brand { display: flex; align-items: center; gap: 16px; }
+      .tile {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        background: #ffffff;
+        overflow: hidden;
+        position: relative;
+        flex: none;
+      }
+      .tile img { position: absolute; left: -9px; top: -9px; width: 74px; height: 74px; object-fit: contain; }
+      .domain { font-size: 26px; font-weight: 700; letter-spacing: -0.01em; color: var(--text); }
+      .category {
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text-subtle);
+      }
+
+      /* 가운데 — 시리즈 칩 + 제목 */
+      .mid {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 0;
+        padding: 28px 0;
+      }
+      .series {
+        align-self: flex-start;
+        margin-bottom: 22px;
+        padding: 9px 20px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-size: 22px;
+        font-weight: 650;
+        letter-spacing: -0.01em;
+        white-space: nowrap;
+      }
+      .series:empty { display: none; }
+      #title {
+        font-weight: 800;
+        letter-spacing: -0.032em;
+        line-height: 1.18;
+        /* 한국어는 어절 단위로 끊는다. 기본값이면 '숨어 있 / 었다' 처럼 낱말 중간이 갈린다. */
+        word-break: keep-all;
+        overflow-wrap: break-word;
+        /* 크기는 아래 스크립트가 상자에 맞춰 정한다 */
+        font-size: 64px;
+      }
+
+      /* 하단 — 헤어라인 + 서명 */
+      .bottom {
+        flex: none;
+        border-top: 1px solid var(--hairline);
+        padding-top: 24px;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        font-size: 23px;
+        color: var(--text-muted);
+      }
+      .bottom .who { font-weight: 650; color: var(--text); }
+      .bottom .tag { color: var(--text-subtle); }
+    </style>
+  </head>
+  <body>
+    <div class="ground"></div>
+    <div class="card">
+      <div class="top">
+        <div class="brand">
+          <span class="tile"><img src="./tree.png" alt="" /></span>
+          <span class="domain">jieun.dev</span>
+        </div>
+        <div class="category" id="category"></div>
+      </div>
+
+      <div class="mid">
+        <div class="series" id="series"></div>
+        <div id="title"></div>
+      </div>
+
+      <div class="bottom">
+        <span class="who">Jieun <span class="tag">· deserve what you want</span></span>
+        <span id="date"></span>
+      </div>
+    </div>
+
+    <script>
+      const p = new URLSearchParams(location.search);
+      const d = JSON.parse(decodeURIComponent(p.get('d') || '{}'));
+
+      document.getElementById('category').textContent = d.category || '';
+      document.getElementById('series').textContent = d.series || '';
+      document.getElementById('date').textContent = d.date || '';
+
+      const title = document.getElementById('title');
+      title.textContent = d.title || '';
+
+      // 제목 길이가 글마다 크게 다르다. 남은 세로 공간에 들어갈 때까지 줄인다.
+      // (clamp 로 자르면 문장이 잘려 무슨 글인지 알 수 없어진다)
+      const mid = title.parentElement;
+      // 시리즈 칩이 있으면 그만큼 제목이 쓸 세로가 줄어든다. 마지막 줄이 하단
+      // 헤어라인에 붙지 않도록 8px 은 늘 비워둔다.
+      const room = () =>
+        mid.clientHeight - (d.series ? title.offsetTop - mid.offsetTop : 0) - 8;
+      for (let size = 64; size >= 30; size -= 2) {
+        title.style.fontSize = size + 'px';
+        if (title.scrollHeight <= room()) break;
+      }
+      document.documentElement.dataset.ready = '1';
+    </script>
+  </body>
+</html>
