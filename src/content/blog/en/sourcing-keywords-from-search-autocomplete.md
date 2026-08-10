@@ -452,4 +452,4 @@ a block can arrive as a 200          three checks ahead of parsing       (3.3)
 sustained polling gets noticed       7-day cache removes sustained load  (4.3)
 ```
 
-Fast and free is the selling point. For whoever inherits this code, the property that matters more is that it was written assuming the thing can vanish. **We didn't build this bridge.**
+Fast and free is the visible win. It isn't why this could go into production. The reason is duller: **this endpoint could be gone tomorrow, and it was written that way from the start.**
