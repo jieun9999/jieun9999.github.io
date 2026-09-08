@@ -112,7 +112,7 @@ export const categories = [
   { id: 'systems', label: 'Systems' },
   { id: 'scaling', label: 'Scaling' },
   { id: 'reliability', label: 'Reliability' },
-  { id: 'cost', label: 'Cost' },
+  { id: 'devops', label: 'DevOps' },
 ] as const;
 
 export function categoryLabel(id: string): string {

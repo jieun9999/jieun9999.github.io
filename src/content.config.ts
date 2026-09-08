@@ -14,7 +14,7 @@ const blog = defineCollection({
     tags: z.array(z.string()).default([]),
     // 카테고리 필터 (배너 아래 pill). all은 UI 기본값이라 글엔 지정 안 함.
     category: z
-      .enum(['systems', 'scaling', 'reliability', 'cost'])
+      .enum(['systems', 'scaling', 'reliability', 'devops'])
       .default('systems'),
     draft: z.boolean().default(false),
     // 검색 대표 URL 수동 오버라이드(선택). 비우면 self-canonical(기본).
