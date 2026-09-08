@@ -13,10 +13,10 @@ tags:
     "alerting",
     "protobuf",
   ]
-category: reliability
+category: devops
 cover: /covers/switching-llm-accounts-before-the-quota-runs-out.webp
-coverAlt: "대시보드에서 주간 한도 소진율이 89%에 닿은 화면"
-coverCaption: "초기화까지 33시간, 남은 건 11%였습니다."
+coverAlt: "대시보드 전체 화면. 오른쪽 위 Grok 주간 소진율 패널이 89%에 닿아 있다"
+coverCaption: "오른쪽 위가 주간 한도입니다. 초기화까지 33시간, 남은 건 11%였습니다."
 ---
 
 > [!NOTE]
