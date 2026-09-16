@@ -5,8 +5,8 @@ pubDate: 2026-09-16
 tags:
   ["linux", "cron", "systemd", "git-worktree", "ssh", "devops", "automation"]
 category: systems
-cover: /covers/part2-four-people-one-dev-machine-enterprise.svg
-coverAlt: "개발자와 디자이너가 계정·홈·포트별로 분리된 공유 VPS에 접속하고, 별도 systemd 터널과 크론 정리가 운영 API 및 작업 프로세스를 관리하는 구조도"
+cover: /covers/part2-four-people-one-dev-machine.webp
+coverAlt: "공유 VPS 안에서 개발자 두 명·디자이너·마케터의 계정·홈·포트를 분리하고, wdot-tunnel 서비스가 :8787 공용 터널에서 운영 API :8987로 연결하는 구조도"
 coverCaption: "사람의 작업공간은 나누고, 공유 자원은 서비스 계정으로 분리했습니다."
 series: shared-dev-machine
 seriesOrder: 2
@@ -217,7 +217,7 @@ WantedBy=multi-user.target
 
 ```bash
 scripts/wt.sh feat/기능이름
-# → .worktrees/2026-09-16/feat-기능이름/
+# → .worktrees/YYYY-MM-DD/feat-기능이름/
 ```
 
 규칙은 날짜와 브랜치 이름, 이 하나입니다. 날짜로 묶은 이유는 둘입니다. 찾기("어제 뭐 했더라")와 버리기(오래된 폴더가 눈에 띕니다).
@@ -230,7 +230,7 @@ scripts/wt.sh feat/기능이름
 REPO="$(dirname "$(git rev-parse --path-format=absolute --git-common-dir)")"
 ```
 
-`--git-common-dir`는 worktree 안에서도 **본체의 `.git`**을 가리킵니다. 이 줄에 나중에 버그가 하나 숨어 있었는데, 7절에서 다룹니다.
+`--git-common-dir`는 worktree 안에서도 **본체의 `.git`**을 가리킵니다.
 
 ---
 
