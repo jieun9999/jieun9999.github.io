@@ -140,6 +140,11 @@ main { min-height: 65vh; padding-block: 2.5rem 4rem; }
 .prose ul, .prose ol { padding-left: 1.4rem; margin: 1.1rem 0; }
 .prose li { margin: 0.4rem 0; }
 .prose li::marker { color: var(--text-subtle); }
+.prose u {
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+  text-decoration-skip-ink: auto;
+}
 .prose img { border-radius: var(--radius-sm); box-shadow: var(--shadow-sm); }
 .prose a {
   text-decoration: underline;
