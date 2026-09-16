@@ -23,7 +23,11 @@ const t = ui[lang];
 
 const posts = (await getCollection('blog'))
   .filter((p) => langFromId(p.id) === lang && !p.data.draft)
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+  .sort(
+    (a, b) =>
+      b.data.pubDate.valueOf() - a.data.pubDate.valueOf() ||
+      (b.data.seriesOrder ?? 0) - (a.data.seriesOrder ?? 0),
+  );
 
 // 태그 누적 (최신순, 중복 제거) — posts는 이미 최신순 정렬됨
 const seenTags = new Set<string>();

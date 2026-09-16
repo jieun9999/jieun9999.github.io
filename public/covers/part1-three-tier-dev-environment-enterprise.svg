@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Part 1 — Why we chose a 96GB VPS</title>
+  <desc id="desc">A restrained enterprise architecture diagram showing a MacBook connecting to a Tokyo VPS and production API, with a separate future e2e branch.</desc>
+  <style>
+    .sans { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .mono { font-family: "SFMono-Regular", Consolas, monospace; }
+    .label { font-size: 19px; font-weight: 750; letter-spacing: 1.8px; }
+  </style>
+  <rect width="1600" height="900" fill="#0b1726"/>
+  <path d="M80 178H1520M80 742H1520M80 178V742M1520 178V742" fill="none" stroke="#27415a" stroke-width="1"/>
+  <text x="80" y="88" class="sans" fill="#72b7e5" font-size="21" font-weight="800" letter-spacing="4">PART 1 / DEVELOPMENT ENVIRONMENT</text>
+  <text x="80" y="140" class="sans" fill="#f3f6fa" font-size="43" font-weight="720">Why we chose a 96GB VPS</text>
+  <text x="80" y="170" class="sans" fill="#9fb0bf" font-size="18">Four 16GB MacBooks were the constraint. One shared server became the boundary.</text>
+
+  <g class="sans">
+    <rect x="120" y="330" width="250" height="150" fill="#11263a" stroke="#72b7e5" stroke-width="2"/>
+    <text x="245" y="390" text-anchor="middle" class="label" fill="#f3f6fa">MACBOOK</text>
+    <text x="245" y="425" text-anchor="middle" class="mono" fill="#9fb0bf" font-size="17">browser only</text>
+    <text x="245" y="452" text-anchor="middle" class="mono" fill="#9fb0bf" font-size="17">SSH client</text>
+    <path d="M370 405H515" stroke="#72b7e5" stroke-width="2"/>
+    <text x="442" y="384" text-anchor="middle" class="mono" fill="#72b7e5" font-size="16">SSH</text>
+
+    <rect x="515" y="270" width="470" height="270" fill="#f3f6fa"/>
+    <text x="555" y="335" class="label" fill="#0b1726">CONTABO VPS · TOKYO</text>
+    <text x="555" y="370" class="mono" fill="#526779" font-size="17">96GB RAM · 18 CORES</text>
+    <path d="M555 398H945" stroke="#ccd6df" stroke-width="2"/>
+    <text x="555" y="440" class="sans" fill="#0b1726" font-size="25" font-weight="700">code · builds · agents</text>
+    <text x="555" y="476" class="mono" fill="#526779" font-size="17">next dev / BFF / worktrees</text>
+    <rect x="555" y="498" width="390" height="4" fill="#72b7e5"/>
+    <path d="M985 405H1130" stroke="#72b7e5" stroke-width="2"/>
+    <text x="1058" y="384" text-anchor="middle" class="mono" fill="#72b7e5" font-size="16">SSH tunnel</text>
+  </g>
+
+  <rect x="1130" y="330" width="310" height="150" fill="#11263a" stroke="#72b7e5" stroke-width="2"/>
+  <text x="1285" y="390" text-anchor="middle" class="sans label" fill="#f3f6fa">PRODUCTION</text>
+  <text x="1285" y="425" text-anchor="middle" class="mono" fill="#9fb0bf" font-size="17">API → database</text>
+  <text x="1285" y="452" text-anchor="middle" class="mono" fill="#9fb0bf" font-size="17">real data preview</text>
+
+  <path d="M750 540V630" stroke="#72b7e5" stroke-width="2" stroke-dasharray="8 8"/>
+  <rect x="575" y="630" width="350" height="70" fill="none" stroke="#526779" stroke-width="2"/>
+  <text x="750" y="660" text-anchor="middle" class="sans label" fill="#f3f6fa">E2E / LATER</text>
+  <text x="750" y="684" text-anchor="middle" class="mono" fill="#9fb0bf" font-size="15">local API · DB · Redis</text>
+
+  <text x="80" y="810" class="mono" fill="#6f879a" font-size="16">CURRENT PATH: BROWSER → VPS → PRODUCTION API</text>
+  <text x="1050" y="810" class="mono" fill="#6f879a" font-size="16">FUTURE PATH: PLAYWRIGHT → LOCAL STACK</text>
+</svg>

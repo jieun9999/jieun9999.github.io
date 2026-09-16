@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Part 2 — Four people sharing one VPS</title>
+  <desc id="desc">An enterprise architecture diagram showing four people with separate access boundaries sharing one VPS, while systemd owns the production tunnel and cron cleans up work.</desc>
+  <style>
+    .sans { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .mono { font-family: "SFMono-Regular", Consolas, monospace; }
+    .label { font-size: 19px; font-weight: 750; letter-spacing: 1.8px; }
+    .role { font-size: 23px; font-weight: 700; }
+  </style>
+  <rect width="1600" height="900" fill="#0b1726"/>
+  <path d="M80 178H1520M80 760H1520M80 178V760M1520 178V760" fill="none" stroke="#27415a" stroke-width="1"/>
+  <text x="80" y="88" class="sans" fill="#72b7e5" font-size="21" font-weight="800" letter-spacing="4">PART 2 / SHARED INFRASTRUCTURE</text>
+  <text x="80" y="140" class="sans" fill="#f3f6fa" font-size="43" font-weight="720">One machine. Four roles.</text>
+  <text x="80" y="170" class="sans" fill="#9fb0bf" font-size="18">Shared hardware, separate access boundaries.</text>
+
+  <text x="120" y="235" class="sans label" fill="#9fb0bf">PEOPLE</text>
+  <g class="sans" fill="#f3f6fa">
+    <text x="120" y="300" class="role">Jieun</text><text x="120" y="326" class="mono" fill="#9fb0bf" font-size="15">developer</text>
+    <text x="120" y="390" class="role">Sungsuk</text><text x="120" y="416" class="mono" fill="#9fb0bf" font-size="15">developer</text>
+    <text x="120" y="480" class="role">Juhee</text><text x="120" y="506" class="mono" fill="#9fb0bf" font-size="15">designer</text>
+    <text x="120" y="570" class="role">Jina</text><text x="120" y="596" class="mono" fill="#9fb0bf" font-size="15">marketer</text>
+  </g>
+  <path d="M265 292H410M265 382H410M265 472H410M265 562H410" stroke="#72b7e5" stroke-width="2"/>
+  <circle cx="410" cy="292" r="4" fill="#72b7e5"/><circle cx="410" cy="382" r="4" fill="#72b7e5"/><circle cx="410" cy="472" r="4" fill="#72b7e5"/><circle cx="410" cy="562" r="4" fill="#72b7e5"/>
+
+  <rect x="455" y="230" width="600" height="430" fill="#f3f6fa"/>
+  <text x="500" y="294" class="sans label" fill="#0b1726">SHARED VPS</text>
+  <text x="500" y="326" class="mono" fill="#526779" font-size="17">96GB RAM · 18 CORES</text>
+  <path d="M500 350H1010" stroke="#ccd6df" stroke-width="2"/>
+  <text x="500" y="392" class="sans" fill="#0b1726" font-size="23" font-weight="700">ACCOUNT / HOME / PORT</text>
+  <g class="mono" font-size="16">
+    <rect x="500" y="420" width="235" height="75" fill="#e5edf3" stroke="#526779"/>
+    <text x="520" y="451" fill="#0b1726">/home/jieun</text><text x="520" y="477" fill="#526779">developer · 3000</text>
+    <rect x="755" y="420" width="235" height="75" fill="#e5edf3" stroke="#526779"/>
+    <text x="775" y="451" fill="#0b1726">/home/sungsuk</text><text x="775" y="477" fill="#526779">developer · 3100</text>
+    <rect x="500" y="515" width="235" height="75" fill="#e5edf3" stroke="#526779"/>
+    <text x="520" y="546" fill="#0b1726">/home/juhee</text><text x="520" y="572" fill="#526779">designer · 3200</text>
+    <rect x="755" y="515" width="235" height="75" fill="#e5edf3" stroke="#526779"/>
+    <text x="775" y="546" fill="#0b1726">/home/jina</text><text x="775" y="572" fill="#526779">marketer · 3300</text>
+  </g>
+  <rect x="500" y="610" width="490" height="4" fill="#72b7e5"/>
+
+  <path d="M1055 365H1195" stroke="#72b7e5" stroke-width="2"/><circle cx="1055" cy="365" r="4" fill="#72b7e5"/>
+  <text x="1080" y="338" class="sans" fill="#72b7e5" font-size="16" font-weight="800" letter-spacing="1.2">SYSTEMD</text>
+  <text x="1080" y="391" class="mono" fill="#f3f6fa" font-size="15">tunnel · nologin</text>
+  <rect x="1195" y="310" width="290" height="120" fill="#11263a" stroke="#72b7e5" stroke-width="2"/>
+  <text x="1340" y="360" text-anchor="middle" class="sans label" fill="#f3f6fa">PRODUCTION API</text>
+  <text x="1340" y="390" text-anchor="middle" class="mono" fill="#9fb0bf" font-size="15">restricted destination</text>
+
+  <path d="M755 660V698" stroke="#72b7e5" stroke-width="2" stroke-dasharray="8 8"/>
+  <text x="755" y="730" text-anchor="middle" class="sans label" fill="#72b7e5">CRON CLEANUP</text>
+  <text x="755" y="756" text-anchor="middle" class="mono" fill="#9fb0bf" font-size="15">merged worktrees · orphan processes</text>
+  <text x="120" y="820" class="mono" fill="#6f879a" font-size="16">ROLE → ACCESS → RESPONSIBILITY</text>
+  <text x="1195" y="820" class="mono" fill="#6f879a" font-size="16">SAME MACHINE ≠ SAME IDENTITY</text>
+</svg>
