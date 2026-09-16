@@ -6,7 +6,7 @@ import PostLayout from '../../../layouts/PostLayout.astro';
 import { langFromId, keyFromId, otherLang, readingMinutes, languages, type Lang } from '../../../i18n/ui';
 
 export async function getStaticPaths() {
-  const posts = (await getCollection('blog')).filter((p) => !p.data.draft);
+  const posts = (await getCollection('blog')).filter((p) => import.meta.env.DEV || !p.data.draft);
   const exists = new Set(posts.map((p) => p.id));
 
   // 언어별 최신순 목록 (prev/next·series 계산용)
