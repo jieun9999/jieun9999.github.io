@@ -1,7 +1,8 @@
 ---
-title: "Measuring the Cost of an AI Blog Pipeline — We Were Paying for the Same Search More Than Once"
+title: "How I Cut AI Blog Generation Costs by Reducing Duplicate Searches and Failed Retries"
 description: "I recalculated the search and full-text parsing cost for 15 topic candidates from the Chuncheon production server logs. The measured cost was about 150 KRW; the counterfactual with omitted calls added back was about 309 KRW."
-pubDate: 2026-09-16
+pubDate: 2026-08-18
+updatedDate: 2026-09-16
 tags: ["observability", "caching", "pipeline", "cost"]
 category: devops
 draft: false
