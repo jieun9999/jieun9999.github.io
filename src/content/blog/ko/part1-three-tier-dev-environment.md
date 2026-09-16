@@ -1,12 +1,12 @@
 ---
 title: "Part 1 — 16GB 맥북 네 대 대신 96GB VPS를 선택한 이유"
 description: "코드는 서버에 있고 컴파일도 서버가 하고, 맥북은 화면만 받습니다. 네 명이 한 대를 나눠 쓰게 되면서 이 구조가 어디까지 맞고 어디부터 타협인지 다시 따져봤습니다. dev 서버 하나가 4시간에 1.2GB에서 3.7GB로 자라는 걸 보고서야 무엇을 서버에 둬야 하는지 분명해졌습니다."
-pubDate: 2026-09-16
+pubDate: 2026-09-15
 tags:
   ["ssh", "port-forwarding", "nextjs", "remote-development", "e2e", "devops"]
 category: systems
-cover: /covers/part1-three-tier-dev-environment-enterprise.svg
-coverAlt: "맥북에서 도쿄 Contabo VPS를 거쳐 운영 API와 DB로 이어지고, 아래에 나중에 붙일 e2e 로컬 테스트 환경이 분리된 구조도"
+cover: /covers/part1-three-tier-dev-environment.webp
+coverAlt: "맥북이 SSH로 개발 서버에 접속하고, 현재 :3100에서 :8787 터널을 거쳐 운영 API·DB로 가는 실선 경로와 추후 서버 내부의 Playwright·:39xx·로컬 API·DB·Redis로 분리할 점선 경로"
 coverCaption: "현재 화면 확인 경로는 운영 API를 보지만, e2e는 추후 별도 로컬 스택으로 분리한다."
 series: shared-dev-machine
 seriesOrder: 1
