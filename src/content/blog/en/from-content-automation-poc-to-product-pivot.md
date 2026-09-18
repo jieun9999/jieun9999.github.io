@@ -17,8 +17,6 @@ We opened the AI blog service beta on August 18. Before that, I was focused on o
 
 The retrospective counted 75 real users and 201 blogs created. Eighty-six of those blogs were still publishing automatically, and the service had published 4,691 posts. The product worked, but those numbers alone did not tell me who would keep paying for it.
 
-![The admin member screen. It separates 75 users, 286 invites, and 18 internal accounts, and shows contacts, age ranges, devices, signup history, and login history. Only member names are hidden.](/images/poc-pivot/member-overview.png)
-
 Looking back, the pre-beta period was about building. After the beta opened, I spent the time finding out why people did not use it.
 
 The first part follows search indexing, domains, article structure, topic discovery, cost, UX, and deployment. The second follows channels, return visits, login, customer questions, operations, and the B2C/B2B fork toward the question “Who is this for?”
