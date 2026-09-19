@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Hero from '../../../components/Hero.astro';
-import { ui, languages, type Lang } from '../../../i18n/ui';
+import { ui, languages, avatarSrc, type Lang } from '../../../i18n/ui';
 import { getPosts, tagStats, tagUrl } from '../../../lib/posts';
 
 export function getStaticPaths() {
@@ -14,7 +14,7 @@ const tags = tagStats(await getPosts(lang));
 ---
 
 <BaseLayout title={`${t.tags} · ${t.siteTitle}`} description={`${t.siteTitle} — ${t.tags}`} lang={lang}>
-  <Hero title={t.tags} />
+  <Hero title={t.tags} image={avatarSrc} imageAlt="Jieun" />
 
   <div class="frame">
     <ul class="cloud">
