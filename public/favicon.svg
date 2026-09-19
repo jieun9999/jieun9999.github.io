@@ -1,17 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-135 -10 470 470">
+  <!-- 타일 없이 J 만. 탭 바 색(브라우저 테마)을 따라 헤더 워드마크의 J 처럼 뒤집는다 — BrandWordmark.astro 와 같은 색.
+       밝으면 에버그린 J + 민트 잎맥, 어두우면 민트 J + 에버그린 잎맥 -->
+  <style>
+    .j0 { stop-color: #519773; } .j1 { stop-color: #307252; } .j2 { stop-color: #1a5439; }
+    .veins { stroke: #e2f6ea; stroke-opacity: .5; }
+    @media (prefers-color-scheme: dark) {
+      .j0 { stop-color: #e2f6ea; } .j1 { stop-color: #bcebd1; } .j2 { stop-color: #93d6b1; }
+      .veins { stroke: #307252; stroke-opacity: .45; }
+    }
+  </style>
   <defs>
     <linearGradient id="g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="450">
-      <stop offset="0" stop-color="#e2f6ea"/>
-      <stop offset=".44" stop-color="#bcebd1"/>
-      <stop offset="1" stop-color="#93d6b1"/>
+      <stop offset="0" class="j0"/>
+      <stop offset=".44" class="j1"/>
+      <stop offset="1" class="j2"/>
     </linearGradient>
     <clipPath id="c">
       <path d="M100 100A100 100 0 0 1 200 0L200 350A100 100 0 0 1 0 350L100 350Z"/>
     </clipPath>
   </defs>
-  <rect width="512" height="512" rx="112" fill="#307252"/>
-  <g transform="translate(162.67 46) scale(.93333)">
-    <path d="M100 100A100 100 0 0 1 200 0L200 350A100 100 0 0 1 0 350L100 350Z" fill="url(#g)"/>
-    <path clip-path="url(#c)" fill="none" stroke="#307252" stroke-width="16" stroke-opacity=".45" d="M238 345L-371.6 937.4M238 345L-561.4 634.0M238 345L-609.1 274.6M238 345L-523.2 -33.3M238 345L-239.7 -358.1M238 345L103.7 -494.3"/>
-  </g>
+  <path d="M100 100A100 100 0 0 1 200 0L200 350A100 100 0 0 1 0 350L100 350Z" fill="url(#g)"/>
+  <path class="veins" clip-path="url(#c)" fill="none" stroke-width="16" d="M238 345L-371.6 937.4M238 345L-561.4 634.0M238 345L-609.1 274.6M238 345L-523.2 -33.3M238 345L-239.7 -358.1M238 345L103.7 -494.3"/>
 </svg>

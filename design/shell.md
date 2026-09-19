@@ -63,12 +63,16 @@ Lightbox   본문 이미지 클릭 확대 (평소엔 숨김)
 - **로고**: 워드마크 하나(`BrandWordmark.astro`) — "Jieun" 36px(모바일 28px)/900. 아이콘은 따로 두지 않는다.
   - **홈·카테고리에선 숨긴다.** 히어로의 큰 이름(`ProfileHero`, `data-hero-name`)이 로고 노릇을 하므로 "Jieun" 이 두 번 서지 않게.
     위에 붙는 폭(≤1199)에서 스크롤해 그 이름이 헤더 밑으로 들어가면 `data-brand-shown` 이 붙고 로고가 0.2s 에 나타난다.
-  - J 는 파비콘과 같은 기하 J(줄기 + 1/4원 + 반원)에 잎맥선 6개를 그은 SVG. 다크에선 파비콘 그대로(민트 J + 초록 잎맥),
-    라이트에선 민트가 흰 바탕에 묻히므로 뒤집어서(에버그린 J + 민트 잎맥) 그린다.
+  - J 는 파비콘과 같은 기하 J(줄기 + 1/4원 + 반원)에 잎맥선 6개를 그은 SVG. 다크에선 민트 J + 초록 잎맥,
+    라이트에선 민트가 흰 바탕에 묻히므로 뒤집어서 에버그린 J + 민트 잎맥으로 그린다(파비콘도 같은 규칙).
   - "ieun" 은 진짜 텍스트에 에버그린 세로 그라데이션을 `background-clip: text` 로 입힌다. 가운데 스톱이 `--accent`.
   - 화면엔 J 가 그림이라 스크린리더용으로 `sr-only` "Jieun" 을 따로 둔다.
-  - 파비콘(`public/favicon.svg`, 같은 그림으로 `favicon.ico`·`favicon-96x96.png`)은 에버그린 타일 + 민트 J + 초록 잎맥.
-    `apple-touch-icon`·`web-app-manifest-*` 는 아직 예전 나무 그림이다. OG 카드는 이제 `favicon.svg` 를 쓰므로 새 로고로 바꿔도 된다.
+  - 파비콘(`public/favicon.svg`)은 **타일 없이 J 만**. 칸을 거의 채우게(높이 약 96%) 키웠다.
+    브라우저 테마(`prefers-color-scheme`)를 따라 워드마크의 J 처럼 뒤집는다 — 밝은 탭 바엔 에버그린 J, 어두운 탭 바엔 민트 J.
+    SVG 파비콘을 못 쓰는 곳(Safari 등)이 받는 `favicon.ico`(16·32·48)·`favicon-96x96.png` 는 색을 못 바꾸니
+    밝은 탭용(에버그린 J + 민트 잎맥) 투명 PNG 다. 헤드리스 크롬으로 `favicon.svg` 를 라이트로 렌더해 만든다.
+  - `apple-touch-icon`·`web-app-manifest-*` 는 아직 예전 나무 그림이다. 홈 화면 아이콘은 iOS 가 투명한 곳을 검게 채우므로
+    바꿀 때도 타일(`design/brand/jieun-icon-square.*`)을 쓴다. SNS 카드 로고는 `design/brand/jieun-icon.svg`(타일).
 - **메뉴**: 홈 · 소개 · 태그, 16px/600, 간격 16px.
   - 현재 메뉴는 **초록 글자 + 2px 초록 밑줄**(글자 아래 6px). 글자색만으론 검정과 구분이 잘 안 돼서 밑줄을 넣었다.
   - hover 하면 같은 밑줄이 가운데서 펼쳐진다.

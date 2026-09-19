@@ -67,7 +67,9 @@ const CARD = path.join(ROOT, 'scripts/og-card.html');
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'og-'));
 
 // 카드 HTML 이 같은 디렉터리에서 찾는 자산을 옆에 둔다
-fs.copyFileSync(path.join(ROOT, 'public/favicon.svg'), path.join(tmp, 'logo.svg')); // 파비콘 = 카드 왼쪽 위 로고
+// 카드 왼쪽 위 로고 = 에버그린 타일 아이콘. 파비콘은 타일을 뺐지만(탭 바 위엔 J 만) 카드엔 타일이 있어야
+// 흰 카드 위에서 로고로 선다 — 파비콘과 같은 J 를 타일에 올린 design/brand 원본을 쓴다.
+fs.copyFileSync(path.join(ROOT, 'design/brand/jieun-icon.svg'), path.join(tmp, 'logo.svg'));
 fs.copyFileSync(path.join(ROOT, 'public/avatar-illustration.jpg'), path.join(tmp, 'avatar.jpg'));
 fs.copyFileSync(
   path.join(ROOT, 'node_modules/pretendard/dist/web/variable/woff2/PretendardVariable.woff2'),

@@ -34,14 +34,14 @@ jieun.dev 의 화면을 **페이지(URL)마다 한 파일**로 적은 문서다.
 ## 브랜드 파일 — `brand/`
 
 로고·아이콘 원본. 프로필 사진·발표 자료처럼 사이트 밖에서 쓸 때 여기서 가져간다.
-사이트가 실제로 쓰는 건 `src/components/BrandWordmark.astro`(헤더·푸터)와 `public/favicon.svg` 이다 —
-그쪽 그림이 바뀌면 여기 파일도 다시 뽑는다. PNG 는 모두 투명 배경이다.
+사이트가 실제로 쓰는 건 `src/components/BrandWordmark.astro`(헤더·푸터)와 `public/favicon.svg`(타일 없는 J),
+그리고 SNS 카드 로고로 쓰는 여기 `jieun-icon.svg` 다 — 그쪽 그림이 바뀌면 여기 파일도 다시 뽑는다. PNG 는 모두 투명 배경이다.
 
 | 파일 | 내용 |
 | --- | --- |
 | `jieun-logo-light.*` | 밝은 바탕용 워드마크 — 에버그린 J + 민트 잎맥. "ieun" 은 Nunito 900 을 윤곽선으로 바꿔 넣었다 |
 | `jieun-logo-dark.*` | 어두운 바탕용 워드마크 — 파비콘과 같은 민트 J + 초록 잎맥 |
-| `jieun-icon.*` | 둥근 에버그린 타일 아이콘. 파비콘과 같은 그림 |
+| `jieun-icon.*` | 둥근 에버그린 타일 + 민트 J. 파비콘은 여기서 타일을 뺀 것. **SNS 카드 로고 원본**(`scripts/gen-og.mjs` 가 SVG 를 바로 쓴다) |
 | `jieun-icon-square.*` | 모서리 없는 정사각. 플랫폼이 원·둥근 모서리로 잘라 쓰는 곳(아바타 등)용 |
 
 ## 페이지 문서의 목차

@@ -41,7 +41,7 @@ Hashnode 에 맡기는 2채널 구조였다. Hashnode 가 GraphQL API 를 Pro �
 `scripts/gen-og.mjs` 가 frontmatter(title·category·pubDate)를 읽어 언어별로 한 장씩
 만든다. 템플릿은 `scripts/og-card.html` — 색은 `global.css` 의 라이트 팔레트(포인트 에버그린)와
 같은 값이고, 폰트도 사이트와 같은 Nunito + Pretendard 다. 사이트 색을 바꾸면 템플릿도 맞춘다.
-로고는 `public/favicon.svg`(에버그린 타일 + J)를, 배너 이름은 헤더와 같은 워드마크를 쓴다 —
+로고는 `design/brand/jieun-icon.svg`(에버그린 타일 + J — 파비콘은 여기서 타일을 뺀 것)를, 배너 이름은 헤더와 같은 워드마크를 쓴다 —
 브랜드를 바꾸면 템플릿의 워드마크 SVG 도 `BrandWordmark.astro` 에 맞추고 배너 버전을 올린다.
 
 - 렌더링은 **로컬 크롬 headless** 에 맡긴다. 브라우저를 `package.json` 에 넣지 않으려는
