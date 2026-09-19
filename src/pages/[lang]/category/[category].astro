@@ -3,6 +3,7 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import ProfileHero from '../../../components/ProfileHero.astro';
 import ArticleBrowser from '../../../components/ArticleBrowser.astro';
+import BackToTop from '../../../components/BackToTop.astro';
 import { ui, languages, categoryLabel, type Lang } from '../../../i18n/ui';
 import { getPosts, categoryStats } from '../../../lib/posts';
 
@@ -26,4 +27,5 @@ const label = categoryLabel(category);
   <h1 class="sr-only">{label}</h1>
   <ProfileHero lang={lang} />
   <ArticleBrowser lang={lang} allPosts={posts} category={category} />
+  <BackToTop lang={lang} />
 </BaseLayout>

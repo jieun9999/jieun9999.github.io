@@ -1,0 +1,53 @@
+---
+// 맨 위로 버튼 — 600px 넘게 내려가면 오른쪽 아래에 뜬다. 글 상세·홈·카테고리별 목록이 같이 쓴다.
+import { ui, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+---
+
+<button class="to-top" type="button" aria-label={ui[lang].backToTop} data-to-top>
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
+<style>
+  .to-top {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    width: 48px;
+    height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--bg);
+    color: var(--text-muted);
+    box-shadow: var(--shadow-md);
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s, color 0.15s;
+    z-index: 55;
+  }
+  .to-top.show { opacity: 1; transform: none; pointer-events: auto; }
+  .to-top:hover { color: var(--accent); }
+</style>
+
+<script>
+  const btn = document.querySelector<HTMLButtonElement>('[data-to-top]');
+  if (btn) {
+    const onScroll = () => btn.classList.toggle('show', window.scrollY > 600);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    btn.addEventListener('click', () =>
+      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' })
+    );
+  }
+</script>

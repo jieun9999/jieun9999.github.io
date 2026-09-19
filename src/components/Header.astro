@@ -137,6 +137,29 @@ const menu = [
   .panel-links a[aria-current='page'] {
     color: var(--accent);
   }
+  /* 현재 메뉴는 초록 밑줄로 표시한다 — 글자색만으론 검정과 잘 구분되지 않는다.
+     마우스를 올리면 같은 밑줄이 가운데서 펼쳐진다. */
+  .menu a,
+  .panel-links a { position: relative; }
+  .menu a::after,
+  .panel-links a::after {
+    content: '';
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    bottom: -6px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transition: transform 0.25s cubic-bezier(0.44, 0, 0.56, 1);
+  }
+  .menu a:hover::after,
+  .menu a[aria-current='page']::after,
+  .panel-links a:hover::after,
+  .panel-links a[aria-current='page']::after {
+    transform: scaleX(1);
+  }
 
   .tools {
     justify-self: end;
@@ -211,7 +234,9 @@ const menu = [
       gap: 6px;
       padding-block: 16px 32px;
     }
-    .panel-links a { padding: 8px 0; }
+    /* 세로 목록에선 글자 폭만큼만 차지해야 밑줄이 글자 아래에만 그어진다 */
+    .panel-links a { align-self: flex-start; padding: 8px 0; }
+    .panel-links a::after { left: 0; right: 0; bottom: 2px; }
     .panel-links .divider { margin: 8px 0; }
     .panel-links :global(.lang-text) {
       padding: 8px 0;
