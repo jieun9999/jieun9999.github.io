@@ -1,16 +1,38 @@
 ---
-// 홈 히어로 — 사진 + 모토 + GitHub·LinkedIn·메일. 홈과 카테고리별 목록이 같이 쓴다.
+// 홈 히어로 — 사진 + 큰 이름(워드마크) + 모토 + GitHub·LinkedIn·메일. 홈과 카테고리별 목록이 같이 쓴다.
+// 이름이 이 페이지들의 로고 노릇을 하므로, 헤더는 data-hero-name 을 보고 자기 로고를 숨긴다(Header.astro).
 import Hero from './Hero.astro';
 import SocialLinks from './SocialLinks.astro';
+import BrandWordmark from './BrandWordmark.astro';
 import { ui, avatarSrc, type Lang } from '../i18n/ui';
 
 interface Props {
   lang: Lang;
+  /** 이름을 h1 으로 (홈). 카테고리는 카테고리 이름이 h1 이라 p 로 둔다 */
+  nameHeading?: boolean;
 }
-const { lang } = Astro.props;
+const { lang, nameHeading = false } = Astro.props;
 const t = ui[lang];
+const Name = nameHeading ? 'h1' : 'p';
 ---
 
-<Hero title={t.tagline} image={avatarSrc} imageAlt="Jieun" headingLevel="p">
+<Hero title={t.tagline} image={avatarSrc} imageAlt="Jieun" imageHref={`/${lang}/`} headingLevel="p" snug>
+  <Fragment slot="name">
+    <Name class="name" data-hero-name>
+      <a href={`/${lang}/`}><BrandWordmark id="brand-grad-hero" /></a>
+    </Name>
+  </Fragment>
   <SocialLinks toast="center" muted />
 </Hero>
+
+<style>
+  .name {
+    margin: 0;
+    font-size: 48px;
+    line-height: 1;
+  }
+  .name a { display: inline-flex; }
+  @media (max-width: 809px) {
+    .name { font-size: 40px; }
+  }
+</style>

@@ -20,10 +20,11 @@
 
 ```plaintext
 데스크톱 (≥1200)
-┌ Header ──────────────────────────────────────────────────────────┐
+┌ Header (가운데 로고 없음) ─────────────────── 점이 헤더 뒤까지 ┐
+│ 홈 소개 태그             ( 프로필 그림 120 )           🔍 EN ☾  │ ← 사진 윗선 = 버튼 윗선
 ├ Hero ─────────────────────────────────────── 점: 에버그린 무작위 ┤
-│                        ( 프로필 그림 100 )                        │
-│                     Deserve what you want.        ← <p>, 20/800   │
+│                              Jieun                ← <h1>, 48    │
+│                     Deserve what you want.        ← <p>, 18/600 회색 │
 │                          ⌂   in   ✉               ← 회색 아이콘   │
 ├───────────────────────────────────────────────────────────────────┤
 │ [전체 20] [SYSTEMS 10] [RELIABILITY 6] [SCALING 2] [DEVOPS 2]     │  ← 칩, 선택 = 초록 면
@@ -61,7 +62,8 @@
 
 ### 히어로 — `ProfileHero`
 
-[`shell.md`](./shell.md#profilehero--srccomponentsprofileheroastro) 참고. 모토가 제목 자리에 오고, 사이트 이름 "Jieun" 은 화면에 안 보이는 `<h1 class="sr-only">` 로 둔다.
+[`shell.md`](./shell.md#profilehero--srccomponentsprofileheroastro) 참고. 사진 밑에 사이트 이름 "Jieun" 이 워드마크로 크게 서고(보이는 `<h1>`), 모토가 그 밑 한 줄 소개로 온다.
+헤더 가운데 로고는 이 이름과 겹치지 않게 숨긴다.
 
 ### 카테고리 칩 — `src/components/ArticleBrowser.astro`
 
@@ -115,7 +117,7 @@
 ## 규칙
 
 - 🔴 **카테고리 칩은 링크로 둔다.** 화면 안에서만 거르는 필터로 바꾸지 않는다 — 카테고리 URL 이 공유·검색 대상이다.
-- 🔴 모토("Deserve what you want.")는 `<p>` 다. 이 페이지의 `<h1>` 은 사이트 이름(숨김)이다.
+- 🔴 모토("Deserve what you want.")는 `<p>` 다. 이 페이지의 `<h1>` 은 히어로의 이름 "Jieun" 이다.
 - 카테고리 칩 글자는 대문자 유지. 태그(`#tag`)와 모양을 섞지 않는다 — 카테고리는 대문자 칩, 태그는 원래 글자 알약.
 - 목록 한 줄의 모양은 `PostRow` 하나다. 홈만 다른 카드 모양을 만들지 않는다.
 

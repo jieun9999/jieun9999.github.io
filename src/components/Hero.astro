@@ -7,20 +7,37 @@ interface Props {
   imageAlt?: string;
   /** 제목을 h1 으로 (홈 외 페이지) — 홈은 사이트 이름이 h1 역할을 하지 않도록 p 로 둔다 */
   headingLevel?: 'h1' | 'p';
+  /** 헤더 뒤까지 올라가 로고 바로 밑에 사진을 붙인다 — 로고 · 사진 · 제목이 점 사이 한 장면으로 읽히게 (홈·카테고리) */
+  snug?: boolean;
+  /** 사진을 누르면 갈 곳 (홈 히어로 → 홈). 바로 옆 이름 링크와 같은 곳이라 키보드·스크린리더에선 뺀다 */
+  imageHref?: string;
 }
-const { title, image, imageAlt = '', headingLevel = 'h1' } = Astro.props;
+const { title, image, imageAlt = '', headingLevel = 'h1', snug = false, imageHref } = Astro.props;
 const Heading = headingLevel;
 const words = title.split(/\s+/).filter(Boolean);
+// name 슬롯(홈의 큰 이름)이 있으면 사진 → 이름 → 한 줄 소개 배치로 바뀐다
+const hasName = Astro.slots.has('name');
 ---
 
-<section class="hero">
+<section class:list={['hero', { snug }]} data-under-header={snug || undefined}>
   <canvas class="particles" data-particles aria-hidden="true"></canvas>
-  <div class="frame hero-content">
+  <div class:list={['frame hero-content', { snug, 'has-name': hasName }]}>
     {
-      image ? (
+      image && imageHref ? (
+        <a class="hero-img-link" href={imageHref} aria-hidden="true" tabindex="-1">
+          <img class="hero-img" src={image} alt={imageAlt} width="100" height="100" loading="eager" />
+        </a>
+      ) : image ? (
         <img class="hero-img" src={image} alt={imageAlt} width="100" height="100" loading="eager" />
       ) : (
         <span class="hero-orb" aria-hidden="true" />
+      )
+    }
+    {
+      hasName && (
+        <div class="hero-name">
+          <slot name="name" />
+        </div>
       )
     }
     <Heading class="hero-title">
@@ -82,6 +99,10 @@ const words = title.split(/\s+/).filter(Boolean);
     border-radius: 999px;
     animation: pop 0.6s cubic-bezier(0.34, 1.4, 0.64, 1) 0.1s both;
   }
+  .hero-img-link {
+    display: block;
+    border-radius: 999px;
+  }
   .hero-img {
     object-fit: cover;
     border: 1.5px solid var(--hairline);
@@ -142,6 +163,38 @@ const words = title.split(/\s+/).filter(Boolean);
   }
   @media (max-width: 809px) {
     .hero-content { padding-block: 30px 40px; }
+  }
+  /* snug — 헤더 높이만큼 위로 올라가 점이 로고 뒤에서도 떠다닌다(헤더를 비우는 건 Header.astro).
+     내용은 헤더 바로 밑에서 시작해, 로고 글자 밑 → 사진이 사진 → 제목 간격(24px)과 비슷해진다. */
+  .hero.snug { margin-top: calc(-1 * var(--header-h)); }
+  .hero-content.snug { padding-top: var(--header-h); }
+
+  /* has-name — 사진 → 이름 → 한 줄 소개. 이름이 주인공이라 사진은 키우고,
+     소개는 작고 흐리게 낮춰 이름에 바짝 붙인다. 이름 크기는 넣는 쪽(ProfileHero)이 정한다. */
+  .has-name .hero-img {
+    width: 120px;
+    height: 120px;
+  }
+  /* 헤더 가운데가 비므로 사진을 헤더 줄까지 올려, 사진 윗선을 메뉴 줄 버튼(32px 원) 윗선에 맞춘다.
+     모바일은 헤더가 얇은 막대라 그 밑에서 시작한다(아래 미디어쿼리). */
+  .hero-content.snug.has-name { padding-top: calc((var(--header-h) - 32px) / 2); }
+  .hero-name {
+    margin-top: -8px;
+    animation: rise 0.5s ease 0.15s both;
+  }
+  .has-name .hero-title {
+    margin-top: -20px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-subtle);
+  }
+  @media (max-width: 809px) {
+    .has-name .hero-img {
+      width: 96px;
+      height: 96px;
+    }
+    .hero-content.snug.has-name { padding-top: var(--header-h); }
+    .has-name .hero-title { font-size: 16px; }
   }
 </style>
 

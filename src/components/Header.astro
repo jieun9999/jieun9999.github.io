@@ -34,26 +34,8 @@ const menu = [
 
 <header class="site-header" data-header>
   <div class="frame bar">
-    <a class="brand" href={`/${lang}/`} aria-label={`${t.siteTitle} — ${t.home}`}>
-      <BrandWordmark id="brand-grad-header" />
-    </a>
-
-    <nav class="menu" aria-label="Main">
-      {
-        menu.map((m) => (
-          <a href={m.href} aria-current={m.current ? 'page' : undefined}>
-            {m.label}
-          </a>
-        ))
-      }
-    </nav>
-
-    <div class="tools">
-      <button class="icon-btn" type="button" aria-label={t.search} title={t.search} data-search-open>
-        <svg width="15" height="15" viewBox="0 0 256 256" aria-hidden="true"><path fill="currentColor" d="M232.49,215.51,185,168a92.12,92.12,0,1,0-17,17l47.53,47.54a12,12,0,0,0,17-17ZM44,112a68,68,0,1,1,68,68A68.07,68.07,0,0,1,44,112Z"/></svg>
-      </button>
-      <span class="lang-slot"><LanguageToggle lang={lang} alternates={alternates} /></span>
-      <ThemeToggle label={t.toggleTheme} />
+    <!-- 메뉴가 왼쪽에 서므로, 모바일에서 메뉴를 대신하는 햄버거도 왼쪽에 둔다 -->
+    <div class="start">
       <button
         class="icon-btn burger mobile-only"
         type="button"
@@ -66,6 +48,27 @@ const menu = [
       >
         <span></span><span></span><span></span>
       </button>
+      <nav class="menu" aria-label="Main">
+        {
+          menu.map((m) => (
+            <a href={m.href} aria-current={m.current ? 'page' : undefined}>
+              {m.label}
+            </a>
+          ))
+        }
+      </nav>
+    </div>
+
+    <a class="brand" href={`/${lang}/`} aria-label={`${t.siteTitle} — ${t.home}`}>
+      <BrandWordmark id="brand-grad-header" />
+    </a>
+
+    <div class="tools">
+      <button class="icon-btn" type="button" aria-label={t.search} title={t.search} data-search-open>
+        <svg width="15" height="15" viewBox="0 0 256 256" aria-hidden="true"><path fill="currentColor" d="M232.49,215.51,185,168a92.12,92.12,0,1,0-17,17l47.53,47.54a12,12,0,0,0,17-17ZM44,112a68,68,0,1,1,68,68A68.07,68.07,0,0,1,44,112Z"/></svg>
+      </button>
+      <span class="lang-slot"><LanguageToggle lang={lang} alternates={alternates} /></span>
+      <ThemeToggle label={t.toggleTheme} />
     </div>
   </div>
 
@@ -91,30 +94,57 @@ const menu = [
     position: relative;
     z-index: 50;
     background: var(--bg);
+    transition: background-color 0.2s ease;
   }
   /* 템플릿처럼 데스크톱에선 흘려보내고, 태블릿·모바일에선 위에 붙인다 */
   @media (max-width: 1199px) {
     .site-header { position: sticky; top: 0; }
+  }
+  /* 홈·카테고리는 히어로가 헤더 뒤까지 올라온다(Hero snug) — 헤더를 비워 점이 로고 뒤에서도 떠다니게.
+     위에 붙는 폭에선 스크롤하거나 메뉴를 열면 뒤가 비치지 않게 다시 칠한다. */
+  :global(body:has([data-under-header])) .site-header { background: transparent; }
+  @media (max-width: 1199px) {
+    :global(body:has([data-under-header])) .site-header:is([data-solid], :has(.mobile-panel:not([hidden]))) {
+      background: var(--bg);
+    }
+  }
+  /* 비워둔 헤더 줄에 홈 사진 윗부분이 걸친다 — 빈 곳을 누르면 사진이 눌리게 헤더는 메뉴·로고·도구만 받는다 */
+  :global(body:has([data-under-header])) .site-header:not([data-solid]) { pointer-events: none; }
+  :global(body:has([data-under-header])) .site-header :is(.start, .brand, .tools, .mobile-panel) {
+    pointer-events: auto;
   }
 
   .bar {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    height: 80px;
+    height: var(--header-h);
   }
-  .brand {
+  .start {
     justify-self: start;
+    display: flex;
+    align-items: center;
+  }
+  /* 양옆이 1fr 로 같은 폭이라 로고가 화면 정가운데에 선다 */
+  .brand {
+    justify-self: center;
     display: inline-flex;
     align-items: center;
     gap: 10px;
     /* 심볼 없이 워드마크 하나로 서므로 글자를 키운다 */
-    font-size: 28px;
+    font-size: 36px;
     font-weight: 800;
     letter-spacing: -0.01em;
     color: var(--text);
   }
   .brand:hover { color: var(--text); }
+  /* 홈·카테고리는 히어로의 큰 이름이 로고 노릇을 한다(ProfileHero) — 헤더 로고는 숨겨 두고,
+     위에 붙는 폭에서 이름이 헤더 밑으로 사라지면(data-brand-shown) 그때 꺼낸다 */
+  .brand { transition: opacity 0.2s ease, visibility 0.2s ease; }
+  :global(body:has([data-hero-name])) .site-header:not([data-brand-shown]) .brand {
+    opacity: 0;
+    visibility: hidden;
+  }
 
   .menu {
     display: flex;
@@ -167,8 +197,8 @@ const menu = [
   }
   .lang-slot { display: contents; }
 
-  /* 원형 아이콘 버튼 (검색·테마·언어 공용) */
-  .tools :global(.icon-btn) {
+  /* 원형 아이콘 버튼 (검색·테마·언어·햄버거 공용) */
+  .bar :global(.icon-btn) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -182,7 +212,7 @@ const menu = [
     cursor: pointer;
     transition: background 0.15s, color 0.15s;
   }
-  .tools :global(.icon-btn:hover) {
+  .bar :global(.icon-btn:hover) {
     background: var(--surface-2);
     color: var(--text);
   }
@@ -205,25 +235,22 @@ const menu = [
   .burger[aria-expanded='true'] span:nth-child(2) { opacity: 0; }
   .burger[aria-expanded='true'] span:nth-child(3) { transform: translateY(-5px) rotate(-45deg); }
 
-  /* .tools .icon-btn 보다 구체적이어야 데스크톱에서 햄버거가 숨는다 */
-  .tools .mobile-only { display: none; }
+  /* .bar .icon-btn 보다 구체적이어야 데스크톱에서 햄버거가 숨는다 */
+  .bar .mobile-only { display: none; }
   .mobile-panel { display: none; }
 
   @media (max-width: 809px) {
-    .bar {
-      grid-template-columns: 1fr auto;
-      height: 60px;
-    }
-    .brand { font-size: 24px; }
+    /* 칸 셋은 그대로 — ☰ · 로고 · 🔍☾ 로 로고가 계속 가운데 선다. 높이는 --header-h 가 60px 로 바뀐다 */
+    .brand { font-size: 28px; }
     .menu { display: none; }
     .tools { gap: 8px; }
     .lang-slot { display: none; }
-    .tools .mobile-only { display: inline-flex; }
+    .bar .mobile-only { display: inline-flex; }
 
     .mobile-panel:not([hidden]) {
       display: block;
       position: fixed;
-      inset: 60px 0 0;
+      inset: var(--header-h) 0 0;
       overflow-y: auto;
       background: var(--bg);
     }
@@ -270,5 +297,20 @@ const menu = [
     matchMedia('(min-width: 810px)').addEventListener('change', (e) => {
       if (e.matches) setOpen(false);
     });
+  }
+
+  // 히어로가 헤더 뒤로 올라오는 페이지에선, 스크롤하면 비워둔 헤더를 다시 칠한다(CSS 가 data-solid 를 본다).
+  // 히어로에 큰 이름이 있으면 사진이 헤더 줄에 걸쳐 있어서, 조금만 내려도 칠하면 사진이 잘린다 —
+  // 이름이 헤더 밑으로 들어간 뒤에야 칠하고, 그때 숨겨둔 헤더 로고도 꺼낸다(data-brand-shown).
+  const header = document.querySelector<HTMLElement>('[data-header]');
+  const heroName = document.querySelector<HTMLElement>('[data-hero-name]');
+  if (header && (heroName || document.querySelector('[data-under-header]'))) {
+    const onScroll = () => {
+      const nameGone = !!heroName && heroName.getBoundingClientRect().bottom <= header.offsetHeight;
+      header.toggleAttribute('data-solid', heroName ? nameGone : scrollY > 0);
+      header.toggleAttribute('data-brand-shown', nameGone);
+    };
+    onScroll();
+    addEventListener('scroll', onScroll, { passive: true });
   }
 </script>

@@ -17,8 +17,7 @@ const posts = await getPosts(lang);
 ---
 
 <BaseLayout title={t.siteTitle} description={t.tagline} lang={lang}>
-  <h1 class="sr-only">{t.siteTitle}</h1>
-  <ProfileHero lang={lang} />
+  <ProfileHero lang={lang} nameHeading />
   <ArticleBrowser lang={lang} allPosts={posts} />
   <BackToTop lang={lang} />
 </BaseLayout>
