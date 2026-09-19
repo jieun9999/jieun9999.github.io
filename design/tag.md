@@ -6,7 +6,7 @@
 | --- | --- |
 | URL | `/[lang]/tag/<tag>/` — 그 언어 글에 한 번이라도 달린 태그마다 만들어진다 |
 | 소스 | `src/pages/[lang]/tag/[tag].astro` |
-| 컴포넌트 | `Hero`(제목 `#<tag>` + 프로필 그림) → `PostList`(→ `PostItem` → `PostRow`) |
+| 컴포넌트 | `Hero`(제목 `#<tag>` + 프로필 그림) → `PostList`(→ `PostItem` → `PostRow`) → `BackToTop` |
 | 헤더 현재 메뉴 | 태그 |
 | 검색 노출 | ✓ |
 | 페이지 제목 | "#bullmq · Jieun" / 설명 "Jieun — #bullmq" |
@@ -38,6 +38,7 @@
 - **히어로**: `Hero` 그대로, 제목 `#<tag>` 가 `<h1>`. 링크 아이콘 없음.
 - **목록**: 홈과 같은 `PostList` — 라벨 "#bullmq — Articles" / "#bullmq — 글", 8개씩 "더 보기". 글 한 줄 모양은 [`home.md`](./home.md#글-한-줄--srccomponentspostrowastro) 참고.
 - 카테고리 칩 줄은 **없다**. 이 화면은 태그로 이미 걸러져 있다.
+- **맨 위로 버튼**: 홈·카테고리와 같은 `BackToTop` ([`shell.md`](./shell.md#맨-위로--srccomponentsbacktotopastro)).
 
 ## 반응형
 
@@ -60,5 +61,5 @@
 
 ## 알아둘 것
 
-- 홈·카테고리와 달리 **맨 위로 버튼이 없다**. 글이 많이 달린 태그가 생기면 `BackToTop` 을 넣을지 검토한다.
+- 맨 위로 버튼은 처음엔 없었다. 목록 화면끼리 맞추려고 홈·카테고리와 같이 넣었다 (2026-09-19).
 - 태그 URL 은 `encodeURIComponent` 로 만든다 (`tagUrl`). 공백·한글 태그도 깨지지 않는다.
