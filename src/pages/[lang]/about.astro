@@ -1,6 +1,7 @@
 ---
 // 소개 페이지 — 카드 한 장. 왼쪽 프로필 그림(홈 히어로와 같은 것), 오른쪽 인사 · 짧은 소개 · 링크 아이콘.
 // 소개 문장은 전 회사 지칭 규칙(CLAUDE.md)을 따른다 — 과거형, 회사명·연차·직함 없이.
+// 들어올 때 움직임은 홈 히어로와 같은 말투 — 그림이 튀어오르고(pop), 인사 단어·소개·아이콘이 차례로 떠오른다(rise).
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SocialLinks from '../../components/SocialLinks.astro';
 import { ui, languages, avatarLargeSrc, type Lang } from '../../i18n/ui';
@@ -27,6 +28,7 @@ const copy = {
   },
 } satisfies Record<Lang, { greeting: string; photoAlt: string; summary: string; bio: string }>;
 const c = copy[lang];
+const words = c.greeting.split(/\s+/).filter(Boolean);
 ---
 
 <BaseLayout title={`${t.about} · ${t.siteTitle}`} description={c.summary} lang={lang}>
@@ -34,9 +36,11 @@ const c = copy[lang];
     <section class="card" aria-labelledby="about-title">
       <img class="photo" src={avatarLargeSrc} alt={c.photoAlt} width="1024" height="1024" loading="eager" />
       <div class="intro">
-        <h1 id="about-title">{c.greeting}</h1>
-        <p class="bio">{c.bio}</p>
-        <div class="links">
+        <h1 id="about-title">
+          {words.map((w, i) => <>{i > 0 && ' '}<span style={`--i:${i}`}>{w}</span></>)}
+        </h1>
+        <p class="bio" style={`--i:${words.length}`}>{c.bio}</p>
+        <div class="links" style={`--i:${words.length + 1}`}>
           <SocialLinks toast="start" muted />
         </div>
       </div>
@@ -86,6 +90,24 @@ const c = copy[lang];
   }
   /* 아이콘 원 안쪽 여백만큼 당겨 글줄 왼쪽 끝에 맞춘다 */
   .links { margin: 28px 0 0 -6px; }
+
+  /* 들어올 때 — 값은 Hero.astro 와 같다 (foundations.md "움직임") */
+  .photo { animation: pop 0.6s cubic-bezier(0.34, 1.4, 0.64, 1) 0.1s both; }
+  .intro h1 span { display: inline-block; }
+  .intro h1 span,
+  .bio,
+  .links {
+    animation: rise 0.5s ease both;
+    animation-delay: calc(0.25s + var(--i) * 0.08s);
+  }
+  @keyframes pop {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+  }
 
   @media (max-width: 1199px) {
     .card { gap: 40px; padding: 32px; }
