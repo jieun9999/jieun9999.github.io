@@ -4,7 +4,7 @@ import Hero from '../../../components/Hero.astro';
 import PostList from '../../../components/PostList.astro';
 import TagPill from '../../../components/TagPill.astro';
 import BackToTop from '../../../components/BackToTop.astro';
-import { ui, languages, avatarSrc, type Lang } from '../../../i18n/ui';
+import { ui, languages, type Lang } from '../../../i18n/ui';
 import { getPosts, tagStats } from '../../../lib/posts';
 
 export async function getStaticPaths() {
@@ -23,7 +23,7 @@ const posts = (await getPosts(lang)).filter((p) => p.data.tags.includes(tag));
 ---
 
 <BaseLayout title={`#${tag} · ${t.siteTitle}`} description={`${t.siteTitle} — #${tag}`} lang={lang}>
-  <Hero title={`#${tag}`} image={avatarSrc} imageAlt="Jieun" />
+  <Hero title={`#${tag}`} plain snug />
 
   <div class="frame list-page">
     <PostList lang={lang} posts={posts} pageSize={8}>

@@ -2,7 +2,7 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Hero from '../../../components/Hero.astro';
 import TagPill from '../../../components/TagPill.astro';
-import { ui, languages, avatarSrc, type Lang } from '../../../i18n/ui';
+import { ui, languages, postCount, type Lang } from '../../../i18n/ui';
 import { getPosts, tagStats, tagUrl } from '../../../lib/posts';
 
 export function getStaticPaths() {
@@ -11,11 +11,17 @@ export function getStaticPaths() {
 
 const { lang } = Astro.params as { lang: Lang };
 const t = ui[lang];
-const tags = tagStats(await getPosts(lang));
+const posts = await getPosts(lang);
+const tags = tagStats(posts);
+// 제목 밑 한 줄 — 구름이 얼마나 큰지 먼저 알려준다
+const summary =
+  lang === 'ko'
+    ? `태그 ${tags.length}개 · ${postCount(lang, posts.length)}`
+    : `${tags.length} tags · ${postCount(lang, posts.length)}`;
 ---
 
 <BaseLayout title={`${t.tags} · ${t.siteTitle}`} description={`${t.siteTitle} — ${t.tags}`} lang={lang}>
-  <Hero title={t.tags} image={avatarSrc} imageAlt="Jieun" />
+  <Hero title={t.tags} plain snug>{summary}</Hero>
 
   <div class="frame">
     <ul class="cloud">
