@@ -2,6 +2,8 @@
 
 기술 블로그. Astro + GitHub Pages, 커스텀 도메인 **jieun.dev**, 한/영 i18n(`/en/`·`/ko/`).
 새 글 작성 절차·frontmatter는 `POST_TEMPLATE.md` 참고. 이 문서는 **SEO/교차발행 규칙**을 다룬다.
+화면 디자인(토큰·공통 틀·페이지별 구조와 규칙)은 **`design/`** 에 페이지마다 한 파일로 있다 — `design/README.md` 부터.
+화면을 고치면 해당 `design/*.md` 도 같은 커밋에서 고친다.
 
 ## 단일 채널 SEO 전략 (jieun.dev 단독)
 
