@@ -86,11 +86,25 @@ const words = title.split(/\s+/).filter(Boolean);
     object-fit: cover;
     border: 1.5px solid var(--hairline);
   }
+  /* 이미지가 없을 때(404) 뜨는 구슬 — 에버그린 단계로 칠한다(foundations.md 단계표).
+     라이트는 옅은 민트 구에 초록 심(accent 로 하면 가운데가 탁해져 한 단계 밝혔다),
+     다크는 짙은 초록 구에 밝은 잎맥선 심. */
   .hero-orb {
+    --orb-core: #4b916e;
+    --orb-core-soft: rgba(75, 145, 110, 0.55);
+    --orb-hi: #e2f6ea;
+    --orb-mid: #bcebd1;
+    --orb-edge: #93d6b1;
     background:
-      radial-gradient(circle at 50% 50%, #f0426b 0%, rgba(240, 66, 107, 0.55) 32%, transparent 62%),
-      radial-gradient(circle at 30% 30%, #8ab4f8 0%, #b9a4ff 55%, #e9d5ff 100%);
-    filter: saturate(1.05);
+      radial-gradient(circle at 50% 50%, var(--orb-core) 0%, var(--orb-core-soft) 32%, transparent 62%),
+      radial-gradient(circle at 30% 30%, var(--orb-hi) 0%, var(--orb-mid) 55%, var(--orb-edge) 100%);
+  }
+  :global(html.dark) .hero-orb {
+    --orb-core: #bcebd1;
+    --orb-core-soft: rgba(114, 190, 150, 0.55);
+    --orb-hi: #4f9773;
+    --orb-mid: #256648;
+    --orb-edge: #195e3f;
   }
   .hero-title {
     max-width: 360px;
