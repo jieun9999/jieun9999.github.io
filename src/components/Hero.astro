@@ -1,5 +1,5 @@
 ---
-// 페이지 맨 위 히어로 — 가운데 둥근 이미지 + 한 줄 제목, 뒤로 떠다니는 점(파티클).
+// 페이지 맨 위 히어로 — 가운데 둥근 이미지 + 한 줄 제목, 뒤로 떠다니는 에버그린 점(파티클).
 // 이미지가 없으면(404) 그라데이션 구슬을 대신 띄운다.
 interface Props {
   title: string;
@@ -48,7 +48,22 @@ const words = title.split(/\s+/).filter(Boolean);
     width: 100%;
     height: 100%;
     pointer-events: none;
-    color: var(--text); /* 점 색은 스크립트가 currentColor 로 읽는다 */
+    /* 점 색 — 에버그린 6단계에서 점마다 하나씩 무작위로 고른다(스크립트가 읽는다).
+       라이트는 흰 바탕에 맞춘 진한 쪽, 다크는 검은 바탕에 맞춘 밝은 쪽. 배경은 그대로 무채색. */
+    --dot-1: #195e3f;
+    --dot-2: #256648;
+    --dot-3: #307252;
+    --dot-4: #3d8160;
+    --dot-5: #4b916e;
+    --dot-6: #a9e0c1;
+  }
+  :global(html.dark) .particles {
+    --dot-1: #3e8562;
+    --dot-2: #4f9773;
+    --dot-3: #5da781;
+    --dot-4: #72be96;
+    --dot-5: #8fd4ad;
+    --dot-6: #bcebd1;
   }
   .hero-content {
     position: relative;
@@ -124,12 +139,19 @@ const words = title.split(/\s+/).filter(Boolean);
   document.querySelectorAll<HTMLCanvasElement>('canvas[data-particles]').forEach((canvas) => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    type Dot = { x: number; y: number; r: number; vx: number; vy: number; a: number };
+    type Dot = { x: number; y: number; r: number; vx: number; vy: number; a: number; c: number };
     let dots: Dot[] = [];
+    let palette: string[] = [];
     let w = 0;
     let h = 0;
     let raf = 0;
     let visible = true;
+
+    // 테마마다 CSS 가 --dot-1..6 을 바꿔 끼운다. 매 프레임 읽지 않고 테마가 바뀔 때만 다시 읽는다.
+    const readPalette = () => {
+      const cs = getComputedStyle(canvas);
+      palette = [1, 2, 3, 4, 5, 6].map((i) => cs.getPropertyValue(`--dot-${i}`).trim());
+    };
 
     const seed = () => {
       const dpr = Math.min(devicePixelRatio || 1, 2);
@@ -142,17 +164,18 @@ const words = title.split(/\s+/).filter(Boolean);
       dots = Array.from({ length: n }, () => ({
         x: Math.random() * w,
         y: Math.random() * h,
-        r: 0.4 + Math.random() * 0.9,
+        r: 0.5 + Math.random() * 1.2, // 무채색일 때(0.4–1.3)보다 살짝 크게 — 너무 작으면 색이 안 읽힌다
         vx: (Math.random() - 0.5) * 0.12,
         vy: (Math.random() - 0.5) * 0.12,
         a: 0.25 + Math.random() * 0.6,
+        c: Math.floor(Math.random() * 6),
       }));
     };
 
     const draw = () => {
       ctx.clearRect(0, 0, w, h);
-      ctx.fillStyle = getComputedStyle(canvas).color;
       for (const d of dots) {
+        ctx.fillStyle = palette[d.c];
         ctx.globalAlpha = d.a;
         ctx.beginPath();
         ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
@@ -179,6 +202,7 @@ const words = title.split(/\s+/).filter(Boolean);
       if (!raf) raf = requestAnimationFrame(step);
     };
 
+    readPalette();
     seed();
     start();
     new ResizeObserver(() => {
@@ -189,8 +213,11 @@ const words = title.split(/\s+/).filter(Boolean);
       visible = entry.isIntersecting;
       if (visible) start();
     }).observe(canvas);
-    // 테마가 바뀌면 점 색도 따라간다 (움직임을 끈 경우 다시 그려야 한다)
-    new MutationObserver(draw).observe(document.documentElement, {
+    // 테마가 바뀌면 팔레트를 다시 읽는다 (움직임을 끈 경우 다시 그려야 한다)
+    new MutationObserver(() => {
+      readPalette();
+      draw();
+    }).observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['class'],
     });
