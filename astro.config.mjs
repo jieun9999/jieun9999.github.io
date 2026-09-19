@@ -137,9 +137,6 @@ export default defineConfig({
         defaultLocale: 'en',
         locales: { en: 'en', ko: 'ko' },
       },
-      // 내용이 아직 없는 소개 페이지는 noindex 라 사이트맵에서도 뺀다
-      // (noindex 페이지를 사이트맵에 올리면 Search Console 이 경고한다). 채우면 이 줄을 지운다.
-      filter: (page) => !/\/(en|ko)\/about\/$/.test(new URL(page).pathname),
       // 글 URL 에만 lastmod 를 붙인다. 태그·목록 페이지는 "언제 바뀌었나"를
       // 정직하게 답할 수 없어 비워둔다(빠진 lastmod 는 크롤러가 그냥 무시한다).
       serialize(item) {
