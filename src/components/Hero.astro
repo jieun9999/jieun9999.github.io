@@ -1,0 +1,196 @@
+---
+// 페이지 맨 위 히어로 — 가운데 둥근 이미지 + 한 줄 제목, 뒤로 떠다니는 에버그린 점(파티클).
+// 이미지가 없으면(404) 그라데이션 구슬을 대신 띄운다. plain 이면 그림 없이 큰 제목만 (태그).
+import Particles from './Particles.astro';
+
+interface Props {
+  title: string;
+  image?: string;
+  imageAlt?: string;
+  /** 제목을 h1 으로 (홈 외 페이지) — 홈은 사이트 이름이 h1 역할을 하지 않도록 p 로 둔다 */
+  headingLevel?: 'h1' | 'p';
+  /** 헤더 뒤까지 올라가 로고 바로 밑에 사진을 붙인다 — 로고 · 사진 · 제목이 점 사이 한 장면으로 읽히게 (홈·카테고리) */
+  snug?: boolean;
+  /** 사진을 누르면 갈 곳 (홈 히어로 → 홈). 바로 옆 이름 링크와 같은 곳이라 키보드·스크린리더에선 뺀다 */
+  imageHref?: string;
+  /** 사진·구슬 없이 제목을 크게 — 사진은 '나'를 말하는 페이지(홈·소개)에만 둔다 (태그) */
+  plain?: boolean;
+}
+const { title, image, imageAlt = '', headingLevel = 'h1', snug = false, imageHref, plain = false } = Astro.props;
+const Heading = headingLevel;
+const words = title.split(/\s+/).filter(Boolean);
+// name 슬롯(홈의 큰 이름)이 있으면 사진 → 이름 → 한 줄 소개 배치로 바뀐다
+const hasName = Astro.slots.has('name');
+---
+
+<section class:list={['hero', { snug }]} data-under-header={snug || undefined}>
+  <Particles />
+  <div class:list={['frame hero-content', { snug, plain, 'has-name': hasName }]}>
+    {
+      plain ? null : image && imageHref ? (
+        <a class="hero-img-link" href={imageHref} aria-hidden="true" tabindex="-1">
+          <img class="hero-img" src={image} alt={imageAlt} width="100" height="100" loading="eager" />
+        </a>
+      ) : image ? (
+        <img class="hero-img" src={image} alt={imageAlt} width="100" height="100" loading="eager" />
+      ) : (
+        <span class="hero-orb" aria-hidden="true" />
+      )
+    }
+    {
+      hasName && (
+        <div class="hero-name">
+          <slot name="name" />
+        </div>
+      )
+    }
+    <Heading class="hero-title">
+      {words.map((w) => <span>{w}</span>)}
+    </Heading>
+    {
+      Astro.slots.has('default') && (
+        <div class="hero-extra">
+          <slot />
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+  }
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    padding-block: 48px 64px;
+  }
+  .hero-img,
+  .hero-orb {
+    display: block;
+    width: 100px;
+    height: 100px;
+    border-radius: 999px;
+  }
+  .hero-img-link {
+    display: block;
+    border-radius: 999px;
+  }
+  .hero-img {
+    object-fit: cover;
+    border: 1.5px solid var(--hairline);
+  }
+  /* 이미지가 없을 때(404) 뜨는 구슬 — 에버그린 단계로 칠한다(foundations.md 단계표).
+     라이트는 옅은 민트 구에 초록 심(accent 로 하면 가운데가 탁해져 한 단계 밝혔다),
+     다크는 짙은 초록 구에 밝은 잎맥선 심. */
+  .hero-orb {
+    --orb-core: #4b916e;
+    --orb-core-soft: rgba(75, 145, 110, 0.55);
+    --orb-hi: #e2f6ea;
+    --orb-mid: #bcebd1;
+    --orb-edge: #93d6b1;
+    background:
+      radial-gradient(circle at 50% 50%, var(--orb-core) 0%, var(--orb-core-soft) 32%, transparent 62%),
+      radial-gradient(circle at 30% 30%, var(--orb-hi) 0%, var(--orb-mid) 55%, var(--orb-edge) 100%);
+  }
+  :global(html.dark) .hero-orb {
+    --orb-core: #bcebd1;
+    --orb-core-soft: rgba(114, 190, 150, 0.55);
+    --orb-hi: #4f9773;
+    --orb-mid: #256648;
+    --orb-edge: #195e3f;
+  }
+  .hero-title {
+    max-width: 360px;
+    margin: 0;
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1.4;
+    text-align: center;
+    color: var(--text);
+  }
+  /* 제목 아래 붙는 것(홈의 링크 아이콘) — 제목과 붙여 한 덩어리로 보이게 */
+  .hero-extra { margin-top: -12px; }
+  /* 단어가 하나씩 떠오르게(아래 스크립트) 블록처럼 세운다 */
+  .hero-title span {
+    display: inline-block;
+    margin-inline: 0.13em;
+  }
+  /* 들어올 때 모션은 GSAP — 뜨기 전엔 점과 내용을 숨겨 둔다(src/lib/motion.ts) */
+  :global(html.gsap-enter) .hero > :global(*) { opacity: 0; }
+
+  @media (max-width: 1199px) {
+    .hero-content { padding-block: 36px 48px; }
+  }
+  @media (max-width: 809px) {
+    .hero-content { padding-block: 30px 40px; }
+  }
+  /* snug — 헤더 높이만큼 위로 올라가 점이 로고 뒤에서도 떠다닌다(헤더를 비우는 건 Header.astro).
+     내용은 헤더 바로 밑에서 시작해, 로고 글자 밑 → 사진이 사진 → 제목 간격(24px)과 비슷해진다. */
+  .hero.snug { margin-top: calc(-1 * var(--header-h)); }
+  .hero-content.snug { padding-top: var(--header-h); }
+
+  /* plain — 그림 없이 제목만. 제목을 소개 인사(about.astro h1)와 같은 크기로 키워 띠가 비어 보이지 않게 하고,
+     슬롯(한 줄 설명)은 작고 흐리게 붙인다. snug 면 헤더 밑에서 한 숨 띄운다. */
+  .plain .hero-title {
+    max-width: none;
+    font-size: clamp(28px, 3.4vw, 38px);
+    font-weight: 900;
+    line-height: 1.25;
+    letter-spacing: -0.025em;
+  }
+  .plain .hero-extra {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-subtle);
+  }
+  .hero-content.snug.plain { padding-top: calc(var(--header-h) + 24px); }
+
+  /* has-name — 사진 → 이름 → 한 줄 소개. 이름이 주인공이라 사진은 키우고,
+     소개는 작고 흐리게 낮춰 이름에 바짝 붙인다. 이름 크기는 넣는 쪽(ProfileHero)이 정한다. */
+  .has-name .hero-img {
+    width: 120px;
+    height: 120px;
+  }
+  /* 헤더 가운데가 비므로 사진을 헤더 줄까지 올려, 사진 윗선을 메뉴 줄 버튼(32px 원) 윗선에 맞춘다.
+     모바일은 헤더가 얇은 막대라 그 밑에서 시작한다(아래 미디어쿼리). */
+  .hero-content.snug.has-name { padding-top: calc((var(--header-h) - 32px) / 2); }
+  .hero-name { margin-top: -8px; }
+  .has-name .hero-title {
+    margin-top: -20px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-subtle);
+  }
+  @media (max-width: 809px) {
+    .has-name .hero-img {
+      width: 96px;
+      height: 96px;
+    }
+    .hero-content.snug.has-name { padding-top: var(--header-h); }
+    .has-name .hero-title { font-size: 16px; }
+  }
+</style>
+
+<script>
+  import { enterTimeline, POP, DOTS } from '../lib/motion';
+
+  // 들어올 때 — 점이 번지고, 사진(구슬)이 튀어오르고, 이름 → 제목 단어 → 링크 아이콘이 차례로 떠오른다.
+  const hero = document.querySelector<HTMLElement>('.hero');
+  const tl = hero && enterTimeline();
+  if (hero && tl) {
+    const $ = (sel: string) => hero.querySelectorAll(sel);
+    tl.from($(':scope > [data-particles]'), DOTS, 0)
+      .from($('.hero-img, .hero-orb'), POP, 0.05)
+      .from($('.hero-name'), { opacity: 0, y: 16 }, 0.15)
+      .from($('.hero-title span'), { opacity: 0, y: 20, stagger: 0.07 }, 0.25)
+      .from($('.hero-extra'), { opacity: 0, y: 12 }, '-=0.55');
+  }
+</script>

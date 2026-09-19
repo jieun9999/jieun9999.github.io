@@ -1,55 +1,35 @@
 ---
-// 한/영 전환 버튼. 현재 언어는 강조, 다른 언어는 해당 대체 URL로 링크.
-import { languages, type Lang } from '../i18n/ui';
+// 한/영 전환. 지금 언어가 아닌 쪽의 대응 URL 로 보내는 버튼 하나.
+import { ui, otherLang, type Lang } from '../i18n/ui';
 
 interface Props {
   lang: Lang;
   /** 각 언어의 현재 페이지 대응 URL */
   alternates: Record<Lang, string>;
+  /** 모바일 메뉴 안에서는 글자 링크로 */
+  variant?: 'icon' | 'text';
 }
-const { lang, alternates } = Astro.props;
+const { lang, alternates, variant = 'icon' } = Astro.props;
+const other = otherLang(lang);
+const label = ui[lang].switchLang;
 ---
 
-<div class="lang-toggle" role="group" aria-label="Language">
-  {
-    (Object.keys(languages) as Lang[]).map((l) => (
-      <a
-        href={alternates[l]}
-        class:list={['lang-btn', { active: l === lang }]}
-        aria-current={l === lang ? 'true' : undefined}
-        hreflang={l}
-      >
-        {l.toUpperCase()}
-      </a>
-    ))
-  }
-</div>
+{
+  variant === 'icon' ? (
+    <a class="icon-btn lang-btn" href={alternates[other]} hreflang={other} aria-label={label} title={label}>
+      {other.toUpperCase()}
+    </a>
+  ) : (
+    <a class="lang-text" href={alternates[other]} hreflang={other}>
+      {label}
+    </a>
+  )
+}
 
 <style>
-  .lang-toggle {
-    display: inline-flex;
-    padding: 0.15rem;
-    gap: 0.1rem;
-    border-radius: 999px;
-    background: var(--surface);
-  }
   .lang-btn {
-    padding: 0.25rem 0.65rem;
-    font-size: 0.78rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    color: var(--text-muted);
-    text-decoration: none;
-    border-radius: 999px;
-    transition: background 0.15s, color 0.15s;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
   }
-  .lang-btn:hover {
-    color: var(--text);
-    background: var(--surface-2);
-  }
-  .lang-btn.active {
-    color: var(--accent-fg);
-    background: var(--accent);
-  }
-  .lang-btn.active:hover { color: var(--accent-fg); background: var(--accent-hover); }
 </style>

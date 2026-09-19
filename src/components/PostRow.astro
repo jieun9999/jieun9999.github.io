@@ -1,0 +1,120 @@
+---
+// 글 한 줄 — 왼쪽 큰 이미지 + 오른쪽 제목·메타·요약·카테고리.
+// 대표 글과 목록이 같은 모양을 쓴다. 좁은 화면에선 이미지가 위로 올라간다.
+import { categoryLabel, type Lang } from '../i18n/ui';
+import { postUrl, categoryUrl, type Post } from '../lib/posts';
+import PostMeta from './PostMeta.astro';
+
+interface Props {
+  lang: Lang;
+  post: Post;
+  /** 대표 글은 h2, 목록은 h3 */
+  headingLevel?: 'h2' | 'h3';
+  /** 첫 화면에 보이는 이미지는 바로 받는다 */
+  eager?: boolean;
+}
+const { lang, post, headingLevel = 'h3', eager = false } = Astro.props;
+const { title, description, pubDate, category, cover, coverAlt } = post.data;
+const href = postUrl(lang, post);
+const Heading = headingLevel;
+const monogram = (title.trim()[0] ?? '·').toUpperCase();
+---
+
+<div class="row">
+  <a class="img" href={href} tabindex="-1" aria-hidden="true">
+    {
+      cover ? (
+        <img
+          src={cover}
+          alt={coverAlt ?? title}
+          loading={eager ? 'eager' : 'lazy'}
+          decoding="async"
+        />
+      ) : (
+        <span class="mono">{monogram}</span>
+      )
+    }
+  </a>
+  <div class="content">
+    <Heading class="title"><a href={href}>{title}</a></Heading>
+    <PostMeta lang={lang} date={pubDate} />
+    <p class="excerpt"><a href={href} tabindex="-1">{description}</a></p>
+    <div><a class="chip" href={categoryUrl(lang, category)}>{categoryLabel(category)}</a></div>
+  </div>
+</div>
+
+<style>
+  /* 제목이 이미지 윗선에서 시작한다 — 가운데 정렬이면 글이 길 때 제목이 이미지보다 올라간다 */
+  .row {
+    display: flex;
+    align-items: flex-start;
+    gap: 40px;
+  }
+  .img {
+    flex: 1 1 0;
+    min-width: 0;
+    position: relative;
+    aspect-ratio: 1.72;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--surface);
+  }
+  /* 선을 이미지 위에 얹어야 사진 가장자리에서도 보인다 */
+  .img::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 1px solid var(--hairline);
+    border-radius: inherit;
+  }
+  .img img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+  .img:hover img { transform: scale(1.03); }
+  .mono {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-size: 48px;
+    font-weight: 800;
+    color: var(--accent);
+  }
+  .content {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+  .title a { color: var(--text); transition: color 0.2s; }
+  .title a:hover { color: var(--accent); }
+  .excerpt {
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--text-muted);
+  }
+  .excerpt a { color: inherit; }
+
+  @media (max-width: 1199px) {
+    .row { flex-direction: column; align-items: stretch; gap: 24px; }
+    .img { flex: none; width: 100%; }
+  }
+  @media (max-width: 809px) {
+    .row { gap: 12px; }
+    .content { gap: 8px; }
+    .title { font-size: 20px; }
+  }
+</style>

@@ -1,0 +1,93 @@
+---
+// 카테고리 칩 + 글 목록. 홈(전체)과 카테고리별(/category/<id>/)이 같은 화면을 쓰고
+// 칩 활성 상태만 다르다.
+import PostList from './PostList.astro';
+import { ui, type Lang } from '../i18n/ui';
+import { categoryUrl, categoryStats, type Post } from '../lib/posts';
+
+interface Props {
+  lang: Lang;
+  /** 이 언어의 전체 글 (칩 개수 계산용) */
+  allPosts: Post[];
+  /** 지금 보고 있는 카테고리. 없으면 전체 */
+  category?: string;
+}
+const { lang, allPosts, category } = Astro.props;
+const t = ui[lang];
+
+const stats = categoryStats(allPosts);
+const current = stats.find((c) => c.id === category);
+const posts = category ? allPosts.filter((p) => p.data.category === category) : allPosts;
+const chips = [
+  { href: `/${lang}/`, label: t.all, count: allPosts.length, active: !category },
+  ...stats.map((c) => ({ href: categoryUrl(lang, c.id), label: c.label, count: c.count, active: c.id === category })),
+];
+---
+
+<div class="frame">
+  <div class="list-page">
+    <nav class="chips" aria-label={t.articles}>
+      {
+        chips.map((c) => (
+          <a class:list={['cat-chip', { active: c.active }]} href={c.href} aria-current={c.active ? 'page' : undefined}>
+            {c.label}
+            <span class="n">{c.count}</span>
+          </a>
+        ))
+      }
+    </nav>
+    <PostList
+      lang={lang}
+      posts={posts}
+      label={current ? `${current.label} — ${t.articles}` : t.allArticles}
+      pageSize={8}
+    />
+  </div>
+</div>
+
+<style>
+  .list-page {
+    padding-block: 48px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .cat-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 34px;
+    padding: 1px 14px 0;
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: background 0.15s, color 0.15s;
+  }
+  .cat-chip:hover { background: var(--surface-2); color: var(--text); }
+  .cat-chip.active,
+  .cat-chip.active:hover {
+    background: var(--accent-bg);
+    color: var(--accent-fg);
+  }
+  .n {
+    font-size: 11px;
+    letter-spacing: 0;
+    opacity: 0.55;
+  }
+
+  @media (max-width: 1199px) {
+    .list-page { padding-block: 36px 48px; gap: 36px; }
+  }
+  @media (max-width: 809px) {
+    .list-page { padding-block: 24px 36px; gap: 28px; }
+  }
+</style>

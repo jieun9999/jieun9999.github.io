@@ -1,0 +1,90 @@
+---
+// 라벨 + 글 목록 + (선택) "더 보기". pageSize 를 주면 그 수만큼씩 펼친다.
+// 라벨 자리에 글자 대신 다른 것을 두려면 slot="label" 로 넘긴다(태그 페이지의 태그 알약).
+import { ui, type Lang } from '../i18n/ui';
+import type { Post } from '../lib/posts';
+import PostItem from './PostItem.astro';
+
+interface Props {
+  lang: Lang;
+  posts: Post[];
+  label?: string;
+  pageSize?: number;
+}
+const { lang, posts, label, pageSize } = Astro.props;
+const t = ui[lang];
+const paged = pageSize !== undefined && posts.length > pageSize;
+---
+
+<div class="post-list" data-post-list data-page-size={pageSize}>
+  <slot name="label"><p class="eyebrow">{label}</p></slot>
+  <ul>
+    {posts.map((post, i) => <PostItem lang={lang} post={post} deferred={paged && i >= pageSize!} />)}
+  </ul>
+  {
+    paged && (
+      <button class="load-more" type="button" data-load-more>
+        {t.loadMore}
+      </button>
+    )
+  }
+</div>
+
+<style>
+  .post-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+  }
+  ul {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
+  }
+  .load-more {
+    align-self: center;
+    display: none; /* JS 가 없으면 숨긴 글이 없으니 버튼도 필요 없다 */
+    min-width: 120px;
+    height: 40px;
+    margin-top: 44px;
+    padding: 1px 20px 0;
+    border: none;
+    border-radius: 40px;
+    background: var(--surface);
+    color: var(--text-muted);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .load-more:hover { background: var(--surface-2); color: var(--text); }
+  :global(html.js) .load-more { display: inline-flex; align-items: center; justify-content: center; }
+
+  @media (max-width: 1199px) {
+    ul { gap: 48px; }
+  }
+  @media (max-width: 809px) {
+    .post-list { gap: 16px; }
+    ul { gap: 36px; }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-post-list]').forEach((list) => {
+    const btn = list.querySelector<HTMLButtonElement>('[data-load-more]');
+    const size = Number(list.dataset.pageSize) || 8;
+    btn?.addEventListener('click', () => {
+      const hidden = list.querySelectorAll('[data-post-item].deferred');
+      hidden.forEach((el, i) => i < size && el.classList.remove('deferred'));
+      // 새로 펼친 첫 글로 초점을 옮겨 키보드 사용자가 위치를 잃지 않게 한다
+      (hidden[0]?.querySelector('h3 a') as HTMLElement | null)?.focus();
+      if (hidden.length <= size) btn.remove();
+    });
+  });
+</script>

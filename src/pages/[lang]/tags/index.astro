@@ -1,0 +1,53 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Hero from '../../../components/Hero.astro';
+import TagPill from '../../../components/TagPill.astro';
+import { ui, languages, postCount, type Lang } from '../../../i18n/ui';
+import { getPosts, tagStats, tagUrl } from '../../../lib/posts';
+
+export function getStaticPaths() {
+  return (Object.keys(languages) as Lang[]).map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params as { lang: Lang };
+const t = ui[lang];
+const posts = await getPosts(lang);
+const tags = tagStats(posts);
+// 제목 밑 한 줄 — 구름이 얼마나 큰지 먼저 알려준다
+const summary =
+  lang === 'ko'
+    ? `태그 ${tags.length}개 · ${postCount(lang, posts.length)}`
+    : `${tags.length} tags · ${postCount(lang, posts.length)}`;
+---
+
+<BaseLayout title={`${t.tags} · ${t.siteTitle}`} description={`${t.siteTitle} — ${t.tags}`} lang={lang}>
+  <Hero title={t.tags} plain snug>{summary}</Hero>
+
+  <div class="frame">
+    <ul class="cloud">
+      {
+        tags.map(({ tag, count }) => (
+          <li>
+            <TagPill tag={tag} count={count} href={tagUrl(lang, tag)} />
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</BaseLayout>
+
+<style>
+  .cloud {
+    list-style: none;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 64px 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+  @media (max-width: 809px) {
+    .cloud { padding-block: 24px 36px; }
+  }
+</style>

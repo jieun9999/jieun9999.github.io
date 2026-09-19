@@ -1,0 +1,92 @@
+---
+// 브랜드 워드마크 — "Jieun" 의 J 를 파비콘의 J(줄기 + 1/4원 + 반원, 잎맥선)로 바꿔 그리고, 타일 배경은 뺀다.
+// 나머지 "ieun" 은 Nunito 900 텍스트에 에버그린 세로 그라데이션을 입힌다. 크기는 부모의 font-size 를 따른다.
+// J 모양·잎맥은 public/favicon.svg 와 같아야 한다 — 한쪽을 고치면 다른 쪽도 고친다.
+interface Props {
+  /** SVG 안 id 접두어 — 헤더·푸터가 한 페이지에 같이 있으므로 호출하는 쪽이 유일한 값을 넘긴다 */
+  id: string;
+}
+const { id } = Astro.props;
+
+// 줄기 + 1/4원 + 반원으로 된 J (폭 200 × 높이 450, 획 두께 100)
+const J = 'M100 100A100 100 0 0 1 200 0L200 350A100 100 0 0 1 0 350L100 350Z';
+// 잎맥 — J 바깥 오른쪽 아래 한 점 O(238, 345)에서 부채꼴(126°~270°)로 퍼지는 선 6개.
+// 로고 시안 1 의 소형 디테일과 같은 시드로 뽑았다. J 밖으로 나간 부분은 clipPath 가 자른다.
+const VEINS =
+  'M238 345L-371.6 937.4M238 345L-561.4 634.0M238 345L-609.1 274.6' +
+  'M238 345L-523.2 -33.3M238 345L-239.7 -358.1M238 345L103.7 -494.3';
+---
+
+<span class="wordmark">
+  <svg class="j" viewBox="0 0 200 450" aria-hidden="true">
+    <defs>
+      <linearGradient id={`${id}-j`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="450">
+        <stop offset="0" class="j0"></stop>
+        <stop offset="0.44" class="j1"></stop>
+        <stop offset="1" class="j2"></stop>
+      </linearGradient>
+      <clipPath id={`${id}-clip`}><path d={J}></path></clipPath>
+    </defs>
+    <path d={J} fill={`url(#${id}-j)`}></path>
+    <path class="veins" d={VEINS} clip-path={`url(#${id}-clip)`}></path>
+  </svg><span class="rest" aria-hidden="true">ieun</span><span class="sr-only">Jieun</span>
+</span>
+
+<style>
+  /* 글자: 가운데 스톱이 사이트 accent — 색조(h160)는 고정하고 명도만 움직인다.
+     J: 다크에선 파비콘의 J 그대로(민트 + 초록 잎맥). 라이트에선 민트가 흰 바탕에 묻히므로
+     파비콘을 뒤집어 에버그린 J 에 민트 잎맥을 긋는다. */
+  .wordmark {
+    --g0: #519773;
+    --g1: #307252;
+    --g2: #1a5439;
+    --j0: #519773;
+    --j1: #307252;
+    --j2: #1a5439;
+    --vein: #e2f6ea;
+    --vein-opacity: 0.5;
+    display: inline-flex;
+    align-items: baseline;
+    font-weight: 900;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  :global(html.dark) .wordmark {
+    --g0: #9ce4bd;
+    --g1: #72be96;
+    --g2: #4b916e;
+    --j0: #e2f6ea;
+    --j1: #bcebd1;
+    --j2: #93d6b1;
+    --vein: #307252;
+    --vein-opacity: 0.45;
+  }
+  .j0 { stop-color: var(--j0); }
+  .j1 { stop-color: var(--j1); }
+  .j2 { stop-color: var(--j2); }
+  .veins {
+    fill: none;
+    stroke: var(--vein);
+    stroke-width: 16;
+    stroke-opacity: var(--vein-opacity);
+  }
+
+  /* Nunito 캡 높이(0.705em)에 둥근 바닥의 오버슛을 더한 키. 획 두께(높이/4.5 ≈ 0.16em)가
+     Nunito 900 의 줄기 굵기와 비슷해서 글자 사이에 섞여도 무게가 튀지 않는다 */
+  .j {
+    flex: none;
+    width: 0.32em;
+    height: 0.72em;
+    margin-right: 0.05em;
+    transform: translateY(0.012em);
+  }
+
+  /* 진짜 텍스트에 글자 모양으로만 칠한다. line-height 1.2 에서 캡 윗선 ≈19%, 기준선 ≈77% */
+  .rest {
+    background-image: linear-gradient(180deg, var(--g0) 19%, var(--g1) 45%, var(--g2) 77%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+</style>

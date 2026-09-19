@@ -1,9 +1,13 @@
 ---
 import BaseLayout from './BaseLayout.astro';
-import { ui, formatDate, type Lang } from '../i18n/ui';
+import PostMeta from '../components/PostMeta.astro';
+import ProfileWidget from '../components/ProfileWidget.astro';
+import BackToTop from '../components/BackToTop.astro';
+import { ui, categoryLabel, type Lang } from '../i18n/ui';
+import { categoryUrl, tagUrl } from '../lib/posts';
 import type { MarkdownHeading } from 'astro';
 
-type NavLink = { title: string; url: string } | null;
+type NavLink = { title: string; url: string; cover?: string } | null;
 type Series = {
   title: string;
   parts: { title: string; url: string; order: number; current: boolean }[];
@@ -15,6 +19,7 @@ interface Props {
   description: string;
   pubDate: Date;
   updatedDate?: Date;
+  category: string;
   tags: string[];
   headings: MarkdownHeading[];
   readingMinutes: number;
@@ -27,6 +32,8 @@ interface Props {
   hreflang: Partial<Record<Lang, string>>;
   canonicalURL?: string;
   hasTranslation: boolean;
+  /** 사이드바 프로필에 띄울 이 언어의 글 수 */
+  postCount: number;
   prev?: NavLink;
   next?: NavLink;
   series?: Series;
@@ -38,6 +45,7 @@ const {
   description,
   pubDate,
   updatedDate,
+  category,
   tags,
   headings,
   readingMinutes,
@@ -49,6 +57,7 @@ const {
   hreflang,
   canonicalURL,
   hasTranslation,
+  postCount,
   prev = null,
   next = null,
   series = null,
@@ -58,6 +67,54 @@ const t = ui[lang];
 // 목차는 h2/h3 만 노출
 const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
 const showToc = toc.length > 1;
+
+// 사이드바 목차는 h2 를 챕터 한 줄로 묶고, 지금 읽는 챕터만 부제·h3 를 펼친다.
+// "1. 주제 — 부제" 형식이면 번호와 부제를 떼어 주제어만 보여준다.
+// h2 보다 먼저 나온 h3 는 부모가 없으니 챕터로 올린다.
+type Chapter = {
+  slug: string;
+  text: string;
+  num: string;
+  label: string;
+  sub: string;
+  isH2: boolean;
+  subs: MarkdownHeading[];
+};
+const chapters: Chapter[] = [];
+for (const h of toc) {
+  const parent = chapters.at(-1);
+  if (h.depth === 3 && parent?.isH2) {
+    parent.subs.push(h);
+    continue;
+  }
+  const m = h.text.match(/^(\d+)\.\s+(.*)$/);
+  const rest = m ? m[2] : h.text;
+  const dash = rest.indexOf(' — ');
+  chapters.push({
+    slug: h.slug,
+    text: h.text,
+    num: m ? m[1] : '',
+    label: dash > 0 ? rest.slice(0, dash) : rest,
+    sub: dash > 0 ? rest.slice(dash + 3) : '',
+    isH2: h.depth === 2,
+    subs: [],
+  });
+}
+// 오른쪽 위 "10 / 13" — 번호 붙은 글은 챕터 번호로, 아니면 순서로 센다
+const numbered = chapters.some((c) => c.num);
+const lastNum = Math.max(0, ...chapters.map((c) => Number(c.num) || 0));
+const chapterPos = (c: Chapter, i: number) =>
+  numbered ? (c.num ? `${c.num} / ${lastNum}` : '') : `${i + 1} / ${chapters.length}`;
+
+// 제목은 단어마다 떠오른다(GSAP, 아래 스크립트) — 단어를 span 으로 나눠 둔다.
+const titleWords = title.split(/\s+/).filter(Boolean);
+
+// "다음 글" = 이어서 읽을 더 오래된 글. 가장 오래된 글이면 더 최신 글을 대신 건다.
+const upNext = prev
+  ? { label: t.nextArticle, link: prev }
+  : next
+    ? { label: t.newerArticle, link: next }
+    : null;
 ---
 
 <BaseLayout
@@ -73,49 +130,17 @@ const showToc = toc.length > 1;
   <!-- 읽기 진행바 -->
   <div class="read-progress" aria-hidden="true"><div id="readbar"></div></div>
 
-  <div class:list={['post', { 'has-toc': showToc }]}>
-    {
-      showToc && (
-        <aside class="toc-col">
-          <nav class="toc" aria-label={t.tableOfContents}>
-            <p class="toc-title">{t.tableOfContents}</p>
-            <ul>
-              {toc.map((h) => (
-                <li class:list={[`depth-${h.depth}`]}>
-                  <a href={`#${h.slug}`}>{h.text}</a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </aside>
-      )
-    }
-
-    <div class="post-main">
-      <a class="back-link" href={`/${lang}/`}>{t.backToList}</a>
-
+  <div class="post-wrap frame">
+    <article class="post-main">
       <header class="post-header">
-        <h1>{title}</h1>
-        <div class="meta">
-          <time datetime={pubDate.toISOString()}>{formatDate(pubDate, lang)}</time>
-          <span class="dot">·</span>
-          <span>{readingMinutes} {t.minRead}</span>
-          {updatedDate && (
-            <>
-              <span class="dot">·</span>
-              <span>{t.updatedOn} {formatDate(updatedDate, lang)}</span>
-            </>
-          )}
+        <div class="meta-row">
+          <PostMeta lang={lang} date={pubDate} mins={readingMinutes} updated={updatedDate} />
+          <a class="chip" href={categoryUrl(lang, category)}>{categoryLabel(category)}</a>
         </div>
-        {
-          tags.length > 0 && (
-            <div class="tags">
-              {tags.map((tag) => (
-                <a class="tag" href={`/${lang}/tag/${encodeURIComponent(tag)}/`}>#{tag}</a>
-              ))}
-            </div>
-          )
-        }
+        <h1>
+          {titleWords.map((w, i) => <>{i > 0 && ' '}<span>{w}</span></>)}
+        </h1>
+        <p class="lede">{description}</p>
         {!hasTranslation && (
           <p class="translation-note">{ui[lang === 'en' ? 'ko' : 'en'].noTranslation}</p>
         )}
@@ -131,22 +156,14 @@ const showToc = toc.length > 1;
       {
         series && (
           <aside class="series-box">
-            <p class="series-label">
+            <p class="eyebrow">
               {t.seriesLabel}
               {series.title ? ` · ${series.title}` : ''}
             </p>
             <ol class="series-parts">
               {series.parts.map((p) => (
                 <li class:list={{ current: p.current }}>
-                  {p.current ? (
-                    <span>
-                      {p.title}
-                    </span>
-                  ) : (
-                    <a href={p.url}>
-                      {p.title}
-                    </a>
-                  )}
+                  {p.current ? <span aria-current="page">{p.title}</span> : <a href={p.url}>{p.title}</a>}
                 </li>
               ))}
             </ol>
@@ -154,226 +171,384 @@ const showToc = toc.length > 1;
         )
       }
 
-      <article class="prose">
+      {
+        showToc && (
+          <details class:list={['toc-inline', { 'no-num': !numbered }]}>
+            <summary class="eyebrow">{t.tableOfContents}</summary>
+            <ul class="inline-chapters">
+              {chapters.map((c) => (
+                <li>
+                  <a class="chapter-link" href={`#${c.slug}`}>
+                    {numbered && <span class="num">{c.num}</span>}
+                    <span class="label">{c.label}</span>
+                  </a>
+                  {(c.sub || c.subs.length > 0) && (
+                    <div class="inline-more">
+                      {c.sub && <p class="chapter-sub">{c.sub}</p>}
+                      {c.subs.map((s) => (
+                        <a class="sub-link" href={`#${s.slug}`}>{s.text}</a>
+                      ))}
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </details>
+        )
+      }
+
+      <div class="prose">
         <slot />
-      </article>
+      </div>
 
       {
-        (prev || next) && (
-          <nav class="post-nav" aria-label="Post navigation">
-            {prev ? (
-              <a class="pn prev" href={prev.url}>
-                <span class="pn-label">← {t.prevPost}</span>
-                <span class="pn-title">{prev.title}</span>
+        tags.length > 0 && (
+          <div class="post-tags">
+            {tags.map((tag) => (
+              <a class="tag" href={tagUrl(lang, tag)}>
+                #{tag}
               </a>
-            ) : (
-              <span />
-            )}
-            {next ? (
-              <a class="pn next" href={next.url}>
-                <span class="pn-label">{t.nextPost} →</span>
-                <span class="pn-title">{next.title}</span>
-              </a>
-            ) : (
-              <span />
-            )}
+            ))}
+          </div>
+        )
+      }
+
+      {
+        upNext && (
+          <nav class="up-next" aria-label={upNext.label}>
+            <p class="eyebrow">{upNext.label}</p>
+            <a class="next-card" href={upNext.link.url}>
+              {upNext.link.cover && (
+                <span class="next-img">
+                  <img src={upNext.link.cover} alt="" loading="lazy" decoding="async" />
+                </span>
+              )}
+              <span class="next-title">{upNext.link.title}</span>
+            </a>
           </nav>
         )
       }
-    </div>
+    </article>
+
+    <div class="vline" aria-hidden="true"></div>
+
+    <aside class="sidebar">
+      {
+        showToc && (
+          <nav class:list={['toc', { 'no-num': !numbered }]} aria-label={t.tableOfContents}>
+            <div class="toc-head">
+              <p class="eyebrow">{t.tableOfContents}</p>
+              <span class="toc-count" aria-hidden="true" data-toc-count></span>
+            </div>
+            <ul class="chapters">
+              {chapters.map((c, i) => (
+                <li class="chapter" data-pos={chapterPos(c, i)}>
+                  <a class="chapter-link" href={`#${c.slug}`} title={c.sub ? c.text : undefined}>
+                    {numbered && <span class="num">{c.num}</span>}
+                    <span class="label">{c.label}</span>
+                  </a>
+                  {(c.sub || c.subs.length > 0) && (
+                    <div class="chapter-more">
+                      {c.sub && <p class="chapter-sub">{c.sub}</p>}
+                      {c.subs.map((s) => (
+                        <a class="sub-link" href={`#${s.slug}`}>{s.text}</a>
+                      ))}
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )
+      }
+      <ProfileWidget lang={lang} count={postCount} />
+    </aside>
   </div>
 
-  <!-- 맨 위로 -->
-  <button id="toTop" class="to-top" type="button" aria-label={t.backToTop}>
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-  </button>
+  <BackToTop lang={lang} />
 </BaseLayout>
 
 <style>
-  .post {
-    display: block;
-    max-width: var(--width-prose);
-    margin-inline: auto;
-  }
-  @media (min-width: 64rem) {
-    .post.has-toc {
-      display: grid;
-      grid-template-columns: minmax(0, var(--width-prose)) 15rem;
-      gap: 3rem;
-      max-width: none;
-      justify-content: center;
-    }
-    .post.has-toc .post-main { grid-column: 1; grid-row: 1; }
-    .post.has-toc .toc-col { grid-column: 2; grid-row: 1; }
-  }
-
-  .back-link {
-    display: inline-block;
-    margin-bottom: 1.75rem;
-    font-size: 0.88rem;
-    color: var(--text-muted);
-  }
-  .back-link:hover { color: var(--accent); }
-
-  .post-header h1 {
-    font-size: clamp(1.8rem, 4vw, 2.5rem);
-    font-weight: 800;
-    letter-spacing: -0.025em;
-    line-height: 1.15;
-    margin: 0 0 0.85rem;
-  }
-  .meta {
+  .post-wrap {
     display: flex;
-    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 48px;
+    padding-block: 64px;
+  }
+  .post-main {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .vline {
+    flex: none;
+    align-self: stretch;
+    width: 1px;
+    background: linear-gradient(180deg, var(--bg-2) 0%, var(--surface-2) 49%, var(--bg-2) 100%);
+  }
+  .sidebar {
+    flex: none;
+    position: sticky;
+    top: 30px;
+    width: 240px;
+    max-height: calc(100vh - 60px);
+    overflow-y: auto;
+    /* 펼친 챕터에 h3 가 많으면 프로필이 조금 밀린다 — 스크롤은 되되 막대는 숨긴다 */
+    scrollbar-width: none;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+  .sidebar::-webkit-scrollbar { display: none; }
+
+  /* 머리말 */
+  .meta-row {
+    display: flex;
     align-items: center;
-    gap: 0.4rem;
-    color: var(--text-muted);
-    font-size: 0.88rem;
-  }
-  .meta .dot { color: var(--text-subtle); }
-  .tags {
-    display: flex;
+    justify-content: space-between;
+    gap: 12px;
     flex-wrap: wrap;
-    gap: 0.4rem;
-    margin-top: 0.9rem;
   }
-  .tags .tag { text-decoration: none; }
-  .translation-note {
-    font-size: 0.85rem;
+  .post-header h1 {
+    margin-top: 20px;
+    font-size: 36px;
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--text);
+    overflow-wrap: anywhere;
+  }
+  .lede {
+    margin-top: 16px;
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 1.6;
     color: var(--text-muted);
-    background: var(--accent-soft);
-    border-left: 3px solid var(--accent);
-    padding: 0.6rem 0.85rem;
-    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-    margin-top: 1.1rem;
+  }
+  .translation-note {
+    margin-top: 16px;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-2);
+    font-size: 14px;
+    color: var(--text-muted);
   }
 
-  /* 커버 히어로 이미지 (해시노드처럼 본문 최상단) */
-  .post-cover-fig {
-    margin: 0;
-  }
+  /* 커버 */
+  .post-cover-fig { margin: 40px 0 0; }
   .post-cover {
     display: block;
     width: 100%;
     height: auto;
-    margin-top: 1.75rem;
     border-radius: var(--radius);
-    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--hairline);
     cursor: zoom-in;
   }
   .post-cover-caption {
-    margin-top: 0.6rem;
-    font-size: 0.85rem;
+    margin-top: 10px;
+    font-size: 14px;
     line-height: 1.5;
-    color: var(--muted, #6b7280);
+    color: var(--text-subtle);
     text-align: center;
   }
 
-  .prose { margin-top: 2.5rem; }
+  .prose { margin-top: 48px; }
 
   /* 시리즈 박스 */
   .series-box {
-    margin-top: 1.75rem;
-    padding: 1rem 1.25rem;
-    border-radius: var(--radius-sm);
-    background: var(--surface);
+    margin-top: 32px;
+    padding: 16px 20px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--bg-2);
   }
-  .series-label {
-    margin: 0 0 0.5rem;
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--accent);
-  }
+  .series-box .eyebrow { margin-bottom: 10px; color: var(--accent); }
   .series-parts {
     margin: 0;
-    padding-left: 0;
-    list-style: none;
-    counter-reset: none;
+    padding-left: 1.3em;
     display: grid;
-    gap: 0.3rem;
-    font-size: 0.92rem;
+    gap: 6px;
+    font-size: 15px;
+    line-height: 1.45;
   }
-  .series-parts li { color: var(--text-muted); }
-  .series-parts a { color: var(--text-muted); text-decoration: none; }
+  .series-parts li { color: var(--text-subtle); }
+  .series-parts li::marker { font-weight: 700; }
+  .series-parts a { color: var(--text-muted); font-weight: 600; }
   .series-parts a:hover { color: var(--accent); }
-  .series-parts li.current { color: var(--text); font-weight: 650; }
+  .series-parts li.current { color: var(--text); font-weight: 800; }
 
-  /* 이전/다음 글 */
-  .post-nav {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-top: 3rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border);
+  /* 태그 */
+  .post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 48px;
   }
-  .pn {
+
+  /* 다음 글 카드 */
+  .up-next {
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
-    padding: 1rem 1.15rem;
-    border-radius: var(--radius-sm);
-    background: var(--surface);
-    color: inherit;
-    transition: background 0.15s;
+    gap: 16px;
+    margin-top: 56px;
   }
-  .pn:hover { background: var(--surface-2); }
-  .pn.next { text-align: right; }
-  .pn-label { font-size: 0.78rem; color: var(--text-subtle); }
-  .pn-title { font-size: 0.95rem; font-weight: 650; color: var(--text); line-height: 1.35; }
-  @media (max-width: 34rem) {
-    .post-nav { grid-template-columns: 1fr; }
-    .pn.next { text-align: left; }
+  .next-card {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--bg-2);
+    color: var(--text);
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .next-card:hover { background: var(--surface); color: var(--text); }
+  .next-img {
+    position: relative;
+    flex: none;
+    width: 118px;
+    aspect-ratio: 1.5;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+  .next-img img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .next-title {
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.45;
   }
 
-  /* 목차 */
-  .toc-col { margin-bottom: 2rem; }
-  .toc {
-    font-size: 0.85rem;
-    border-radius: var(--radius-sm);
-    padding: 1rem 1.1rem;
-    background: var(--surface);
+  /* 목차 (사이드바) — 챕터 한 줄씩, 지금 읽는 챕터만 펼친다.
+     왼쪽 레일이 진행 표시를 겸한다: 읽은 챕터는 옅은 포인트색, 지금 챕터는 진한 포인트색. */
+  .toc { display: flex; flex-direction: column; gap: 14px; }
+  .toc-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
   }
-  @media (min-width: 64rem) {
-    .toc-col { margin-bottom: 0; }
-    .toc {
-      position: sticky;
-      top: 5.25rem;
-      max-height: calc(100vh - 7rem);
-      overflow-y: auto;
-      border: none;
-      background: transparent;
-      padding: 0;
-      border-left: 1px solid var(--border);
-      padding-left: 1.1rem;
-    }
-  }
-  .toc-title {
-    font-weight: 650;
+  .toc-count {
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.4;
     color: var(--text-subtle);
-    margin: 0 0 0.6rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-size: 0.68rem;
+    font-variant-numeric: tabular-nums;
   }
-  .toc ul { list-style: none; margin: 0; padding: 0; }
-  .toc li { margin: 0.35rem 0; line-height: 1.4; }
-  .toc li.depth-3 { padding-left: 0.85rem; }
-  .toc a {
-    color: var(--text-muted);
+  .chapters {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-left: 1px solid var(--border);
+  }
+  .chapter { margin: 0; }
+  .chapter-link {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-left: -1px;
+    padding: 5px 0 5px 12px;
     border-left: 2px solid transparent;
-    margin-left: -1.1rem;
-    padding-left: 1.1rem;
-    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.45;
+    color: var(--text-muted);
     transition: color 0.15s, border-color 0.15s;
   }
-  .toc a:hover { color: var(--accent); }
-  .toc a.active {
+  .chapter-link:hover { color: var(--text); }
+  .num {
+    flex: none;
+    width: 18px;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-faint);
+    font-variant-numeric: tabular-nums;
+  }
+  /* "—" 가 없는 긴 제목도 두 줄에서 끊는다 */
+  .label {
+    min-width: 0;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+  .chapter.read .chapter-link {
+    color: var(--text-subtle);
+    border-left-color: color-mix(in srgb, var(--accent) 28%, transparent);
+  }
+  .chapter.active .chapter-link {
     color: var(--accent);
-    font-weight: 600;
+    font-weight: 800;
     border-left-color: var(--accent);
+  }
+  .chapter.active .num { color: var(--accent); }
+  .chapter-more {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    margin-left: -1px;
+    padding: 0 0 10px 38px; /* 레일 12 + 번호 18 + 간격 8 — 주제어와 줄을 맞춘다 */
+    border-left: 2px solid var(--accent);
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+    text-wrap: pretty;
+  }
+  .toc.no-num .chapter-more { padding-left: 12px; }
+  .chapter.active .chapter-more { display: flex; }
+  .chapter-sub {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--text-subtle);
+  }
+  .sub-link {
+    display: flex;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--text-muted);
+  }
+  .sub-link::before { content: '·'; flex: none; color: var(--text-faint); }
+  .sub-link:hover,
+  .sub-link.current { color: var(--text); }
+  .sub-link.current { font-weight: 800; }
+
+  /* 좁은 화면용 접이식 목차 — 넓은 화면에선 사이드바가 대신한다.
+     사이드바와 같은 챕터 묶음(번호 · 주제어 · 부제 · h3)을 쓰되, 글 위에 있어 읽는 위치를
+     따라가지 않으니 '지금 챕터'가 없다. 그래서 모든 챕터를 펼친 채로 보여준다. */
+  .inline-chapters {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .inline-chapters li { margin: 0; }
+  .inline-chapters .chapter-link { color: var(--text); }
+  .inline-chapters .chapter-link:hover { color: var(--accent); }
+  .inline-more {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 0 0 8px 38px; /* 사이드바 .chapter-more 와 같은 들여쓰기 — 주제어와 줄을 맞춘다 */
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+    text-wrap: pretty;
+  }
+  .toc-inline.no-num .inline-more { padding-left: 12px; }
+  .toc-inline { display: none; }
+
+  /* 들어올 때 움직임은 GSAP(아래 스크립트). 제목 단어가 따로 떠오르게 span 을 블록처럼 세운다. */
+  .post-header h1 span { display: inline-block; }
+  /* GSAP 이 뜨기 전엔 글 전체를 숨겨 둔다(src/lib/motion.ts) — 스크립트가 떼면서 같은 틱에 시작 상태를 입힌다 */
+  :global(html.gsap-enter) .post-wrap { opacity: 0; }
+  /* 아직 스크롤로 안 띄운 블록이 인쇄에서 빈칸으로 나오지 않게 */
+  @media print {
+    .post-wrap :global(*) { opacity: 1 !important; transform: none !important; }
   }
 
   /* 읽기 진행바 */
@@ -384,40 +559,50 @@ const showToc = toc.length > 1;
     right: 0;
     height: 3px;
     z-index: 60;
-    background: transparent;
     pointer-events: none;
   }
   #readbar {
     height: 100%;
     width: 0;
-    background: var(--accent);
+    background: var(--accent-bg);
     transition: width 0.1s linear;
   }
 
-  /* 맨 위로 버튼 */
-  .to-top {
-    position: fixed;
-    right: 1.5rem;
-    bottom: 1.5rem;
-    width: 2.6rem;
-    height: 2.6rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    border-radius: 999px;
-    background: var(--card);
-    color: var(--text-muted);
-    box-shadow: var(--shadow-md);
-    cursor: pointer;
-    opacity: 0;
-    transform: translateY(8px);
-    pointer-events: none;
-    transition: opacity 0.2s, transform 0.2s, color 0.15s, border-color 0.15s;
-    z-index: 55;
+  @media (max-width: 1199px) {
+    .post-wrap {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 48px;
+      padding-block: 36px;
+    }
+    .vline { display: none; }
+    .sidebar {
+      position: static;
+      width: 100%;
+      max-width: 360px;
+      max-height: none;
+      overflow: visible;
+    }
+    .sidebar .toc { display: none; }
+    .toc-inline {
+      display: block;
+      margin-top: 32px;
+      padding: 14px 18px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+    }
+    .toc-inline summary { cursor: pointer; }
+    .toc-inline[open] summary { margin-bottom: 12px; }
   }
-  .to-top.show { opacity: 1; transform: none; pointer-events: auto; }
-  .to-top:hover { color: var(--accent); border-color: var(--accent); }
+  @media (max-width: 809px) {
+    .post-wrap { padding-block: 24px; }
+    .post-header h1 { font-size: 28px; }
+    .lede { font-size: 18px; }
+    .post-cover-fig { margin-top: 28px; }
+    .prose { margin-top: 32px; font-size: 17px; }
+    .next-img { width: 88px; }
+    .next-title { font-size: 16px; }
+  }
 </style>
 
 <script is:inline>
@@ -426,33 +611,44 @@ const showToc = toc.length > 1;
 
     // 읽기 진행바
     const bar = document.getElementById('readbar');
-    const toTop = document.getElementById('toTop');
     const onScroll = () => {
       const max = de.scrollHeight - de.clientHeight;
       const pct = max > 0 ? (de.scrollTop / max) * 100 : 0;
       if (bar) bar.style.width = pct + '%';
-      if (toTop) toTop.classList.toggle('show', de.scrollTop > 600);
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
 
-    // 맨 위로
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    toTop?.addEventListener('click', () =>
-      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' })
-    );
-
-    // 목차 활성 섹션 하이라이트
-    const links = [...document.querySelectorAll('.toc a')];
-    if (links.length) {
+    // 목차 활성 챕터 (사이드바 목차) — 지금 챕터를 펼치고, 앞 챕터는 읽음으로 칠한다
+    const chapters = [...document.querySelectorAll('.toc .chapter')];
+    if (chapters.length) {
+      const count = document.querySelector('[data-toc-count]');
+      // 제목 id → [챕터 번호, h3 링크(챕터 제목이면 null)]
       const map = new Map();
-      links.forEach((a) => map.set(decodeURIComponent(a.getAttribute('href').slice(1)), a));
+      chapters.forEach((li, i) =>
+        li.querySelectorAll('a').forEach((a) =>
+          map.set(decodeURIComponent(a.getAttribute('href').slice(1)), [
+            i,
+            a.classList.contains('sub-link') ? a : null,
+          ])
+        )
+      );
       const heads = [...document.querySelectorAll('.prose h2, .prose h3')].filter((h) =>
         map.has(h.id)
       );
       const setActive = (id) => {
-        links.forEach((l) => l.classList.remove('active'));
-        map.get(id)?.classList.add('active');
+        const hit = map.get(id);
+        if (!hit) return;
+        const [cur, sub] = hit;
+        chapters.forEach((li, i) => {
+          li.classList.toggle('active', i === cur);
+          li.classList.toggle('read', i < cur);
+          const link = li.querySelector('.chapter-link');
+          if (i === cur) link.setAttribute('aria-current', 'true');
+          else link.removeAttribute('aria-current');
+          li.querySelectorAll('.sub-link').forEach((a) => a.classList.toggle('current', a === sub));
+        });
+        if (count) count.textContent = chapters[cur].dataset.pos ?? '';
       };
       const obs = new IntersectionObserver(
         (entries) => {
@@ -464,4 +660,79 @@ const showToc = toc.length > 1;
       heads.forEach((h) => obs.observe(h));
     }
   })();
+</script>
+
+<script>
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  import { gsap, enterTimeline } from '../lib/motion';
+
+  // 글 상세 모션 (design/post.md "움직임")
+  // 1) 첫 화면 — 메타 → 제목 단어 → 요약 · 커버 · 시리즈 → 본문이 차례로 떠오른다. 옆 사이드바는 목차 → 프로필.
+  // 2) 그 아래 — 소제목 · 코드 · 표 · 인용 · 그림 · 태그 · 다음 글이 화면에 들어올 때 떠오른다(ScrollTrigger).
+  //    문단은 움직이지 않는다 — 읽는 흐름을 끊지 않게.
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    gsap.registerPlugin(ScrollTrigger);
+    const sideBySide = matchMedia('(min-width: 1200px)').matches;
+    // display:none 인 것(데스크톱의 접는 목차 등)은 차례에서 뺀다
+    const all = (sel: string) => gsap.utils.toArray<HTMLElement>(sel).filter((el) => el.getClientRects().length > 0);
+
+    // 1) BaseHead 가 숨겨둔 첫 화면을 받아 띄운다(src/lib/motion.ts)
+    const tl = enterTimeline();
+    if (tl) {
+      const words = all('.post-header h1 span');
+      tl.from('.meta-row', { opacity: 0, y: 12 })
+        // 긴 제목도 단어가 0.45s 안에 다 출발하게 간격을 줄인다
+        .from(words, { opacity: 0, y: 28, stagger: Math.min(0.06, 0.45 / words.length) }, 0.1)
+        .from(
+          all('.lede, .translation-note, .post-cover-fig, .series-box, .toc-inline, .prose'),
+          { opacity: 0, y: 28, stagger: 0.1 },
+          '-=0.65'
+        );
+      if (sideBySide) {
+        tl.from(
+          all('.sidebar .toc-head, .sidebar .chapter, .sidebar .profile-widget'),
+          { opacity: 0, y: 16, stagger: 0.04 },
+          '<'
+        );
+      }
+    }
+
+    // 2) 처음에 화면 아래 있던 것만 숨긴다 — 이미 보이는 걸 숨겼다 띄우면 깜빡인다.
+    const blocks = gsap.utils
+      .toArray<HTMLElement>(
+        '.prose > :is(h2, h3, figure, .expressive-code, blockquote, .markdown-alert, table), .post-tags, .up-next' +
+          (sideBySide ? '' : ', .sidebar > *')
+      )
+      .filter((el) => el.getBoundingClientRect().top > innerHeight);
+    // 빠르게 내리거나 목차로 건너뛰면 한꺼번에 여러 개가 들어온다 — 이미 지나친 건 바로 보이고,
+    // 화면 안 것만 떠오르되 몇 개든 0.4s 안에 다 출발하게 간격을 줄인다.
+    const show = (els: Element[]) => {
+      const past = els.filter((el) => el.getBoundingClientRect().bottom < 0);
+      const inView = els.filter((el) => !past.includes(el));
+      if (past.length) {
+        gsap.killTweensOf(past);
+        gsap.set(past, { clearProps: 'opacity,transform' });
+      }
+      if (inView.length) {
+        gsap.to(inView, {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: 'power3.out',
+          stagger: Math.min(0.08, 0.4 / inView.length),
+          overwrite: true,
+          clearProps: 'opacity,transform',
+        });
+      }
+    };
+    gsap.set(blocks, { opacity: 0, y: 32 });
+    ScrollTrigger.batch(blocks, {
+      start: 'top 92%',
+      end: 'max',
+      once: true,
+      onEnter: show,
+      // 이미 지나친 채로 열리면(새로고침 위치 복원·#앵커) '들어오는' 순간이 없다 — 새로 잴 때 지나쳐 있으면 띄운다
+      onRefresh: (els, triggers) => show(els.filter((_, i) => triggers[i].progress > 0)),
+    });
+  }
 </script>

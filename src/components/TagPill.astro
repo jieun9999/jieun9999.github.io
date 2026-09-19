@@ -1,0 +1,25 @@
+---
+// 태그 알약 + 글 수 — 태그 목록 구름과 태그별 글 목록 라벨이 같은 모양을 쓴다.
+// href 가 있으면 링크, 없으면(지금 보고 있는 태그) 그냥 글자.
+interface Props {
+  tag: string;
+  count: number;
+  href?: string;
+}
+const { tag, count, href } = Astro.props;
+const Element = href ? 'a' : 'span';
+---
+
+<Element class="tag" href={href}>
+  #{tag}
+  <span class="n">{count}</span>
+</Element>
+
+<style>
+  .tag { gap: 6px; font-size: 14px; padding: 7px 12px; }
+  .n {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-faint);
+  }
+</style>

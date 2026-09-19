@@ -1,0 +1,24 @@
+---
+// 글 목록 한 항목 — 모양은 대표 글과 같은 PostRow.
+import type { Lang } from '../i18n/ui';
+import type { Post } from '../lib/posts';
+import PostRow from './PostRow.astro';
+
+interface Props {
+  lang: Lang;
+  post: Post;
+  /** "더 보기" 전까지 숨길 항목 */
+  deferred?: boolean;
+}
+const { lang, post, deferred = false } = Astro.props;
+---
+
+<li class:list={['item', { deferred }]} data-post-item>
+  <PostRow lang={lang} post={post} />
+</li>
+
+<style>
+  .item { list-style: none; }
+  /* JS 가 있을 때만 숨긴다 — 스크립트가 막혀도 글은 다 보인다 */
+  :global(html.js) .item.deferred { display: none; }
+</style>

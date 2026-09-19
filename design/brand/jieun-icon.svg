@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>Jieun</title>
+  <defs>
+    <linearGradient id="g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="450"><stop offset="0" stop-color="#e2f6ea"/><stop offset="0.44" stop-color="#bcebd1"/><stop offset="1" stop-color="#93d6b1"/></linearGradient>
+    <clipPath id="c"><path d="M100 100A100 100 0 0 1 200 0L200 350A100 100 0 0 1 0 350L100 350Z"/></clipPath>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="#307252"/>
+  <g transform="translate(162.67 46) scale(0.93333)">
+    <path d="M100 100A100 100 0 0 1 200 0L200 350A100 100 0 0 1 0 350L100 350Z" fill="url(#g)"/>
+    <path d="M238 345L-371.6 937.4M238 345L-561.4 634.0M238 345L-609.1 274.6M238 345L-523.2 -33.3M238 345L-239.7 -358.1M238 345L103.7 -494.3" clip-path="url(#c)" fill="none" stroke="#307252" stroke-width="16" stroke-opacity="0.45"/>
+  </g>
+</svg>

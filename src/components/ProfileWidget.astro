@@ -1,0 +1,68 @@
+---
+// 글 사이드바 프로필 — 예전 홈 프로필 카드(사진·이름·한 줄 소개·글 수·링크 셋)를 위젯 크기로.
+import { ui, avatarSrc, postCount, type Lang } from '../i18n/ui';
+import SocialLinks from './SocialLinks.astro';
+
+interface Props {
+  lang: Lang;
+  count: number;
+}
+const { lang, count } = Astro.props;
+const t = ui[lang];
+---
+
+<div class="profile-widget">
+  <div class="row">
+    <img src={avatarSrc} width="32" height="32" alt="" aria-hidden="true" loading="lazy" />
+    <span class="count">{postCount(lang, count)}</span>
+  </div>
+  <p class="name">{t.siteTitle}</p>
+  <p class="bio">{t.tagline}</p>
+  <SocialLinks toast="start" />
+</div>
+
+<style>
+  .profile-widget {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 2px;
+  }
+  .row img {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    object-fit: cover;
+  }
+  .count {
+    display: inline-flex;
+    align-items: center;
+    height: 32px;
+    padding: 0 10px;
+    border-radius: 18px;
+    background: color-mix(in srgb, var(--surface-2) 64%, transparent);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    color: var(--text);
+  }
+  .name {
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.4;
+    color: var(--text);
+  }
+  .bio {
+    margin-top: -6px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-muted);
+  }
+  .profile-widget :global(.socials) { margin-left: -5px; }
+</style>

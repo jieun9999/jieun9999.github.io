@@ -1,0 +1,129 @@
+---
+import { ui, type Lang } from '../i18n/ui';
+import BrandWordmark from './BrandWordmark.astro';
+import SocialLinks from './SocialLinks.astro';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = ui[lang];
+
+// GNB 와 같은 구성. GitHub·LinkedIn 은 오른쪽 아이콘이 맡는다
+const pages = [
+  { href: `/${lang}/`, label: t.home },
+  { href: `/${lang}/about/`, label: t.about },
+  { href: `/${lang}/tags/`, label: t.tags },
+];
+---
+
+<!-- 헤더(로고 · 메뉴 · 도구)와 짝을 이루는 두 줄 푸터.
+     위 줄은 로고 · 링크 · 아이콘, 아래 줄은 태그라인 · 저작권 -->
+<footer class="site-footer">
+  <div class="frame">
+    <hr class="divider" />
+  </div>
+  <div class="frame inner">
+    <div class="row-main">
+      <a class="brand" href={`/${lang}/`}>
+        <BrandWordmark id="brand-grad-footer" />
+      </a>
+      <nav class="links" aria-label={t.pages}>
+        {pages.map((l) => <a href={l.href}>{l.label}</a>)}
+      </nav>
+      <div class="social-slot">
+        <SocialLinks />
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="row-sub">
+      <p class="desc">{t.tagline}</p>
+      <p class="copy">© {new Date().getFullYear()} {t.siteTitle} — Built with <strong>Astro</strong></p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer { background: var(--bg); }
+  .inner {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding-block: 40px 32px;
+  }
+
+  .row-main {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: 'brand links social';
+    align-items: center;
+    column-gap: 20px;
+  }
+  .brand {
+    grid-area: brand;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text);
+  }
+  .brand:hover { color: var(--text); }
+
+  /* 44px 터치 높이는 패딩으로 만든다 */
+  .links {
+    grid-area: links;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-inline: 12px;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-muted);
+    transition: color 0.3s cubic-bezier(0.44, 0, 0.56, 1), background 0.15s;
+  }
+  .links a:hover { color: var(--accent); background: var(--surface); }
+  .social-slot { grid-area: social; }
+
+  .row-sub {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px 16px;
+  }
+  .desc {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--text);
+  }
+  .copy {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--text-subtle);
+  }
+  .copy strong { font-weight: 800; }
+
+  /* 모바일: 로고와 아이콘은 한 줄에 두고, 링크는 그 아래 줄로 내린다.
+     링크 글자 시작을 로고 왼쪽 끝에 맞추려고 패딩만큼 당긴다 */
+  @media (max-width: 809px) {
+    .inner { gap: 14px; padding-block: 24px; }
+    .row-main {
+      grid-template-columns: 1fr auto;
+      grid-template-areas:
+        'brand social'
+        'links links';
+      row-gap: 6px;
+    }
+    .links { margin-left: -12px; }
+    .row-sub { flex-direction: column; align-items: flex-start; gap: 4px; }
+  }
+</style>

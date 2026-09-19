@@ -120,14 +120,15 @@ export default defineConfig({
         wrap: true,
       },
       styleOverrides: {
-        borderRadius: '14px',
-        // 테두리 대신 그림자로 띄운다 (사이트 전체가 borderless 라 선을 맞춘다)
+        borderRadius: '12px',
+        // 사이트 전체가 그림자 대신 가는 선으로 면을 나눈다. borderColor 는 테마 색 계산에
+        // 쓰여 CSS 변수를 못 받으므로 투명으로 두고, 선은 그림자 1px 로 긋는다.
         borderColor: 'transparent',
         codeFontFamily: "'JetBrains Mono Variable', ui-monospace, SFMono-Regular, monospace",
-        codeFontSize: '0.85rem',
+        codeFontSize: '14px',
         uiFontFamily: 'inherit',
         frames: {
-          frameBoxShadowCssValue: 'var(--shadow-sm)',
+          frameBoxShadowCssValue: '0 0 0 1px var(--border)',
         },
       },
     }),
