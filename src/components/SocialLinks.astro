@@ -62,10 +62,6 @@ const { toast = 'end', muted = false } = Astro.props;
   .toast-end .copied { right: 0; bottom: calc(100% + 6px); }
   .toast-start .copied { left: 0; top: calc(100% + 6px); }
   .toast-center .copied { left: 50%; top: calc(100% + 6px); transform: translateX(-50%); }
-  /* 좁은 화면에선 푸터가 세로로 쌓여 아이콘이 왼쪽 끝에 온다 — 안내도 왼쪽에서 펼친다 */
-  @media (max-width: 809px) {
-    .toast-end .copied { right: auto; left: 0; }
-  }
 </style>
 
 <script>
