@@ -1,5 +1,6 @@
 ---
 // 라벨 + 글 목록 + (선택) "더 보기". pageSize 를 주면 그 수만큼씩 펼친다.
+// 라벨 자리에 글자 대신 다른 것을 두려면 slot="label" 로 넘긴다(태그 페이지의 태그 알약).
 import { ui, type Lang } from '../i18n/ui';
 import type { Post } from '../lib/posts';
 import PostItem from './PostItem.astro';
@@ -7,7 +8,7 @@ import PostItem from './PostItem.astro';
 interface Props {
   lang: Lang;
   posts: Post[];
-  label: string;
+  label?: string;
   pageSize?: number;
 }
 const { lang, posts, label, pageSize } = Astro.props;
@@ -16,7 +17,7 @@ const paged = pageSize !== undefined && posts.length > pageSize;
 ---
 
 <div class="post-list" data-post-list data-page-size={pageSize}>
-  <p class="eyebrow">{label}</p>
+  <slot name="label"><p class="eyebrow">{label}</p></slot>
   <ul>
     {posts.map((post, i) => <PostItem lang={lang} post={post} deferred={paged && i >= pageSize!} />)}
   </ul>

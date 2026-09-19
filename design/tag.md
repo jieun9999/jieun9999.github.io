@@ -6,7 +6,7 @@
 | --- | --- |
 | URL | `/[lang]/tag/<tag>/` — 그 언어 글에 한 번이라도 달린 태그마다 만들어진다 |
 | 소스 | `src/pages/[lang]/tag/[tag].astro` |
-| 컴포넌트 | `Hero`(제목 `#<tag>` + 프로필 그림) → `PostList`(→ `PostItem` → `PostRow`) → `BackToTop` |
+| 컴포넌트 | `Hero`(제목 `#<tag>` + 프로필 그림) → `PostList`(라벨 자리에 `TagPill`, → `PostItem` → `PostRow`) → `BackToTop` |
 | 헤더 현재 메뉴 | 태그 |
 | 검색 노출 | ✓ |
 | 페이지 제목 | "#bullmq · Jieun" / 설명 "Jieun — #bullmq" |
@@ -24,7 +24,7 @@
 │                       #bullmq             <h1> 20/800 │
 ├───────────────────────────────────────────────────────┤
 │                                         위 64px       │
-│ #BULLMQ — ARTICLES                   ← .eyebrow       │
+│ (#bullmq 2)                          ← TagPill 라벨   │
 │ ┌──────────────┐  제목 24/800                          │
 │ │ 커버 1.72:1  │  🙂 Jieun ╱ 날짜                       │
 │ └──────────────┘  요약 · [RELIABILITY]                 │
@@ -36,7 +36,8 @@
 ## 구성 요소
 
 - **히어로**: `Hero` 그대로, 제목 `#<tag>` 가 `<h1>`. 링크 아이콘 없음.
-- **목록**: 홈과 같은 `PostList` — 라벨 "#bullmq — Articles" / "#bullmq — 글", 8개씩 "더 보기". 글 한 줄 모양은 [`home.md`](./home.md#글-한-줄--srccomponentspostrowastro) 참고.
+- **목록**: 홈과 같은 `PostList`, 8개씩 "더 보기". 글 한 줄 모양은 [`home.md`](./home.md#글-한-줄--srccomponentspostrowastro) 참고.
+- **목록 라벨**: 글자 라벨(`.eyebrow`) 대신 [태그 목록](./tags.md)에서 누른 것과 같은 알약 `TagPill` — `#bullmq 2`(태그 원래 글자 + 이 태그의 글 수). 링크가 아니라 hover 가 없다. `PostList` 의 `slot="label"` 로 넘긴다.
 - 카테고리 칩 줄은 **없다**. 이 화면은 태그로 이미 걸러져 있다.
 - **맨 위로 버튼**: 홈·카테고리와 같은 `BackToTop` ([`shell.md`](./shell.md#맨-위로--srccomponentsbacktotopastro)).
 
@@ -51,15 +52,17 @@
 ## 다크 모드 · 한/영 차이
 
 - 토큰만 바뀐다.
-- 라벨 뒤 "Articles / 글"만 바뀐다. 태그 글자는 번역하지 않는다.
+- 라벨(알약)은 두 언어가 같다 — 태그 글자는 번역하지 않고, 숫자만 그 언어의 글 수.
 - 같은 태그라도 언어마다 글 수가 다를 수 있고, 한쪽 언어에만 있는 태그는 그 언어에만 페이지가 있다.
 
 ## 규칙
 
 - 🔴 목록 모양은 `PostList`/`PostRow` 를 그대로 쓴다. 태그 페이지만의 카드 모양을 만들지 않는다.
 - 히어로 제목은 항상 `#` 을 붙인 원래 태그 글자.
+- 🔴 목록 라벨의 태그도 대문자로 올리지 않는다. `.eyebrow` 는 대문자 변환을 하므로 태그 라벨로 쓰지 않는다 ([`tags.md`](./tags.md#규칙)).
 
 ## 알아둘 것
 
 - 맨 위로 버튼은 처음엔 없었다. 목록 화면끼리 맞추려고 홈·카테고리와 같이 넣었다 (2026-09-19).
 - 태그 URL 은 `encodeURIComponent` 로 만든다 (`tagUrl`). 공백·한글 태그도 깨지지 않는다.
+- 목록 라벨은 처음엔 `.eyebrow` 글자("#DEVOPS — 글")였다. 태그 목록에서 누른 알약이 이 화면에도 그대로 보이게 `TagPill` 로 바꿨다 — 태그가 대문자로 올라가던 것도 같이 없어졌다 (2026-09-19).

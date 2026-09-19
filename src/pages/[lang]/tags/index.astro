@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Hero from '../../../components/Hero.astro';
+import TagPill from '../../../components/TagPill.astro';
 import { ui, languages, avatarSrc, type Lang } from '../../../i18n/ui';
 import { getPosts, tagStats, tagUrl } from '../../../lib/posts';
 
@@ -21,10 +22,7 @@ const tags = tagStats(await getPosts(lang));
       {
         tags.map(({ tag, count }) => (
           <li>
-            <a class="tag" href={tagUrl(lang, tag)}>
-              #{tag}
-              <span class="n">{count}</span>
-            </a>
+            <TagPill tag={tag} count={count} href={tagUrl(lang, tag)} />
           </li>
         ))
       }
@@ -42,12 +40,6 @@ const tags = tagStats(await getPosts(lang));
     flex-wrap: wrap;
     justify-content: center;
     gap: 10px;
-  }
-  .tag { gap: 6px; font-size: 14px; padding: 7px 12px; }
-  .n {
-    font-size: 12px;
-    font-weight: 800;
-    color: var(--text-faint);
   }
   @media (max-width: 809px) {
     .cloud { padding-block: 24px 36px; }

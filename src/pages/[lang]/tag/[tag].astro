@@ -2,6 +2,7 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Hero from '../../../components/Hero.astro';
 import PostList from '../../../components/PostList.astro';
+import TagPill from '../../../components/TagPill.astro';
 import BackToTop from '../../../components/BackToTop.astro';
 import { ui, languages, avatarSrc, type Lang } from '../../../i18n/ui';
 import { getPosts, tagStats } from '../../../lib/posts';
@@ -25,13 +26,17 @@ const posts = (await getPosts(lang)).filter((p) => p.data.tags.includes(tag));
   <Hero title={`#${tag}`} image={avatarSrc} imageAlt="Jieun" />
 
   <div class="frame list-page">
-    <PostList lang={lang} posts={posts} label={`#${tag} — ${t.articles}`} pageSize={8} />
+    <PostList lang={lang} posts={posts} pageSize={8}>
+      <p slot="label" class="list-label"><TagPill tag={tag} count={posts.length} /></p>
+    </PostList>
   </div>
   <BackToTop lang={lang} />
 </BaseLayout>
 
 <style>
   .list-page { padding-block: 64px; }
+  /* 태그 목록에서 누른 알약을 그대로 라벨로 — 어떤 태그를 보고 있는지, 글이 몇 개인지 */
+  .list-label { margin: 0; }
   @media (max-width: 1199px) {
     .list-page { padding-block: 48px; }
   }
