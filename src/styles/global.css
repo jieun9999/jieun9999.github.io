@@ -424,7 +424,5 @@ html.dark .markdown-alert-caution { --al: #f5525f; }
   *, *::before, *::after {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
-    /* 차례로 들어오는 요소가 지연 동안 안 보인 채 기다리지 않게 */
-    animation-delay: 0s !important;
   }
 }

@@ -2,7 +2,7 @@
 // 소개 페이지 — 카드 한 장. 왼쪽 프로필 그림(홈 히어로와 같은 것), 오른쪽 인사 · 짧은 소개 · 링크 아이콘.
 // 소개 문장은 전 회사 지칭 규칙(CLAUDE.md)을 따른다 — 과거형, 회사명·연차·직함 없이.
 // 카드 뒤에는 홈 히어로와 같은 에버그린 점을 깔고, 홈처럼 헤더 뒤까지 올린다 — 메뉴를 오가도 바탕이 이어지게.
-// 들어올 때 움직임은 홈 히어로와 같은 말투 — 그림이 튀어오르고(pop), 인사 단어·소개·아이콘이 차례로 떠오른다(rise).
+// 들어올 때 움직임은 홈 히어로와 같은 말투(GSAP) — 카드가 떠오르고 그림이 튀어오르며, 인사 단어 · 소개 · 아이콘이 차례로 떠오른다.
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SocialLinks from '../../components/SocialLinks.astro';
 import Particles from '../../components/Particles.astro';
@@ -41,10 +41,10 @@ const words = c.greeting.split(/\s+/).filter(Boolean);
         <img class="photo" src={avatarLargeSrc} alt={c.photoAlt} width="1024" height="1024" loading="eager" />
         <div class="intro">
           <h1 id="about-title">
-            {words.map((w, i) => <>{i > 0 && ' '}<span style={`--i:${i}`}>{w}</span></>)}
+            {words.map((w, i) => <>{i > 0 && ' '}<span>{w}</span></>)}
           </h1>
-          <p class="bio" style={`--i:${words.length}`}>{c.bio}</p>
-          <div class="links" style={`--i:${words.length + 1}`}>
+          <p class="bio">{c.bio}</p>
+          <div class="links">
             <SocialLinks toast="start" muted />
           </div>
         </div>
@@ -108,23 +108,10 @@ const words = c.greeting.split(/\s+/).filter(Boolean);
   /* 아이콘 원 안쪽 여백만큼 당겨 글줄 왼쪽 끝에 맞춘다 */
   .links { margin: 28px 0 0 -6px; }
 
-  /* 들어올 때 — 값은 Hero.astro 와 같다 (foundations.md "움직임") */
-  .photo { animation: pop 0.6s cubic-bezier(0.34, 1.4, 0.64, 1) 0.1s both; }
+  /* 들어올 때 모션은 GSAP(아래 스크립트) — 인사 단어가 따로 떠오르게 블록처럼 세우고,
+     뜨기 전엔 점과 카드를 숨겨 둔다(src/lib/motion.ts) */
   .intro h1 span { display: inline-block; }
-  .intro h1 span,
-  .bio,
-  .links {
-    animation: rise 0.5s ease both;
-    animation-delay: calc(0.25s + var(--i) * 0.08s);
-  }
-  @keyframes pop {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: none; }
-  }
-  @keyframes rise {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: none; }
-  }
+  :global(html.gsap-enter) .field > :global(*) { opacity: 0; }
 
   @media (max-width: 1199px) {
     .card { gap: 40px; padding: 32px; }
@@ -137,3 +124,18 @@ const words = c.greeting.split(/\s+/).filter(Boolean);
     .links { margin-top: 22px; }
   }
 </style>
+
+<script>
+  import { enterTimeline, POP, DOTS } from '../../lib/motion';
+
+  // 들어올 때 — 홈 히어로와 같은 말투. 점이 번지고 카드가 떠오르며, 그림이 튀어오르고
+  // 인사 단어 → 소개 → 링크 아이콘이 차례로 떠오른다.
+  const tl = enterTimeline();
+  if (tl) {
+    tl.from('.field > [data-particles]', DOTS, 0)
+      .from('.card', { opacity: 0, y: 24 }, 0)
+      .from('.photo', { ...POP, scale: 0.92, ease: 'back.out(1.4)' }, 0.1)
+      .from('.intro h1 span', { opacity: 0, y: 24, stagger: 0.07 }, 0.25)
+      .from('.bio, .links', { opacity: 0, y: 16, stagger: 0.1 }, '-=0.55');
+  }
+</script>

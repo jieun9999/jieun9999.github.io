@@ -146,12 +146,26 @@
 | --- | --- | --- |
 | hover 색·면 | 색 전환 | `0.15s` |
 | 헤더 메뉴 | 밑줄이 가운데서 펼쳐짐 | `0.25s cubic-bezier(0.44, 0, 0.56, 1)` |
-| 히어로 | 아바타 튀어오름(pop), 제목 단어가 차례로 떠오름(rise, 0.08s 간격) | `Hero.astro` |
-| 소개 카드 | 히어로와 같은 값 — 그림 pop, 인사 단어 → 소개 → 아이콘 순으로 rise | `about.astro` |
+| 히어로 | **GSAP** — 점이 번지고, 사진(구슬)이 튀어오르고, 이름 → 제목 단어(0.07s 간격) → 링크 아이콘이 떠오름 | `Hero.astro`, [`shell.md`](./shell.md#히어로--srccomponentsheroastro) |
+| 소개 카드 | **GSAP** — 히어로와 같은 말투. 점 · 카드 → 그림 튀어오름 → 인사 단어 → 소개 → 아이콘 | `about.astro`, [`about.md`](./about.md#들어올-때-움직임) |
+| 글 상세 | **GSAP** — 첫 화면은 메타 → 제목 단어 → 요약 · 커버 · 시리즈 → 본문 타임라인, 그 아래 소제목 · 코드 · 표 · 인용 · 그림은 스크롤로 떠오름(ScrollTrigger). 문단은 안 움직인다 | `PostLayout.astro`, [`post.md`](./post.md#움직임--gsap) |
 | 목록 이미지 | hover 시 살짝 확대 | `scale(1.03)`, `0.4s` |
 | 히어로 점 | 천천히 떠다님, 화면 밖이면 멈춤 | `Particles.astro` 스크립트 (히어로·소개 카드 뒤) |
 
-`prefers-reduced-motion: reduce` 면 **전역에서** 애니메이션·전환을 끈다(`global.css` 끝). 파티클은 한 번만 그린다.
+`prefers-reduced-motion: reduce` 면 **전역에서** 애니메이션·전환을 끈다(`global.css` 끝). GSAP 모션도 돌지 않는다(아래). 파티클은 한 번만 그린다.
+
+### 들어올 때 모션 — GSAP 공용 약속 (`src/lib/motion.ts`)
+
+첫 화면 모션은 전부 **GSAP** 이다(CSS 키프레임은 쓰지 않는다). 한 페이지에서 첫 화면을 맡는 곳은 하나다 — 히어로 · 소개 카드 · 글 머리말.
+
+- **값**: 아래에서 떠오름 `power3.out` 0.8s(`ENTER_DEFAULTS`), 사진·구슬은 튀어오름 `back.out(1.6)` scale 0.85(`POP`), 점은 1.6s 동안 번짐(`DOTS`).
+- **번쩍임 방지**: GSAP 은 페이지를 그린 뒤에 뜬다. `BaseHead.astro` 인라인 스크립트가 먼저 `html.gsap-enter` 를 붙이고,
+  각 컴포넌트 CSS 가 그걸 보고 **첫 화면 덩어리**(히어로 `.hero > *`, 소개 `.field > *`, 글 `.post-wrap`)를 숨긴다.
+  페이지 스크립트는 `enterTimeline()` 으로 클래스를 떼고 **같은 틱에** from 상태를 입힌다 — 그래서 사이에 비치지 않는다.
+- **대비책**: 스크립트가 끝내 못 뜨면 2.5초 뒤 클래스를 떼서 그냥 보여준다.
+- **끝나면** `clearProps` 로 인라인 `opacity`·`transform` 을 지운다 — 남은 transform 이 고정 위치 요소의 기준을 바꾸지 않게.
+- **모션 줄이기**면 클래스를 붙이지 않고, `enterTimeline()` 이 `null` 을 돌려줘 아무것도 하지 않는다.
+- 새 페이지에 첫 화면 모션을 넣으려면: 첫 화면 덩어리에 `:global(html.gsap-enter) … { opacity: 0 }` 를 걸고, 스크립트에서 `enterTimeline()` 을 받아 `from` 을 건다.
 
 ## 테마 (라이트/다크)
 

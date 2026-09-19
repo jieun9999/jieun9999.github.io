@@ -106,6 +106,9 @@ const lastNum = Math.max(0, ...chapters.map((c) => Number(c.num) || 0));
 const chapterPos = (c: Chapter, i: number) =>
   numbered ? (c.num ? `${c.num} / ${lastNum}` : '') : `${i + 1} / ${chapters.length}`;
 
+// 제목은 단어마다 떠오른다(GSAP, 아래 스크립트) — 단어를 span 으로 나눠 둔다.
+const titleWords = title.split(/\s+/).filter(Boolean);
+
 // "다음 글" = 이어서 읽을 더 오래된 글. 가장 오래된 글이면 더 최신 글을 대신 건다.
 const upNext = prev
   ? { label: t.nextArticle, link: prev }
@@ -134,7 +137,9 @@ const upNext = prev
           <PostMeta lang={lang} date={pubDate} mins={readingMinutes} updated={updatedDate} />
           <a class="chip" href={categoryUrl(lang, category)}>{categoryLabel(category)}</a>
         </div>
-        <h1>{title}</h1>
+        <h1>
+          {titleWords.map((w, i) => <>{i > 0 && ' '}<span>{w}</span></>)}
+        </h1>
         <p class="lede">{description}</p>
         {!hasTranslation && (
           <p class="translation-note">{ui[lang === 'en' ? 'ko' : 'en'].noTranslation}</p>
@@ -537,6 +542,15 @@ const upNext = prev
   .toc-inline.no-num .inline-more { padding-left: 12px; }
   .toc-inline { display: none; }
 
+  /* 들어올 때 움직임은 GSAP(아래 스크립트). 제목 단어가 따로 떠오르게 span 을 블록처럼 세운다. */
+  .post-header h1 span { display: inline-block; }
+  /* GSAP 이 뜨기 전엔 글 전체를 숨겨 둔다(src/lib/motion.ts) — 스크립트가 떼면서 같은 틱에 시작 상태를 입힌다 */
+  :global(html.gsap-enter) .post-wrap { opacity: 0; }
+  /* 아직 스크롤로 안 띄운 블록이 인쇄에서 빈칸으로 나오지 않게 */
+  @media print {
+    .post-wrap :global(*) { opacity: 1 !important; transform: none !important; }
+  }
+
   /* 읽기 진행바 */
   .read-progress {
     position: fixed;
@@ -646,4 +660,79 @@ const upNext = prev
       heads.forEach((h) => obs.observe(h));
     }
   })();
+</script>
+
+<script>
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  import { gsap, enterTimeline } from '../lib/motion';
+
+  // 글 상세 모션 (design/post.md "움직임")
+  // 1) 첫 화면 — 메타 → 제목 단어 → 요약 · 커버 · 시리즈 → 본문이 차례로 떠오른다. 옆 사이드바는 목차 → 프로필.
+  // 2) 그 아래 — 소제목 · 코드 · 표 · 인용 · 그림 · 태그 · 다음 글이 화면에 들어올 때 떠오른다(ScrollTrigger).
+  //    문단은 움직이지 않는다 — 읽는 흐름을 끊지 않게.
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    gsap.registerPlugin(ScrollTrigger);
+    const sideBySide = matchMedia('(min-width: 1200px)').matches;
+    // display:none 인 것(데스크톱의 접는 목차 등)은 차례에서 뺀다
+    const all = (sel: string) => gsap.utils.toArray<HTMLElement>(sel).filter((el) => el.getClientRects().length > 0);
+
+    // 1) BaseHead 가 숨겨둔 첫 화면을 받아 띄운다(src/lib/motion.ts)
+    const tl = enterTimeline();
+    if (tl) {
+      const words = all('.post-header h1 span');
+      tl.from('.meta-row', { opacity: 0, y: 12 })
+        // 긴 제목도 단어가 0.45s 안에 다 출발하게 간격을 줄인다
+        .from(words, { opacity: 0, y: 28, stagger: Math.min(0.06, 0.45 / words.length) }, 0.1)
+        .from(
+          all('.lede, .translation-note, .post-cover-fig, .series-box, .toc-inline, .prose'),
+          { opacity: 0, y: 28, stagger: 0.1 },
+          '-=0.65'
+        );
+      if (sideBySide) {
+        tl.from(
+          all('.sidebar .toc-head, .sidebar .chapter, .sidebar .profile-widget'),
+          { opacity: 0, y: 16, stagger: 0.04 },
+          '<'
+        );
+      }
+    }
+
+    // 2) 처음에 화면 아래 있던 것만 숨긴다 — 이미 보이는 걸 숨겼다 띄우면 깜빡인다.
+    const blocks = gsap.utils
+      .toArray<HTMLElement>(
+        '.prose > :is(h2, h3, figure, .expressive-code, blockquote, .markdown-alert, table), .post-tags, .up-next' +
+          (sideBySide ? '' : ', .sidebar > *')
+      )
+      .filter((el) => el.getBoundingClientRect().top > innerHeight);
+    // 빠르게 내리거나 목차로 건너뛰면 한꺼번에 여러 개가 들어온다 — 이미 지나친 건 바로 보이고,
+    // 화면 안 것만 떠오르되 몇 개든 0.4s 안에 다 출발하게 간격을 줄인다.
+    const show = (els: Element[]) => {
+      const past = els.filter((el) => el.getBoundingClientRect().bottom < 0);
+      const inView = els.filter((el) => !past.includes(el));
+      if (past.length) {
+        gsap.killTweensOf(past);
+        gsap.set(past, { clearProps: 'opacity,transform' });
+      }
+      if (inView.length) {
+        gsap.to(inView, {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: 'power3.out',
+          stagger: Math.min(0.08, 0.4 / inView.length),
+          overwrite: true,
+          clearProps: 'opacity,transform',
+        });
+      }
+    };
+    gsap.set(blocks, { opacity: 0, y: 32 });
+    ScrollTrigger.batch(blocks, {
+      start: 'top 92%',
+      end: 'max',
+      once: true,
+      onEnter: show,
+      // 이미 지나친 채로 열리면(새로고침 위치 복원·#앵커) '들어오는' 순간이 없다 — 새로 잴 때 지나쳐 있으면 띄운다
+      onRefresh: (els, triggers) => show(els.filter((_, i) => triggers[i].progress > 0)),
+    });
+  }
 </script>

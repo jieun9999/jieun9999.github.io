@@ -156,6 +156,13 @@ const xDefaultHref =
     // JS 가 도는 환경 표시 — "더 보기"처럼 스크립트가 있어야 의미 있는 숨김에만 쓴다
     document.documentElement.classList.add('js');
 
+    // 첫 화면 모션(GSAP)이 뜨기 전에 첫 화면을 숨겨 둔다 — 그 페이지 스크립트가 떼면서 띄운다(src/lib/motion.ts).
+    // 모션을 줄인 사용자는 건너뛰고, 스크립트가 끝내 못 뜨면 2.5초 뒤 그냥 보여준다.
+    if (!(typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+      document.documentElement.classList.add('gsap-enter');
+      setTimeout(() => document.documentElement.classList.remove('gsap-enter'), 2500);
+    }
+
     // 모바일 브라우저 주소창 색을 실제 테마에 맞춘다 (global.css 의 --bg 와 같은 값)
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute('content', mode === 'dark' ? '#040405' : '#ffffff');

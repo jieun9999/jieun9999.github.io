@@ -45,11 +45,11 @@ const hasName = Astro.slots.has('name');
       )
     }
     <Heading class="hero-title">
-      {words.map((w, i) => <span style={`--i:${i}`}>{w}</span>)}
+      {words.map((w) => <span>{w}</span>)}
     </Heading>
     {
       Astro.slots.has('default') && (
-        <div class="hero-extra" style={`--i:${words.length}`}>
+        <div class="hero-extra">
           <slot />
         </div>
       )
@@ -78,7 +78,6 @@ const hasName = Astro.slots.has('name');
     width: 100px;
     height: 100px;
     border-radius: 999px;
-    animation: pop 0.6s cubic-bezier(0.34, 1.4, 0.64, 1) 0.1s both;
   }
   .hero-img-link {
     display: block;
@@ -118,26 +117,14 @@ const hasName = Astro.slots.has('name');
     color: var(--text);
   }
   /* 제목 아래 붙는 것(홈의 링크 아이콘) — 제목과 붙여 한 덩어리로 보이게 */
-  .hero-extra {
-    margin-top: -12px;
-    animation: rise 0.5s ease both;
-    animation-delay: calc(0.25s + var(--i) * 0.08s);
-  }
-  /* 단어가 하나씩 떠오른다 */
+  .hero-extra { margin-top: -12px; }
+  /* 단어가 하나씩 떠오르게(아래 스크립트) 블록처럼 세운다 */
   .hero-title span {
     display: inline-block;
     margin-inline: 0.13em;
-    animation: rise 0.5s ease both;
-    animation-delay: calc(0.25s + var(--i) * 0.08s);
   }
-  @keyframes pop {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: none; }
-  }
-  @keyframes rise {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: none; }
-  }
+  /* 들어올 때 모션은 GSAP — 뜨기 전엔 점과 내용을 숨겨 둔다(src/lib/motion.ts) */
+  :global(html.gsap-enter) .hero > :global(*) { opacity: 0; }
 
   @media (max-width: 1199px) {
     .hero-content { padding-block: 36px 48px; }
@@ -175,10 +162,7 @@ const hasName = Astro.slots.has('name');
   /* 헤더 가운데가 비므로 사진을 헤더 줄까지 올려, 사진 윗선을 메뉴 줄 버튼(32px 원) 윗선에 맞춘다.
      모바일은 헤더가 얇은 막대라 그 밑에서 시작한다(아래 미디어쿼리). */
   .hero-content.snug.has-name { padding-top: calc((var(--header-h) - 32px) / 2); }
-  .hero-name {
-    margin-top: -8px;
-    animation: rise 0.5s ease 0.15s both;
-  }
+  .hero-name { margin-top: -8px; }
   .has-name .hero-title {
     margin-top: -20px;
     font-size: 18px;
@@ -195,3 +179,18 @@ const hasName = Astro.slots.has('name');
   }
 </style>
 
+<script>
+  import { enterTimeline, POP, DOTS } from '../lib/motion';
+
+  // 들어올 때 — 점이 번지고, 사진(구슬)이 튀어오르고, 이름 → 제목 단어 → 링크 아이콘이 차례로 떠오른다.
+  const hero = document.querySelector<HTMLElement>('.hero');
+  const tl = hero && enterTimeline();
+  if (hero && tl) {
+    const $ = (sel: string) => hero.querySelectorAll(sel);
+    tl.from($(':scope > [data-particles]'), DOTS, 0)
+      .from($('.hero-img, .hero-orb'), POP, 0.05)
+      .from($('.hero-name'), { opacity: 0, y: 16 }, 0.15)
+      .from($('.hero-title span'), { opacity: 0, y: 20, stagger: 0.07 }, 0.25)
+      .from($('.hero-extra'), { opacity: 0, y: 12 }, '-=0.55');
+  }
+</script>
