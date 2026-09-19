@@ -120,14 +120,15 @@ export default defineConfig({
         wrap: true,
       },
       styleOverrides: {
-        borderRadius: '14px',
-        // 테두리 대신 그림자로 띄운다 (사이트 전체가 borderless 라 선을 맞춘다)
+        borderRadius: '12px',
+        // 사이트 전체가 그림자 대신 가는 선으로 면을 나눈다. borderColor 는 테마 색 계산에
+        // 쓰여 CSS 변수를 못 받으므로 투명으로 두고, 선은 그림자 1px 로 긋는다.
         borderColor: 'transparent',
         codeFontFamily: "'JetBrains Mono Variable', ui-monospace, SFMono-Regular, monospace",
-        codeFontSize: '0.85rem',
+        codeFontSize: '14px',
         uiFontFamily: 'inherit',
         frames: {
-          frameBoxShadowCssValue: 'var(--shadow-sm)',
+          frameBoxShadowCssValue: '0 0 0 1px var(--border)',
         },
       },
     }),
@@ -136,6 +137,9 @@ export default defineConfig({
         defaultLocale: 'en',
         locales: { en: 'en', ko: 'ko' },
       },
+      // 내용이 아직 없는 소개 페이지는 noindex 라 사이트맵에서도 뺀다
+      // (noindex 페이지를 사이트맵에 올리면 Search Console 이 경고한다). 채우면 이 줄을 지운다.
+      filter: (page) => !/\/(en|ko)\/about\/$/.test(new URL(page).pathname),
       // 글 URL 에만 lastmod 를 붙인다. 태그·목록 페이지는 "언제 바뀌었나"를
       // 정직하게 답할 수 없어 비워둔다(빠진 lastmod 는 크롤러가 그냥 무시한다).
       serialize(item) {

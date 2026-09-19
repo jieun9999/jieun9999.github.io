@@ -35,7 +35,7 @@ export async function getStaticPaths() {
     const list = byLang[lang];
     const i = list.findIndex((p) => p.id === post.id);
     const nav = (p: (typeof posts)[number] | undefined) =>
-      p ? { title: p.data.title, url: `/${lang}/blog/${keyFromId(p.id)}/` } : null;
+      p ? { title: p.data.title, url: `/${lang}/blog/${keyFromId(p.id)}/`, cover: p.data.cover } : null;
     const prev = nav(list[i + 1]); // 이전 글 = 더 오래된 글
     const next = nav(list[i - 1]); // 다음 글 = 더 최신 글
 
@@ -67,12 +67,24 @@ export async function getStaticPaths() {
 
     return {
       params: { lang, slug: key },
-      props: { post, alternates, hreflang, canonicalURL, hasTranslation, prev, next, series, ogImage },
+      props: {
+        post,
+        alternates,
+        hreflang,
+        canonicalURL,
+        hasTranslation,
+        prev,
+        next,
+        series,
+        ogImage,
+        postCount: list.length,
+      },
     };
   });
 }
 
-const { post, alternates, hreflang, canonicalURL, hasTranslation, prev, next, series, ogImage } = Astro.props;
+const { post, alternates, hreflang, canonicalURL, hasTranslation, prev, next, series, ogImage, postCount } =
+  Astro.props;
 const lang = langFromId(post.id);
 const { Content, headings } = await render(post);
 const mins = readingMinutes(post.body ?? '');
@@ -84,6 +96,7 @@ const mins = readingMinutes(post.body ?? '');
   description={post.data.description}
   pubDate={post.data.pubDate}
   updatedDate={post.data.updatedDate}
+  category={post.data.category}
   tags={post.data.tags}
   headings={headings}
   readingMinutes={mins}
@@ -95,6 +108,7 @@ const mins = readingMinutes(post.body ?? '');
   hreflang={hreflang}
   canonicalURL={canonicalURL}
   hasTranslation={hasTranslation}
+  postCount={postCount}
   prev={prev}
   next={next}
   series={series}

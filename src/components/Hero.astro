@@ -1,0 +1,198 @@
+---
+// 페이지 맨 위 히어로 — 가운데 둥근 이미지 + 한 줄 제목, 뒤로 떠다니는 점(파티클).
+// 이미지가 없으면(카테고리 목록·태그 페이지) 그라데이션 구슬을 대신 띄운다.
+interface Props {
+  title: string;
+  image?: string;
+  imageAlt?: string;
+  /** 제목을 h1 으로 (홈 외 페이지) — 홈은 사이트 이름이 h1 역할을 하지 않도록 p 로 둔다 */
+  headingLevel?: 'h1' | 'p';
+}
+const { title, image, imageAlt = '', headingLevel = 'h1' } = Astro.props;
+const Heading = headingLevel;
+const words = title.split(/\s+/).filter(Boolean);
+---
+
+<section class="hero">
+  <canvas class="particles" data-particles aria-hidden="true"></canvas>
+  <div class="frame hero-content">
+    {
+      image ? (
+        <img class="hero-img" src={image} alt={imageAlt} width="100" height="100" loading="eager" />
+      ) : (
+        <span class="hero-orb" aria-hidden="true" />
+      )
+    }
+    <Heading class="hero-title">
+      {words.map((w, i) => <span style={`--i:${i}`}>{w}</span>)}
+    </Heading>
+    {
+      Astro.slots.has('default') && (
+        <div class="hero-extra" style={`--i:${words.length}`}>
+          <slot />
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+  }
+  .particles {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    color: var(--text); /* 점 색은 스크립트가 currentColor 로 읽는다 */
+  }
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    padding-block: 48px 64px;
+  }
+  .hero-img,
+  .hero-orb {
+    display: block;
+    width: 100px;
+    height: 100px;
+    border-radius: 999px;
+    animation: pop 0.6s cubic-bezier(0.34, 1.4, 0.64, 1) 0.1s both;
+  }
+  .hero-img {
+    object-fit: cover;
+    border: 1.5px solid var(--hairline);
+  }
+  .hero-orb {
+    background:
+      radial-gradient(circle at 50% 50%, #f0426b 0%, rgba(240, 66, 107, 0.55) 32%, transparent 62%),
+      radial-gradient(circle at 30% 30%, #8ab4f8 0%, #b9a4ff 55%, #e9d5ff 100%);
+    filter: saturate(1.05);
+  }
+  .hero-title {
+    max-width: 360px;
+    margin: 0;
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1.4;
+    text-align: center;
+    color: var(--text);
+  }
+  /* 제목 아래 붙는 것(홈의 링크 아이콘) — 제목과 붙여 한 덩어리로 보이게 */
+  .hero-extra {
+    margin-top: -12px;
+    animation: rise 0.5s ease both;
+    animation-delay: calc(0.25s + var(--i) * 0.08s);
+  }
+  /* 단어가 하나씩 떠오른다 */
+  .hero-title span {
+    display: inline-block;
+    margin-inline: 0.13em;
+    animation: rise 0.5s ease both;
+    animation-delay: calc(0.25s + var(--i) * 0.08s);
+  }
+  @keyframes pop {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  @media (max-width: 1199px) {
+    .hero-content { padding-block: 36px 48px; }
+  }
+  @media (max-width: 809px) {
+    .hero-content { padding-block: 30px 40px; }
+  }
+</style>
+
+<script>
+  // 가벼운 캔버스 파티클 — 작은 점이 천천히 떠다닌다.
+  // 화면 밖이면 멈추고, 움직임 줄이기 설정이면 한 번만 그린다.
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLCanvasElement>('canvas[data-particles]').forEach((canvas) => {
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    type Dot = { x: number; y: number; r: number; vx: number; vy: number; a: number };
+    let dots: Dot[] = [];
+    let w = 0;
+    let h = 0;
+    let raf = 0;
+    let visible = true;
+
+    const seed = () => {
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      w = canvas.clientWidth;
+      h = canvas.clientHeight;
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const n = Math.min(90, Math.round((w * h) / 7000));
+      dots = Array.from({ length: n }, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: 0.4 + Math.random() * 0.9,
+        vx: (Math.random() - 0.5) * 0.12,
+        vy: (Math.random() - 0.5) * 0.12,
+        a: 0.25 + Math.random() * 0.6,
+      }));
+    };
+
+    const draw = () => {
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = getComputedStyle(canvas).color;
+      for (const d of dots) {
+        ctx.globalAlpha = d.a;
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    };
+
+    const step = () => {
+      for (const d of dots) {
+        d.x += d.vx;
+        d.y += d.vy;
+        if (d.x < -2) d.x = w + 2;
+        if (d.x > w + 2) d.x = -2;
+        if (d.y < -2) d.y = h + 2;
+        if (d.y > h + 2) d.y = -2;
+      }
+      draw();
+      raf = visible ? requestAnimationFrame(step) : 0;
+    };
+
+    const start = () => {
+      if (reduce) return draw();
+      if (!raf) raf = requestAnimationFrame(step);
+    };
+
+    seed();
+    start();
+    new ResizeObserver(() => {
+      seed();
+      draw();
+    }).observe(canvas);
+    new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (visible) start();
+    }).observe(canvas);
+    // 테마가 바뀌면 점 색도 따라간다 (움직임을 끈 경우 다시 그려야 한다)
+    new MutationObserver(draw).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+  });
+</script>

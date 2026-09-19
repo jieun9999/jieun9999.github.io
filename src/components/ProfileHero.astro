@@ -1,0 +1,16 @@
+---
+// 홈 히어로 — 사진 + 모토 + GitHub·LinkedIn·메일. 홈과 카테고리별 목록이 같이 쓴다.
+import Hero from './Hero.astro';
+import SocialLinks from './SocialLinks.astro';
+import { ui, avatarSrc, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = ui[lang];
+---
+
+<Hero title={t.tagline} image={avatarSrc} imageAlt="Jieun" headingLevel="p">
+  <SocialLinks toast="center" muted />
+</Hero>

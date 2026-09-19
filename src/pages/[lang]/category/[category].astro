@@ -1,0 +1,29 @@
+---
+// 카테고리별 글 목록 — 홈과 같은 화면에서 칩만 바뀐다.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ProfileHero from '../../../components/ProfileHero.astro';
+import ArticleBrowser from '../../../components/ArticleBrowser.astro';
+import { ui, languages, categoryLabel, type Lang } from '../../../i18n/ui';
+import { getPosts, categoryStats } from '../../../lib/posts';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const lang of Object.keys(languages) as Lang[]) {
+    for (const c of categoryStats(await getPosts(lang))) {
+      paths.push({ params: { lang, category: c.id } });
+    }
+  }
+  return paths;
+}
+
+const { lang, category } = Astro.params as { lang: Lang; category: string };
+const t = ui[lang];
+const posts = await getPosts(lang);
+const label = categoryLabel(category);
+---
+
+<BaseLayout title={`${label} · ${t.siteTitle}`} description={`${t.siteTitle} — ${label}`} lang={lang}>
+  <h1 class="sr-only">{label}</h1>
+  <ProfileHero lang={lang} />
+  <ArticleBrowser lang={lang} allPosts={posts} category={category} />
+</BaseLayout>

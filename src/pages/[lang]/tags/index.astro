@@ -1,0 +1,55 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Hero from '../../../components/Hero.astro';
+import { ui, languages, type Lang } from '../../../i18n/ui';
+import { getPosts, tagStats, tagUrl } from '../../../lib/posts';
+
+export function getStaticPaths() {
+  return (Object.keys(languages) as Lang[]).map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params as { lang: Lang };
+const t = ui[lang];
+const tags = tagStats(await getPosts(lang));
+---
+
+<BaseLayout title={`${t.tags} · ${t.siteTitle}`} description={`${t.siteTitle} — ${t.tags}`} lang={lang}>
+  <Hero title={t.tags} />
+
+  <div class="frame">
+    <ul class="cloud">
+      {
+        tags.map(({ tag, count }) => (
+          <li>
+            <a class="tag" href={tagUrl(lang, tag)}>
+              #{tag}
+              <span class="n">{count}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</BaseLayout>
+
+<style>
+  .cloud {
+    list-style: none;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 64px 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+  .tag { gap: 6px; font-size: 14px; padding: 7px 12px; }
+  .n {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-faint);
+  }
+  @media (max-width: 809px) {
+    .cloud { padding-block: 24px 36px; }
+  }
+</style>

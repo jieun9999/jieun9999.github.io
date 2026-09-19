@@ -1,0 +1,18 @@
+---
+// 소개 페이지 — 내용은 아직 없다. GNB 자리만 먼저 잡아둔다.
+// 🔴 내용을 채우면 noindex 를 지운다 (astro.config.mjs 의 sitemap filter 도 함께).
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import { ui, languages, avatarSrc, type Lang } from '../../i18n/ui';
+
+export function getStaticPaths() {
+  return (Object.keys(languages) as Lang[]).map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params as { lang: Lang };
+const t = ui[lang];
+---
+
+<BaseLayout title={`${t.about} · ${t.siteTitle}`} description={`${t.siteTitle} — ${t.about}`} lang={lang} noindex>
+  <Hero title={t.about} image={avatarSrc} imageAlt="Jieun" />
+</BaseLayout>

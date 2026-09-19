@@ -1,0 +1,213 @@
+---
+// 헤더 돋보기 버튼([data-search-open])이 여는 검색 모달.
+// 서버가 없으니 /<lang>/search.json 을 받아 브라우저에서 제목·요약·태그·카테고리를 거른다.
+import { ui, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = ui[lang];
+---
+
+<dialog class="search-dialog" aria-label={t.search} data-search-dialog data-src={`/${lang}/search.json`}>
+  <div class="search-box">
+    <div class="search-field">
+      <svg width="16" height="16" viewBox="0 0 256 256" aria-hidden="true"><path fill="currentColor" d="M232.49,215.51,185,168a92.12,92.12,0,1,0-17,17l47.53,47.54a12,12,0,0,0,17-17ZM44,112a68,68,0,1,1,68,68A68.07,68.07,0,0,1,44,112Z"/></svg>
+      <input
+        type="search"
+        placeholder={t.searchPlaceholder}
+        aria-label={t.search}
+        autocomplete="off"
+        spellcheck="false"
+        data-search-input
+      />
+      <button class="search-esc" type="button" data-search-close>Esc</button>
+    </div>
+    <ul class="search-results" data-search-results></ul>
+    <p class="search-empty" data-search-empty hidden>{t.noResults}</p>
+  </div>
+</dialog>
+
+<style>
+  .search-dialog {
+    width: min(560px, calc(100vw - 32px));
+    max-height: min(560px, calc(100dvh - 120px));
+    margin: 12vh auto auto;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--bg);
+    color: var(--text);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+  }
+  .search-dialog::backdrop {
+    background: rgba(9, 9, 11, 0.35);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+  }
+  .search-box {
+    display: flex;
+    flex-direction: column;
+    max-height: inherit;
+  }
+  .search-field {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-subtle);
+  }
+  .search-field input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .search-field input::placeholder { color: var(--text-faint); }
+  .search-field input::-webkit-search-cancel-button { display: none; }
+  .search-esc {
+    padding: 3px 7px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg-2);
+    color: var(--text-subtle);
+    font: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .search-results {
+    list-style: none;
+    margin: 0;
+    padding: 8px;
+    overflow-y: auto;
+  }
+  .search-results :global(a) {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    color: var(--text);
+  }
+  .search-results :global(a:hover),
+  .search-results :global(a:focus-visible) {
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+  }
+  .search-results :global(.sr-title) {
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.4;
+  }
+  .search-results :global(.sr-meta) {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-subtle);
+  }
+  .search-empty {
+    margin: 0;
+    padding: 20px 20px 24px;
+    font-size: 14px;
+    color: var(--text-subtle);
+  }
+</style>
+
+<script>
+  type Item = {
+    title: string;
+    description: string;
+    tags: string[];
+    category: string;
+    date: string;
+    url: string;
+  };
+
+  const dialog = document.querySelector<HTMLDialogElement>('[data-search-dialog]');
+  const input = dialog?.querySelector<HTMLInputElement>('[data-search-input]');
+  const list = dialog?.querySelector<HTMLUListElement>('[data-search-results]');
+  const empty = dialog?.querySelector<HTMLElement>('[data-search-empty]');
+
+  if (dialog && input && list && empty) {
+    let items: Item[] | null = null;
+
+    const load = async () => {
+      if (items) return items;
+      try {
+        const res = await fetch(dialog.dataset.src!);
+        items = (await res.json()) as Item[];
+      } catch {
+        items = [];
+      }
+      return items;
+    };
+
+    const render = (all: Item[]) => {
+      const q = input.value.trim().toLowerCase();
+      // 빈 검색어면 최신 글 몇 개를 보여준다
+      const hits = q
+        ? all.filter((it) =>
+            [it.title, it.description, it.category, ...it.tags].some((s) => s.toLowerCase().includes(q))
+          )
+        : all.slice(0, 6);
+      list.replaceChildren(
+        ...hits.slice(0, 20).map((it) => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = it.url;
+          const title = document.createElement('span');
+          title.className = 'sr-title';
+          title.textContent = it.title;
+          const meta = document.createElement('span');
+          meta.className = 'sr-meta';
+          meta.textContent = `${it.category} · ${it.date}`;
+          a.append(title, meta);
+          li.append(a);
+          return li;
+        })
+      );
+      empty.hidden = hits.length > 0;
+    };
+
+    const open = async () => {
+      dialog.showModal();
+      input.select();
+      render(await load());
+    };
+
+    document.querySelectorAll('[data-search-open]').forEach((btn) => btn.addEventListener('click', open));
+    dialog.querySelector('[data-search-close]')?.addEventListener('click', () => dialog.close());
+    input.addEventListener('input', async () => render(await load()));
+    // 패널 바깥(백드롭)을 누르면 닫힌다
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+    // 입력창에서 ↓ 로 첫 결과로 넘어간다
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        list.querySelector('a')?.focus();
+      }
+    });
+    list.addEventListener('keydown', (e) => {
+      const links = [...list.querySelectorAll('a')];
+      const i = links.indexOf(document.activeElement as HTMLAnchorElement);
+      if (e.key === 'ArrowDown' && i < links.length - 1) {
+        e.preventDefault();
+        links[i + 1].focus();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        (i > 0 ? links[i - 1] : input).focus();
+      }
+    });
+  }
+</script>

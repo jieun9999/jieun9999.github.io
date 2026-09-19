@@ -1,18 +1,9 @@
 ---
-import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import ProfileCard from '../../components/ProfileCard.astro';
-import PostCard from '../../components/PostCard.astro';
-import CategoryBar from '../../components/CategoryBar.astro';
-import TagsPanel from '../../components/TagsPanel.astro';
-import {
-  ui,
-  languages,
-  langFromId,
-  keyFromId,
-  readingMinutes,
-  type Lang,
-} from '../../i18n/ui';
+import ProfileHero from '../../components/ProfileHero.astro';
+import ArticleBrowser from '../../components/ArticleBrowser.astro';
+import { ui, languages, type Lang } from '../../i18n/ui';
+import { getPosts } from '../../lib/posts';
 
 export function getStaticPaths() {
   return (Object.keys(languages) as Lang[]).map((lang) => ({ params: { lang } }));
@@ -21,81 +12,11 @@ export function getStaticPaths() {
 const { lang } = Astro.params as { lang: Lang };
 const t = ui[lang];
 
-const posts = (await getCollection('blog'))
-  .filter((p) => langFromId(p.id) === lang && !p.data.draft)
-  .sort(
-    (a, b) =>
-      b.data.pubDate.valueOf() - a.data.pubDate.valueOf() ||
-      (b.data.seriesOrder ?? 0) - (a.data.seriesOrder ?? 0),
-  );
-
-// 태그 누적 (최신순, 중복 제거) — posts는 이미 최신순 정렬됨
-const seenTags = new Set<string>();
-const orderedTags: string[] = [];
-for (const p of posts) {
-  for (const tag of p.data.tags) {
-    if (!seenTags.has(tag)) {
-      seenTags.add(tag);
-      orderedTags.push(tag);
-    }
-  }
-}
+const posts = await getPosts(lang);
 ---
 
 <BaseLayout title={t.siteTitle} description={t.tagline} lang={lang}>
-  <div class="home">
-    <div class="feed">
-      <ProfileCard lang={lang} count={posts.length} />
-
-      <CategoryBar />
-
-      <ul class="feed-list">
-        {
-          posts.map((post) => (
-            <PostCard
-              lang={lang}
-              slug={keyFromId(post.id)}
-              title={post.data.title}
-              description={post.data.description}
-              pubDate={post.data.pubDate}
-              mins={readingMinutes(post.body ?? '')}
-              category={post.data.category}
-              cover={post.data.cover}
-              coverAlt={post.data.coverAlt}
-            />
-          ))
-        }
-      </ul>
-    </div>
-
-    <TagsPanel lang={lang} tags={orderedTags} />
-  </div>
+  <h1 class="sr-only">{t.siteTitle}</h1>
+  <ProfileHero lang={lang} />
+  <ArticleBrowser lang={lang} allPosts={posts} />
 </BaseLayout>
-
-<style>
-  /* 홈: 넓은 피드 + 오른쪽 TAGS 사이드바를 하나의 그룹으로 중앙 정렬 */
-  .home {
-    display: flex;
-    gap: 2.5rem;
-    align-items: flex-start;
-    justify-content: center;
-  }
-  .feed {
-    flex: 1 1 auto;
-    min-width: 0;
-    max-width: 1180px; /* 홈 콘텐츠 폭 (본문보다 넓게) */
-    /* 글자 크기 (본문 .prose 스케일은 불변) */
-    font-size: clamp(17px, 15px + 0.28vw, 20px);
-  }
-  .feed-list {
-    list-style: none;
-    padding: 0;
-    margin: 1.5rem 0 0;
-    display: grid;
-    gap: 1.75rem;
-  }
-  /* 좁은 화면: 사이드바 숨기고 피드만 (오버플로/겹침 방지) */
-  @media (max-width: 64rem) {
-    .home { display: block; }
-  }
-</style>
