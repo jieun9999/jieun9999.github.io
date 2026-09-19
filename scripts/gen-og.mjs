@@ -9,6 +9,11 @@
  * public/og/<lang>/<slug>.jpg 를 만든다. 언어별로 따로 만들기 때문에
  * /ko/ 글을 공유하면 한글 제목 카드가 뜬다.
  *
+ * 글이 아닌 페이지(홈·태그 등)가 쓰는 기본 배너 public/og-default-v4.jpg 도
+ * 같은 템플릿으로 만든다. 배너 디자인을 바꾸면 파일명의 버전을 올린다 —
+ * 링크드인·카톡은 이미지를 URL 단위로 캐시해서, 같은 경로에 덮어쓰면 예전
+ * 그림이 계속 나온다. (BaseHead.astro 의 기본값도 함께 바꾼다)
+ *
  * 렌더링은 로컬 크롬(headless)에 맡긴다 — 브라우저 의존성을 package.json 에
  * 넣지 않으려는 선택이라, CI 에서는 돌지 않는다. 새 글을 쓰면 로컬에서 한 번
  * 돌리고 결과 JPG 를 커밋한다. (빌드는 이 파일이 없으면 기본 배너로 폴백한다)
@@ -63,9 +68,14 @@ const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'og-'));
 
 // 카드 HTML 이 같은 디렉터리에서 찾는 자산을 옆에 둔다
 fs.copyFileSync(path.join(ROOT, 'public/web-app-manifest-512x512.png'), path.join(tmp, 'tree.png'));
+fs.copyFileSync(path.join(ROOT, 'public/avatar-illustration.jpg'), path.join(tmp, 'avatar.jpg'));
 fs.copyFileSync(
   path.join(ROOT, 'node_modules/pretendard/dist/web/variable/woff2/PretendardVariable.woff2'),
   path.join(tmp, 'PretendardVariable.woff2'),
+);
+fs.copyFileSync(
+  path.join(ROOT, 'node_modules/@fontsource-variable/nunito/files/nunito-latin-wght-normal.woff2'),
+  path.join(tmp, 'nunito.woff2'),
 );
 fs.copyFileSync(CARD, path.join(tmp, 'card.html'));
 
@@ -119,6 +129,14 @@ for (const lang of fs.readdirSync(BLOG)) {
     made++;
     console.log(`✓ og/${lang}/${slug}.jpg`);
   }
+}
+
+// 기본 배너
+const BANNER = path.join(ROOT, 'public/og-default-v4.jpg');
+if (FORCE || !fs.existsSync(BANNER)) {
+  render({ banner: true }, BANNER);
+  made++;
+  console.log('✓ og-default-v4.jpg');
 }
 
 fs.rmSync(tmp, { recursive: true, force: true });

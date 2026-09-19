@@ -3,6 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <style>
+      /* 라틴은 Nunito, 한글은 Pretendard — 사이트(global.css --font-sans)와 같은 조합 */
+      @font-face {
+        font-family: 'Nunito Variable';
+        src: url('./nunito.woff2') format('woff2-variations');
+        font-weight: 200 1000;
+        font-display: block;
+      }
       @font-face {
         font-family: 'Pretendard Variable';
         src: url('./PretendardVariable.woff2') format('woff2-variations');
@@ -10,16 +17,18 @@
         font-display: block;
       }
 
-      /* global.css 의 다크 팔레트와 같은 값. 기본 배너(og-default-v3)와 한 세트다. */
+      /* global.css 의 라이트 팔레트와 같은 값 (포인트는 에버그린) */
       :root {
-        --bg: #0d1310;
-        --card: #151d17;
-        --text: #e6ece7;
-        --text-muted: #9aa89c;
-        --text-subtle: #6b7a6d;
-        --accent: #86c95a;
-        --accent-soft: rgba(134, 201, 90, 0.16);
-        --hairline: #232e26;
+        --bg: #ffffff;
+        --bg-2: #fafafa;
+        --surface: #f4f4f5;
+        --text: #18181b;
+        --text-muted: #3f3f46;
+        --text-subtle: #71717a;
+        --border: #e4e4e7;
+        --accent: #307252;
+        --accent-soft: rgba(48, 114, 82, 0.1);
+        --hairline: rgba(0, 0, 0, 0.06);
       }
 
       * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -29,111 +38,159 @@
         height: 630px;
         overflow: hidden;
         position: relative;
-        background: var(--bg);
-        font-family: 'Pretendard Variable', -apple-system, sans-serif;
+        background: linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+        font-family: 'Nunito Variable', 'Pretendard Variable', -apple-system, sans-serif;
         color: var(--text);
         -webkit-font-smoothing: antialiased;
       }
 
-      /* 지면 — 아래쪽에 옅은 잔디 기운 */
-      .ground {
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(120% 70% at 50% 118%, rgba(134, 201, 90, 0.14) 0%, transparent 62%);
-      }
+      /* 사이트 히어로처럼 떠 있는 점 */
+      canvas { position: absolute; inset: 0; width: 1200px; height: 630px; }
 
+      /* ---- 글 카드 ---------------------------------------------------- */
       .card {
         position: absolute;
-        inset: 46px;
-        border-radius: 40px;
-        background: var(--card);
-        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
-        padding: 56px 64px 48px;
+        inset: 44px;
+        border-radius: 32px;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        padding: 52px 60px 44px;
         display: flex;
         flex-direction: column;
       }
 
-      /* 상단 — 로고 + 도메인 / 카테고리 */
       .top {
         display: flex;
         align-items: center;
         justify-content: space-between;
         flex: none;
       }
-      .brand { display: flex; align-items: center; gap: 16px; }
-      .tile {
-        width: 56px;
-        height: 56px;
-        border-radius: 14px;
-        background: #ffffff;
-        overflow: hidden;
+      .brand { display: flex; align-items: center; gap: 14px; }
+      /* 앱 아이콘(흰 바탕 + 여백)을 잘라 나무만 보이게 한다 — 카드도 흰 바탕이라 경계가 사라진다 */
+      .logo { position: relative; width: 52px; height: 52px; overflow: hidden; flex: none; }
+      .logo img { position: absolute; left: -8px; top: -8px; width: 68px; height: 68px; }
+      /* GNB 현재 메뉴처럼 초록 밑줄 */
+      .domain {
         position: relative;
-        flex: none;
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--text);
       }
-      .tile img { position: absolute; left: -9px; top: -9px; width: 74px; height: 74px; object-fit: contain; }
-      .domain { font-size: 26px; font-weight: 700; letter-spacing: -0.01em; color: var(--text); }
+      .domain::after {
+        content: '';
+        position: absolute;
+        left: 1px;
+        right: 1px;
+        bottom: -7px;
+        height: 3px;
+        border-radius: 3px;
+        background: var(--accent);
+      }
       .category {
-        font-size: 20px;
-        font-weight: 700;
-        letter-spacing: 0.12em;
+        padding: 10px 16px 9px;
+        border-radius: 12px;
+        background: var(--surface);
+        color: var(--text-muted);
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
-        color: var(--text-subtle);
       }
 
-      /* 가운데 — 시리즈 칩 + 제목 */
       .mid {
         flex: 1;
         display: flex;
         flex-direction: column;
         justify-content: center;
         min-height: 0;
-        padding: 28px 0;
+        padding: 26px 0;
       }
       .series {
         align-self: flex-start;
         margin-bottom: 22px;
-        padding: 9px 20px;
+        padding: 9px 20px 8px;
         border-radius: 999px;
         background: var(--accent-soft);
         color: var(--accent);
         font-size: 22px;
-        font-weight: 650;
-        letter-spacing: -0.01em;
+        font-weight: 800;
         white-space: nowrap;
       }
       .series:empty { display: none; }
       #title {
         font-weight: 800;
-        letter-spacing: -0.032em;
-        line-height: 1.18;
+        letter-spacing: -0.015em;
+        line-height: 1.24;
+        color: var(--text);
         /* 한국어는 어절 단위로 끊는다. 기본값이면 '숨어 있 / 었다' 처럼 낱말 중간이 갈린다. */
         word-break: keep-all;
         overflow-wrap: break-word;
         /* 크기는 아래 스크립트가 상자에 맞춰 정한다 */
-        font-size: 64px;
+        font-size: 62px;
       }
 
-      /* 하단 — 헤어라인 + 서명 */
       .bottom {
         flex: none;
-        border-top: 1px solid var(--hairline);
-        padding-top: 24px;
+        border-top: 1px solid var(--border);
+        padding-top: 22px;
         display: flex;
-        align-items: baseline;
+        align-items: center;
         justify-content: space-between;
-        font-size: 23px;
-        color: var(--text-muted);
+        font-size: 22px;
+        color: var(--text-subtle);
       }
-      .bottom .who { font-weight: 650; color: var(--text); }
-      .bottom .tag { color: var(--text-subtle); }
+      .who { display: flex; align-items: center; gap: 12px; }
+      .who img {
+        width: 38px;
+        height: 38px;
+        border-radius: 999px;
+        object-fit: cover;
+        border: 1px solid var(--hairline);
+      }
+      .who b { font-weight: 800; color: var(--text); }
+      #date { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+      /* ---- 기본 배너 (홈·태그 등 글이 아닌 페이지) ---------------------- */
+      .banner {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 22px;
+        text-align: center;
+      }
+      .banner .avatar {
+        width: 132px;
+        height: 132px;
+        border-radius: 999px;
+        object-fit: cover;
+        border: 2px solid var(--hairline);
+        margin-bottom: 6px;
+      }
+      .banner h1 { font-size: 76px; font-weight: 800; line-height: 1; letter-spacing: -0.01em; }
+      .banner p { font-size: 30px; font-weight: 800; color: var(--text-muted); }
+      .banner .pill {
+        margin-top: 10px;
+        padding: 11px 24px 10px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-size: 22px;
+        font-weight: 800;
+      }
+
+      [hidden] { display: none !important; }
     </style>
   </head>
   <body>
-    <div class="ground"></div>
-    <div class="card">
+    <canvas id="dots" width="2400" height="1260"></canvas>
+
+    <div class="card" id="card">
       <div class="top">
         <div class="brand">
-          <span class="tile"><img src="./tree.png" alt="" /></span>
+          <span class="logo"><img src="./tree.png" alt="" /></span>
           <span class="domain">jieun.dev</span>
         </div>
         <div class="category" id="category"></div>
@@ -145,34 +202,63 @@
       </div>
 
       <div class="bottom">
-        <span class="who">Jieun <span class="tag">· deserve what you want</span></span>
+        <span class="who"><img src="./avatar.jpg" alt="" /><span><b>Jieun</b> · Deserve what you want.</span></span>
         <span id="date"></span>
       </div>
+    </div>
+
+    <div class="banner" id="banner" hidden>
+      <img class="avatar" src="./avatar.jpg" alt="" />
+      <h1>Jieun</h1>
+      <p>Deserve what you want.</p>
+      <span class="pill">jieun.dev · Engineering Blog</span>
     </div>
 
     <script>
       const p = new URLSearchParams(location.search);
       const d = JSON.parse(decodeURIComponent(p.get('d') || '{}'));
 
-      document.getElementById('category').textContent = d.category || '';
-      document.getElementById('series').textContent = d.series || '';
-      document.getElementById('date').textContent = d.date || '';
-
-      const title = document.getElementById('title');
-      title.textContent = d.title || '';
-
-      // 제목 길이가 글마다 크게 다르다. 남은 세로 공간에 들어갈 때까지 줄인다.
-      // (clamp 로 자르면 문장이 잘려 무슨 글인지 알 수 없어진다)
-      const mid = title.parentElement;
-      // 시리즈 칩이 있으면 그만큼 제목이 쓸 세로가 줄어든다. 마지막 줄이 하단
-      // 헤어라인에 붙지 않도록 8px 은 늘 비워둔다.
-      const room = () =>
-        mid.clientHeight - (d.series ? title.offsetTop - mid.offsetTop : 0) - 8;
-      for (let size = 64; size >= 30; size -= 2) {
-        title.style.fontSize = size + 'px';
-        if (title.scrollHeight <= room()) break;
+      // 점 배치는 제목에서 뽑은 시드로 정한다 — 다시 만들어도 같은 그림이 나온다
+      let seed = 0;
+      for (const ch of d.title || 'banner') seed = (seed * 31 + ch.charCodeAt(0)) >>> 0;
+      const rand = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+      const ctx = document.getElementById('dots').getContext('2d');
+      ctx.scale(2, 2);
+      ctx.fillStyle = '#18181b';
+      for (let i = 0; i < 110; i++) {
+        ctx.globalAlpha = 0.2 + rand() * 0.5;
+        ctx.beginPath();
+        ctx.arc(rand() * 1200, rand() * 630, 0.5 + rand() * 1.1, 0, Math.PI * 2);
+        ctx.fill();
       }
-      document.documentElement.dataset.ready = '1';
+
+      if (d.banner) {
+        document.getElementById('card').hidden = true;
+        document.getElementById('banner').hidden = false;
+        document.documentElement.dataset.ready = '1';
+      } else {
+        document.getElementById('category').textContent = d.category || '';
+        document.getElementById('series').textContent = d.series || '';
+        document.getElementById('date').textContent = d.date || '';
+        const title = document.getElementById('title');
+        title.textContent = d.title || '';
+
+        // 제목 길이가 글마다 크게 다르다. 남은 세로 공간에 들어갈 때까지 줄인다.
+        // (clamp 로 자르면 문장이 잘려 무슨 글인지 알 수 없어진다)
+        // 폰트가 다 받아진 뒤에 재야 줄바꿈이 실제와 같다.
+        document.fonts.ready.then(() => {
+          const mid = title.parentElement;
+          // 시리즈 칩이 있으면 그만큼 제목이 쓸 세로가 줄어든다. 마지막 줄이 하단
+          // 헤어라인에 붙지 않도록 8px 은 늘 비워둔다.
+          const room = () =>
+            mid.clientHeight - (d.series ? title.offsetTop - mid.offsetTop : 0) - 8;
+          for (let size = 62; size >= 30; size -= 2) {
+            title.style.fontSize = size + 'px';
+            if (title.scrollHeight <= room()) break;
+          }
+          document.documentElement.dataset.ready = '1';
+        });
+      }
     </script>
   </body>
 </html>
