@@ -168,12 +168,23 @@ const upNext = prev
 
       {
         showToc && (
-          <details class="toc-inline">
+          <details class:list={['toc-inline', { 'no-num': !numbered }]}>
             <summary class="eyebrow">{t.tableOfContents}</summary>
-            <ul>
-              {toc.map((h) => (
-                <li class:list={[`depth-${h.depth}`]}>
-                  <a href={`#${h.slug}`}>{h.text}</a>
+            <ul class="inline-chapters">
+              {chapters.map((c) => (
+                <li>
+                  <a class="chapter-link" href={`#${c.slug}`}>
+                    {numbered && <span class="num">{c.num}</span>}
+                    <span class="label">{c.label}</span>
+                  </a>
+                  {(c.sub || c.subs.length > 0) && (
+                    <div class="inline-more">
+                      {c.sub && <p class="chapter-sub">{c.sub}</p>}
+                      {c.subs.map((s) => (
+                        <a class="sub-link" href={`#${s.slug}`}>{s.text}</a>
+                      ))}
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>
@@ -499,29 +510,31 @@ const upNext = prev
   .sub-link.current { color: var(--text); }
   .sub-link.current { font-weight: 800; }
 
-  /* 좁은 화면용 접이식 목차 — 넓은 화면에선 사이드바가 대신한다 */
-  .toc-inline ul {
+  /* 좁은 화면용 접이식 목차 — 넓은 화면에선 사이드바가 대신한다.
+     사이드바와 같은 챕터 묶음(번호 · 주제어 · 부제 · h3)을 쓰되, 글 위에 있어 읽는 위치를
+     따라가지 않으니 '지금 챕터'가 없다. 그래서 모든 챕터를 펼친 채로 보여준다. */
+  .inline-chapters {
     list-style: none;
     margin: 0;
     padding: 0;
     border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
   }
-  .toc-inline li { margin: 0; }
-  .toc-inline a {
-    display: block;
-    margin-left: -1px;
-    padding: 5px 0 5px 12px;
-    border-left: 2px solid transparent;
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 1.4;
-    color: var(--text-subtle);
+  .inline-chapters li { margin: 0; }
+  .inline-chapters .chapter-link { color: var(--text); }
+  .inline-chapters .chapter-link:hover { color: var(--accent); }
+  .inline-more {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 0 0 8px 38px; /* 사이드바 .chapter-more 와 같은 들여쓰기 — 주제어와 줄을 맞춘다 */
     word-break: keep-all;
     overflow-wrap: anywhere;
-    transition: color 0.15s, border-color 0.15s;
+    text-wrap: pretty;
   }
-  .toc-inline li.depth-3 a { padding-left: 24px; font-weight: 500; }
-  .toc-inline a:hover { color: var(--text); }
+  .toc-inline.no-num .inline-more { padding-left: 12px; }
   .toc-inline { display: none; }
 
   /* 읽기 진행바 */
