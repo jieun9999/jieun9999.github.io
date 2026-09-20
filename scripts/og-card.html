@@ -17,18 +17,19 @@
         font-display: block;
       }
 
-      /* global.css 의 라이트 팔레트와 같은 값 (포인트는 에버그린) */
+      /* global.css 의 다크 팔레트(html.dark)와 같은 값. 피드에서 흰 카드가 너무 튀어
+         다크로 옮겼다 — 사이트 색을 바꾸면 여기도 맞춘다. */
       :root {
-        --bg: #ffffff;
-        --bg-2: #fafafa;
-        --surface: #f4f4f5;
-        --text: #18181b;
-        --text-muted: #3f3f46;
-        --text-subtle: #71717a;
-        --border: #e4e4e7;
-        --accent: #307252;
-        --accent-soft: rgba(48, 114, 82, 0.1);
-        --hairline: rgba(0, 0, 0, 0.06);
+        --bg: #040405;
+        --bg-2: #09090b;
+        --surface: #18181b;
+        --text: #f4f4f5;
+        --text-muted: #d4d4d8;
+        --text-subtle: #a1a1aa;
+        --border: #27272a;
+        --accent: #72be96;
+        --accent-soft: rgba(114, 190, 150, 0.22);
+        --hairline: rgba(255, 255, 255, 0.08);
       }
 
       * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -168,8 +169,8 @@
         border: 2px solid var(--hairline);
         margin-bottom: 6px;
       }
-      /* 헤더·푸터와 같은 워드마크(src/components/BrandWordmark.astro)의 라이트 판.
-         J 는 에버그린 세로 그라데이션 + 민트 잎맥, "ieun" 은 같은 그라데이션을 글자에만 칠한다. */
+      /* 헤더·푸터와 같은 워드마크(src/components/BrandWordmark.astro)의 다크 판.
+         J 는 민트 세로 그라데이션 + 에버그린 잎맥, "ieun" 은 밝은 초록을 글자에만 칠한다. */
       .wordmark {
         display: inline-flex;
         align-items: baseline;
@@ -185,25 +186,15 @@
         margin-right: 0.05em;
         transform: translateY(0.012em);
       }
-      .wordmark .veins { fill: none; stroke: #e2f6ea; stroke-width: 16; stroke-opacity: 0.5; }
+      .wordmark .veins { fill: none; stroke: #307252; stroke-width: 16; stroke-opacity: 0.45; }
       .wordmark .rest {
-        background-image: linear-gradient(180deg, #519773 19%, #307252 45%, #1a5439 77%);
+        background-image: linear-gradient(180deg, #9ce4bd 19%, #72be96 45%, #4b916e 77%);
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
         -webkit-text-fill-color: transparent;
       }
       .banner p { font-size: 30px; font-weight: 800; color: var(--text-muted); }
-      .banner .pill {
-        margin-top: 10px;
-        padding: 11px 24px 10px;
-        border-radius: 999px;
-        background: var(--accent-soft);
-        color: var(--accent);
-        font-size: 22px;
-        font-weight: 800;
-      }
-
       [hidden] { display: none !important; }
     </style>
   </head>
@@ -236,9 +227,9 @@
         <svg class="j" viewBox="0 0 200 450" aria-hidden="true">
           <defs>
             <linearGradient id="wm-j" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="450">
-              <stop offset="0" stop-color="#519773" />
-              <stop offset="0.44" stop-color="#307252" />
-              <stop offset="1" stop-color="#1a5439" />
+              <stop offset="0" stop-color="#e2f6ea" />
+              <stop offset="0.44" stop-color="#bcebd1" />
+              <stop offset="1" stop-color="#93d6b1" />
             </linearGradient>
             <clipPath id="wm-clip"><path d="M100 100A100 100 0 0 1 200 0L200 350A100 100 0 0 1 0 350L100 350Z" /></clipPath>
           </defs>
@@ -247,7 +238,6 @@
         </svg><span class="rest">ieun</span>
       </h1>
       <p>Deserve what you want.</p>
-      <span class="pill">jieun.dev · Engineering Blog</span>
     </div>
 
     <script>
@@ -262,9 +252,9 @@
       const rand = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
       const ctx = document.getElementById('dots').getContext('2d');
       ctx.scale(2, 2);
-      // 사이트 히어로와 같은 에버그린 6단계(라이트 지면용, Hero.astro 의 --dot-1..6)에서 점마다
-      // 하나씩 고른다. 카드는 피드에서 절반 크기쯤으로 줄어 보이므로 점을 히어로보다 조금 키운다.
-      const DOTS = ['#195e3f', '#256648', '#307252', '#3d8160', '#4b916e', '#a9e0c1'];
+      // 사이트 히어로와 같은 6단계(Particles.astro 의 다크 --dot-1..6)에서 점마다 하나씩
+      // 고른다. 카드는 피드에서 절반 크기쯤으로 줄어 보이므로 점을 히어로보다 조금 키운다.
+      const DOTS = ['#3e8562', '#4f9773', '#5da781', '#72be96', '#8fd4ad', '#bcebd1'];
       for (let i = 0; i < 110; i++) {
         ctx.fillStyle = DOTS[Math.floor(rand() * DOTS.length)];
         ctx.globalAlpha = 0.25 + rand() * 0.6;
