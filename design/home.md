@@ -4,7 +4,7 @@
 
 | | |
 | --- | --- |
-| URL | `/en/`, `/ko/` (`/` 는 `/en/` 으로 보내는 스텁) |
+| URL | `/en/`, `/ko/` (`/` 는 `/ko/` 로 보내는 스텁) |
 | 소스 | `src/pages/[lang]/index.astro` |
 | 컴포넌트 | `ProfileHero` → `ArticleBrowser`(칩 + `PostList` → `PostItem` → `PostRow` → `PostMeta`) → `BackToTop` |
 | 헤더 현재 메뉴 | 홈 |

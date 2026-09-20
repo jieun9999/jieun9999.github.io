@@ -19,6 +19,11 @@ const TARGET = '/ko/'; // 주 독자가 한국어라 한국어 홈으로 보낸�
 const t = ui.ko;
 const site = Astro.site ?? new URL('https://jieun.dev');
 const target = new URL(TARGET, site).href;
+// og:url 은 self — 이 스텁 자신이다. canonical(/ko/) 과 일부러 다르다.
+// 링크드인은 붙여넣은 주소가 아니라 og:url 을 캐시 키로 쓴다. 여기가 /ko/ 를 가리키면
+// 맨 주소로 공유한 카드가 /ko/ 캐시에 얹혀서, 인스펙터로 맨 주소를 갱신해도
+// 작성창엔 예전 그림이 그대로 나왔다. 검색 신호는 canonical 이 지고, og:url 은 안 진다.
+const ogUrl = new URL('/', site).href;
 // 기본 배너 — BaseHead 의 기본값과 같은 파일이어야 한다. 바꾸면 양쪽 다 바꾼다.
 const ogImage = new URL('/og-default-v6.jpg', site).href;
 ---
@@ -40,7 +45,7 @@ const ogImage = new URL('/og-default-v6.jpg', site).href;
     <meta property="og:site_name" content={t.siteTitle} />
     <meta property="og:title" content={t.siteTitle} />
     <meta property="og:description" content={t.tagline} />
-    <meta property="og:url" content={target} />
+    <meta property="og:url" content={ogUrl} />
     <meta property="og:locale" content="ko_KR" />
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
