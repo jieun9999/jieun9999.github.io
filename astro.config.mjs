@@ -97,13 +97,19 @@ export default defineConfig({
     locales: ['en', 'ko'],
     routing: {
       prefixDefaultLocale: true, // 기본 언어도 /en/ 으로 (좌우대칭 → 토글이 단순해짐)
+      // Astro 5 는 이게 기본 true 라, '/' 를 자동으로 /en/ 으로 보내면서
+      // src/pages/index.astro 를 덮어쓴다. 우리 스텁이 이기게 꺼둔다.
+      // (Astro 6 부터는 기본이 false 지만, 의도를 남기려 명시한다)
+      redirectToDefaultLocale: false,
     },
   },
 
-  // 최상단 '/' 방문 시 기본 언어로 보냄
-  redirects: {
-    '/': '/en/',
-  },
+  // 최상단 '/' 는 src/pages/index.astro 가 그리는 스텁이다(redirects 옵션이 아니다).
+  //   ⚠ redirects 가 만드는 스텁에는 og: 태그가 없어서, 맨 주소(jieun.dev)를 공유하면
+  //     링크드인·카톡 카드가 비었다. 스텁을 직접 그려 배너를 붙였다 — 자세한 건 그 파일.
+  //   ⚠ 사람은 /ko/ 로 보내지만, 검색엔진에게 알리는 기본 언어는 BaseHead 의
+  //     x-default(= en)와 아래 sitemap 의 defaultLocale(= en) 쪽이고 일부러 영어로 둔다 —
+  //     한국어도 영어도 아닌 검색 사용자에겐 영어판이 낫다.
 
   integrations: [
     // 코드블록 업그레이드: 파일명 프레임, 복사 버튼, 줄번호(옵션), 하이라이트, diff
@@ -137,6 +143,9 @@ export default defineConfig({
         defaultLocale: 'en',
         locales: { en: 'en', ko: 'ko' },
       },
+      // 루트 '/' 는 noindex 스텁이라 사이트맵에 넣지 않는다. 색인하지 말라고 해놓고
+      // 사이트맵으로 내미는 건 서로 어긋나는 신호다.
+      filter: (page) => page !== `${SITE}/`,
       // 글 URL 에만 lastmod 를 붙인다. 태그·목록 페이지는 "언제 바뀌었나"를
       // 정직하게 답할 수 없어 비워둔다(빠진 lastmod 는 크롤러가 그냥 무시한다).
       serialize(item) {
