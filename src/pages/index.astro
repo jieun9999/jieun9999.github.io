@@ -1,0 +1,65 @@
+---
+// 최상단 '/' — 화면이 아니라 /ko/ 로 보내는 스텁이다.
+//
+// 왜 astro.config 의 redirects 가 아니라 진짜 페이지인가:
+//   redirects 가 만들어 주는 스텁에는 og: 태그가 없다. 그런데 사람들이 공유하는 건
+//   거의 언제나 맨 주소(jieun.dev)라, 링크드인·카톡 스크래퍼가 여기로 와서 아무것도
+//   못 읽고 카드가 비거나 예전에 캐시해 둔 그림을 계속 띄웠다. 스텁을 직접 그리면
+//   같은 meta-refresh 를 유지하면서 배너·제목·설명을 붙일 수 있다.
+//
+// GitHub Pages 는 서버 301 을 못 쓰므로 meta-refresh 가 유일한 수단이다.
+// noindex 는 그대로 둔다 — GSC 의 "'NOINDEX' 태그에 의해 제외" 한 건이 이 페이지다.
+// canonical 은 /ko/ 를 가리켜, 검색 점수가 이 빈 스텁이 아니라 한국어 홈으로 간다.
+//
+// ⚠ 이 페이지는 사이트맵에서 뺀다(astro.config 의 sitemap filter).
+// ⚠ BaseLayout 을 쓰지 않는다. 0.1 초 뒤 떠날 화면에 폰트·CSS·JS 를 받게 할 이유가 없다.
+import { ui } from '../i18n/ui';
+
+const TARGET = '/ko/'; // 주 독자가 한국어라 한국어 홈으로 보낸다
+const t = ui.ko;
+const site = Astro.site ?? new URL('https://jieun.dev');
+const target = new URL(TARGET, site).href;
+// 기본 배너 — BaseHead 의 기본값과 같은 파일이어야 한다. 바꾸면 양쪽 다 바꾼다.
+const ogImage = new URL('/og-default-v5.jpg', site).href;
+---
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{t.siteTitle}</title>
+    <meta http-equiv="refresh" content={`0;url=${TARGET}`} />
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href={target} />
+
+    <meta name="description" content={t.tagline} />
+
+    <!-- SNS 카드 — 맨 주소를 붙여넣었을 때 쓰인다 -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={t.siteTitle} />
+    <meta property="og:title" content={t.siteTitle} />
+    <meta property="og:description" content={t.tagline} />
+    <meta property="og:url" content={target} />
+    <meta property="og:locale" content="ko_KR" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={t.siteTitle} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={t.siteTitle} />
+    <meta name="twitter:description" content={t.tagline} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+  </head>
+  <body>
+    <!-- meta-refresh 를 무시하는 곳(스크래퍼·일부 접근성 도구)을 위한 실제 링크 -->
+    <a href={TARGET}>Redirecting to {TARGET}</a>
+    <script is:inline define:vars={{ TARGET }}>
+      // meta-refresh 는 뒤로가기 기록을 남겨 "뒤로" 가 다시 여기로 튕긴다. replace 가 그걸 막는다.
+      location.replace(TARGET);
+    </script>
+  </body>
+</html>

@@ -117,7 +117,13 @@ prettier가 `11~~14초`처럼 물결표를 붙여 정규화해두면 이 grep에
 - **색인 모니터링(팔로업)**: canonical 회수 후 영문 7편이 Google Search Console 에서
   "대체 페이지"에서 빠지고 색인으로 넘어오는지 확인(수 주 걸림).
 - GSC 의 **"'NOINDEX' 태그에 의해 제외"는 `https://jieun.dev/` 한 건이 정상**이다.
-  `astro.config.mjs` 의 `redirects: {'/': '/ko/'}` 가 만드는 meta-refresh 스텁에 Astro 가
-  `noindex` 를 자동으로 넣는다. GitHub Pages 는 서버 301 을 못 써서 이게 유일한 수단 —
-  고장이 아니니 손대지 말 것.
+  루트는 `src/pages/index.astro` 가 그리는 meta-refresh 스텁(→ `/ko/`)이고 `noindex` 가 붙어 있다.
+  GitHub Pages 는 서버 301 을 못 써서 meta-refresh 가 유일한 수단 — 고장이 아니니 손대지 말 것.
+  - 예전엔 `astro.config.mjs` 의 `redirects` 가 만들어 줬는데, **그 스텁엔 `og:` 태그가 없어서**
+    맨 주소(`jieun.dev`)를 링크드인·카톡에 붙이면 카드가 비었다. 사람들이 공유하는 건 거의
+    맨 주소라, 스텁을 직접 그려 배너를 붙였다(2026-09-20).
+  - Astro 5 는 `i18n.routing.redirectToDefaultLocale` 이 기본 `true` 라 `/` 를 자동으로
+    `/en/` 으로 보내며 이 페이지를 덮는다. `false` 로 꺼둬야 스텁이 이긴다.
+  - 루트는 **사이트맵에서 뺀다**(`sitemap` 의 `filter`). noindex 라고 해놓고 사이트맵으로
+    내미는 건 어긋나는 신호다.
 - Search Console: `jieun.dev` 도메인 속성 등록됨, sitemap `sitemap-index.xml` 제출됨.
