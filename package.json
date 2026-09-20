@@ -8,7 +8,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "og": "node scripts/gen-og.mjs"
+    "og": "node scripts/gen-og.mjs",
+    "icons": "node scripts/gen-icons.mjs"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.11",

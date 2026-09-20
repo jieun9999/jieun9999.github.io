@@ -71,8 +71,16 @@ Lightbox   본문 이미지 클릭 확대 (평소엔 숨김)
     브라우저 테마(`prefers-color-scheme`)를 따라 워드마크의 J 처럼 뒤집는다 — 밝은 탭 바엔 에버그린 J, 어두운 탭 바엔 민트 J.
     SVG 파비콘을 못 쓰는 곳(Safari 등)이 받는 `favicon.ico`(16·32·48)·`favicon-96x96.png` 는 색을 못 바꾸니
     밝은 탭용(에버그린 J + 민트 잎맥) 투명 PNG 다. 헤드리스 크롬으로 `favicon.svg` 를 라이트로 렌더해 만든다.
-  - `apple-touch-icon`·`web-app-manifest-*` 는 아직 예전 나무 그림이다. 홈 화면 아이콘은 iOS 가 투명한 곳을 검게 채우므로
-    바꿀 때도 타일(`design/brand/jieun-icon-square.*`)을 쓴다. SNS 카드 로고는 `design/brand/jieun-icon.svg`(타일).
+  - `apple-touch-icon`·`web-app-manifest-*` 도 2026-09-20 에 J 로 바꿨다. `npm run icons`(`scripts/gen-icons.mjs`)가
+    브랜드 SVG 를 헤드리스 크롬으로 1024 에 그려 줄인다 — `npm run og` 처럼 CI 에서는 돌지 않으니 결과 PNG 를 커밋한다.
+    | 파일 | 원본 | 왜 |
+    | --- | --- | --- |
+    | `apple-touch-icon.png` 180 | `jieun-icon-square.svg` | 아이폰 홈 화면. iOS 가 스스로 모서리를 둥글리고 **투명한 곳은 검게 채우므로** 모서리 없는 정사각을 쓴다 |
+    | `web-app-manifest-192·512.png` | `jieun-icon.svg` | `purpose: any` — 플랫폼이 자르지 않으니 타일이 스스로 둥근 모서리를 갖는다. 모서리는 투명 |
+    | `web-app-manifest-maskable-512.png` | `jieun-icon-square.svg` + J 0.86 축소 | `purpose: maskable` — 가운데 80% 원 밖은 잘릴 수 있어 J 를 안전권 안으로 넣었다. 배경은 꽉 채운다 |
+    SNS 카드 로고는 `design/brand/jieun-icon.svg`(타일).
+  - `site.webmanifest` 의 `theme_color`·`background_color` 는 `global.css` 의 라이트 `--bg`(`#ffffff`)와 같은 값이다.
+    홈 화면에서 연 직후 스플래시 색이라, 배경 토큰을 바꾸면 여기도 맞춘다.
 - **메뉴**: 홈 · 소개 · 태그, 16px/600, 간격 16px.
   - 현재 메뉴는 **초록 글자 + 2px 초록 밑줄**(글자 아래 6px). 글자색만으론 검정과 구분이 잘 안 돼서 밑줄을 넣었다.
   - hover 하면 같은 밑줄이 가운데서 펼쳐진다.
