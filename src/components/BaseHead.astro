@@ -36,7 +36,7 @@ const selfUrl = new URL(Astro.url.pathname, site).href;
 const canonical = canonicalURL ?? selfUrl;
 // 기본 배너. 브랜드가 바뀌면 파일명의 버전을 올린다 — 링크드인·카톡 등은 이미지를
 // URL 단위로 캐시해서, 같은 경로에 덮어쓰면 예전 그림이 계속 나온다.
-const ogImage = new URL(image ?? '/og-default-v5.jpg', site).href;
+const ogImage = new URL(image ?? '/og-default-v6.jpg', site).href;
 
 // hreflang 절대 URL 목록 (구글에게 "같은 글의 다른 언어 버전"임을 알림)
 const hreflangs = Object.entries(alternates).map(([l, path]) => ({

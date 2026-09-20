@@ -40,8 +40,9 @@ Hashnode 에 맡기는 2채널 구조였다. Hashnode 가 GraphQL API 를 Pro �
 ### SNS 공유 카드 (`public/og/`)
 
 `scripts/gen-og.mjs` 가 frontmatter(title·category·pubDate)를 읽어 언어별로 한 장씩
-만든다. 템플릿은 `scripts/og-card.html` — 색은 `global.css` 의 라이트 팔레트(포인트 에버그린)와
+만든다. 템플릿은 `scripts/og-card.html` — 색은 `global.css` 의 **다크 팔레트(`html.dark`)** 와
 같은 값이고, 폰트도 사이트와 같은 Nunito + Pretendard 다. 사이트 색을 바꾸면 템플릿도 맞춘다.
+⚠ 카드가 다크인 것과 **사이트 테마는 무관하다** — 사이트는 OS 설정·KST 시각으로 정한다.
 로고는 `design/brand/jieun-icon.svg`(에버그린 타일 + J — 파비콘은 여기서 타일을 뺀 것)를, 배너 이름은 헤더와 같은 워드마크를 쓴다 —
 브랜드를 바꾸면 템플릿의 워드마크 SVG 도 `BrandWordmark.astro` 에 맞추고 배너 버전을 올린다.
 
@@ -52,10 +53,11 @@ Hashnode 에 맡기는 2채널 구조였다. Hashnode 가 GraphQL API 를 Pro �
 - 제목이 길면 스크립트가 폰트 크기를 줄여 맞춘다. `[시리즈 N편]` 대괄호 프리픽스는
   자동으로 초록 칩으로 빠진다.
 - 빌드는 파일이 있을 때만 `og:image` 를 글별 카드로 걸고, 없으면 기본 배너
-  (`/og-default-v5.jpg`)로 폴백한다 — 404 미리보기가 나가지 않게.
+  (`/og-default-v6.jpg`)로 폴백한다 — 404 미리보기가 나가지 않게.
 - 기본 배너도 같은 스크립트가 같은 템플릿으로 만든다. 배너 디자인을 바꾸면 파일명 버전을
-  올리고 `BaseHead.astro` 기본값도 바꾼다(링크드인·카톡이 URL 단위로 캐시한다).
-  예전 배너(`og-default-v2.jpg`·`v3.jpg`·`v4.jpg`)는 이미 공유된 링크가 참조하니 지우지 않는다.
+  올리고 `BaseHead.astro` **와 `src/pages/index.astro`** 의 기본값도 바꾼다
+  (링크드인·카톡이 URL 단위로 캐시한다).
+  예전 배너(`og-default-v2.jpg` … `v5.jpg`)는 이미 공유된 링크가 참조하니 지우지 않는다.
 - `public/og/*.jpg`(언어 폴더 밖, 8장)는 **예전 경로**다. 이미 공유된 링크가
   참조하고 있어 남겨둔 것이니 지우지 않는다.
 

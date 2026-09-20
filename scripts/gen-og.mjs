@@ -9,7 +9,7 @@
  * public/og/<lang>/<slug>.jpg 를 만든다. 언어별로 따로 만들기 때문에
  * /ko/ 글을 공유하면 한글 제목 카드가 뜬다.
  *
- * 글이 아닌 페이지(홈·태그 등)가 쓰는 기본 배너 public/og-default-v5.jpg 도
+ * 글이 아닌 페이지(홈·태그 등)가 쓰는 기본 배너 public/og-default-v6.jpg 도
  * 같은 템플릿으로 만든다. 배너 디자인을 바꾸면 파일명의 버전을 올린다 —
  * 링크드인·카톡은 이미지를 URL 단위로 캐시해서, 같은 경로에 덮어쓰면 예전
  * 그림이 계속 나온다. (BaseHead.astro 의 기본값도 함께 바꾼다)
@@ -134,11 +134,11 @@ for (const lang of fs.readdirSync(BLOG)) {
 }
 
 // 기본 배너
-const BANNER = path.join(ROOT, 'public/og-default-v5.jpg');
+const BANNER = path.join(ROOT, 'public/og-default-v6.jpg');
 if (FORCE || !fs.existsSync(BANNER)) {
   render({ banner: true }, BANNER);
   made++;
-  console.log('✓ og-default-v5.jpg');
+  console.log('✓ og-default-v6.jpg');
 }
 
 fs.rmSync(tmp, { recursive: true, force: true });
