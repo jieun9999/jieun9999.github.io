@@ -100,9 +100,14 @@ export default defineConfig({
     },
   },
 
-  // 최상단 '/' 방문 시 기본 언어로 보냄
+  // 최상단 '/' 방문 시 보낼 곳. 주 독자가 한국어라 /ko/ 로 보낸다.
+  //   ⚠ 이건 "사람이 jieun.dev 를 쳤을 때 어디로 가나"만 정한다. 검색엔진에게
+  //     기본 언어를 알리는 건 BaseHead 의 x-default(= en)와 sitemap 의
+  //     defaultLocale(= en) 쪽이고, 둘은 일부러 영어로 두었다 —
+  //     한국어/영어 어느 쪽도 아닌 검색 사용자에겐 영어판이 낫다.
+  //   ⚠ 이 스텁('/')에는 Astro 가 noindex 를 붙인다. 정상이다(CLAUDE.md 참고).
   redirects: {
-    '/': '/en/',
+    '/': '/ko/',
   },
 
   integrations: [

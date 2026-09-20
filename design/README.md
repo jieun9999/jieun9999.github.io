@@ -29,7 +29,8 @@ jieun.dev 의 화면을 **페이지(URL)마다 한 파일**로 적은 문서다.
 | [`404.md`](./404.md) | 없는 페이지 | `/404` | `src/pages/404.astro` |
 | [`og-card.md`](./og-card.md) | SNS 공유 카드 (사이트 밖) | `public/og/<lang>/<slug>.jpg` | `scripts/og-card.html`, `scripts/gen-og.mjs` |
 
-`/` 는 화면이 없다. `/en/` 으로 보내는 리디렉션 스텁이다(CLAUDE.md "배포 & 검증" 참고).
+`/` 는 화면이 없다. `/ko/` 로 보내는 리디렉션 스텁이다(CLAUDE.md "배포 & 검증" 참고).
+주 독자가 한국어라 사람은 한국어판으로 보내고, 검색엔진에 알리는 기본 언어(x-default)는 en 으로 둔다.
 
 ## 브랜드 파일 — `brand/`
 
