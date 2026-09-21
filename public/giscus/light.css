@@ -1,0 +1,202 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400..900;1,400..900&display=swap');
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css');
+
+/*! jieun.dev giscus 테마 — 라이트
+ *
+ * giscus 댓글창(iframe) 안쪽을 사이트 팔레트·글꼴에 맞춘다.
+ * `src/components/Comments.astro` 가 이 파일의 **절대 URL** 을 data-theme 으로 넘긴다.
+ *
+ * ⚠ 이 파일은 giscus.app 이 jieun.dev 에서 직접 받아간다. 그래서:
+ *   - 배포된 것만 쓰인다 — 로컬에서 고쳐도 배포 전엔 댓글창에 반영되지 않는다.
+ *   - 경로(`/giscus/light.css`)를 바꾸면 Comments.astro 도 같이 바꾼다.
+ *
+ * 색·글꼴 값은 `src/styles/global.css` 의 토큰과 같은 값이다. 사이트 색을 바꾸면 여기도 맞춘다.
+ * 아래 기본 블록은 giscus 공식 light 테마를 그대로 가져온 것이고, 그 다음 블록에서 우리 값으로 덮는다.
+ * (문서: design/post.md "댓글")
+ */
+
+/*! MIT License · Copyright (c) 2018 GitHub Inc.
+ * https://github.com/primer/primitives/blob/main/LICENSE
+ */
+
+main {
+  --color-prettylights-syntax-comment: #6e7781;
+  --color-prettylights-syntax-constant: #0550ae;
+  --color-prettylights-syntax-entity: #8250df;
+  --color-prettylights-syntax-storage-modifier-import: #24292f;
+  --color-prettylights-syntax-entity-tag: #116329;
+  --color-prettylights-syntax-keyword: #cf222e;
+  --color-prettylights-syntax-string: #0a3069;
+  --color-prettylights-syntax-variable: #953800;
+  --color-prettylights-syntax-brackethighlighter-unmatched: #82071e;
+  --color-prettylights-syntax-invalid-illegal-text: #f6f8fa;
+  --color-prettylights-syntax-invalid-illegal-bg: #82071e;
+  --color-prettylights-syntax-carriage-return-text: #f6f8fa;
+  --color-prettylights-syntax-carriage-return-bg: #cf222e;
+  --color-prettylights-syntax-string-regexp: #116329;
+  --color-prettylights-syntax-markup-list: #3b2300;
+  --color-prettylights-syntax-markup-heading: #0550ae;
+  --color-prettylights-syntax-markup-italic: #24292f;
+  --color-prettylights-syntax-markup-bold: #24292f;
+  --color-prettylights-syntax-markup-deleted-text: #82071e;
+  --color-prettylights-syntax-markup-deleted-bg: #ffebe9;
+  --color-prettylights-syntax-markup-inserted-text: #116329;
+  --color-prettylights-syntax-markup-inserted-bg: #dafbe1;
+  --color-prettylights-syntax-markup-changed-text: #953800;
+  --color-prettylights-syntax-markup-changed-bg: #ffd8b5;
+  --color-prettylights-syntax-markup-ignored-text: #eaeef2;
+  --color-prettylights-syntax-markup-ignored-bg: #0550ae;
+  --color-prettylights-syntax-meta-diff-range: #8250df;
+  --color-prettylights-syntax-brackethighlighter-angle: #57606a;
+  --color-prettylights-syntax-sublimelinter-gutter-mark: #8c959f;
+  --color-prettylights-syntax-constant-other-reference-link: #0a3069;
+  --color-btn-text: #24292f;
+  --color-btn-bg: #f6f8fa;
+  --color-btn-border: rgb(31 35 40 / 15%);
+  --color-btn-shadow: 0 1px 0 rgb(31 35 40 / 4%);
+  --color-btn-inset-shadow: inset 0 1px 0 rgb(255 255 255 / 25%);
+  --color-btn-hover-bg: #f3f4f6;
+  --color-btn-hover-border: rgb(31 35 40 / 15%);
+  --color-btn-active-bg: hsl(220deg 14% 93% / 100%);
+  --color-btn-active-border: rgb(31 35 40 / 15%);
+  --color-btn-selected-bg: hsl(220deg 14% 94% / 100%);
+  --color-btn-primary-text: #fff;
+  --color-btn-primary-bg: #1f883d;
+  --color-btn-primary-border: rgb(31 35 40 / 15%);
+  --color-btn-primary-shadow: 0 1px 0 rgb(31 35 40 / 10%);
+  --color-btn-primary-inset-shadow: inset 0 1px 0 rgb(255 255 255 / 3%);
+  --color-btn-primary-hover-bg: #1a7f37;
+  --color-btn-primary-hover-border: rgb(31 35 40 / 15%);
+  --color-btn-primary-selected-bg: hsl(137deg 66% 28% / 100%);
+  --color-btn-primary-selected-shadow: inset 0 1px 0 rgb(0 45 17 / 20%);
+  --color-btn-primary-disabled-text: rgb(255 255 255 / 80%);
+  --color-btn-primary-disabled-bg: #94d3a2;
+  --color-btn-primary-disabled-border: rgb(31 35 40 / 15%);
+  --color-action-list-item-default-hover-bg: rgb(208 215 222 / 32%);
+  --color-segmented-control-bg: #eaeef2;
+  --color-segmented-control-button-bg: #fff;
+  --color-segmented-control-button-selected-border: #8c959f;
+  --color-fg-default: #1F2328;
+  --color-fg-muted: #656d76;
+  --color-fg-subtle: #6e7781;
+  --color-canvas-default: #fff;
+  --color-canvas-overlay: #fff;
+  --color-canvas-inset: #f6f8fa;
+  --color-canvas-subtle: #f6f8fa;
+  --color-border-default: #d0d7de;
+  --color-border-muted: hsl(210deg 18% 87% / 100%);
+  --color-neutral-muted: rgb(175 184 193 / 20%);
+  --color-accent-fg: #0969da;
+  --color-accent-emphasis: #0969da;
+  --color-accent-muted: rgb(84 174 255 / 40%);
+  --color-accent-subtle: #ddf4ff;
+  --color-success-fg: #1a7f37;
+  --color-attention-fg: #9a6700;
+  --color-attention-muted: rgb(212 167 44 / 40%);
+  --color-attention-subtle: #fff8c5;
+  --color-danger-fg: #d1242f;
+  --color-danger-muted: rgb(255 129 130 / 40%);
+  --color-danger-subtle: #ffebe9;
+  --color-primer-shadow-inset: inset 0 1px 0 rgb(208 215 222 / 20%);
+  --color-scale-gray-1: #eaeef2;
+  --color-scale-blue-1: #b6e3ff;
+
+  /*! Extensions from @primer/css/alerts/flash.scss */
+  --color-social-reaction-bg-hover: var(--color-scale-gray-1);
+  --color-social-reaction-bg-reacted-hover: var(--color-scale-blue-1);
+}
+
+main .pagination-loader-container {
+  background-image: url("https://github.com/images/modules/pulls/progressive-disclosure-line.svg");
+}
+
+main .gsc-loading-image {
+  background-image: url("https://github.githubassets.com/images/mona-loading-default.gif");
+}
+
+/*! ▼ 여기서부터 jieun.dev 값 — global.css :root 와 같다 */
+main {
+  /* 글자 */
+  --color-fg-default: #27272a;            /* --text-2 */
+  --color-fg-muted: #71717a;              /* --text-subtle */
+  --color-fg-subtle: #a1a1aa;             /* --text-faint */
+
+  /* 면 */
+  --color-canvas-default: #ffffff;        /* --bg */
+  --color-canvas-overlay: #ffffff;
+  --color-canvas-subtle: #fafafa;         /* --bg-2 */
+  --color-canvas-inset: #fafafa;
+
+  /* 선 */
+  --color-border-default: #e4e4e7;        /* --border */
+  --color-border-muted: #ededef;
+  --color-neutral-muted: rgb(24 24 27 / 6%);
+
+  /* 포인트 — 링크·멘션·포커스 테두리 */
+  --color-accent-fg: #307252;             /* --accent */
+  --color-accent-emphasis: #307252;
+  --color-accent-muted: rgb(48 114 82 / 40%);
+  --color-accent-subtle: rgb(48 114 82 / 10%);
+  --color-success-fg: #307252;
+
+  /* 보조 버튼 */
+  --color-btn-text: #27272a;
+  --color-btn-bg: #f4f4f5;                /* --surface */
+  --color-btn-border: #e4e4e7;
+  --color-btn-shadow: 0 0 transparent;
+  --color-btn-inset-shadow: 0 0 transparent;
+  --color-btn-hover-bg: #e4e4e7;          /* --surface-2 */
+  --color-btn-hover-border: #d4d4d8;      /* --border-strong */
+  --color-btn-active-bg: #e4e4e7;
+  --color-btn-active-border: #d4d4d8;
+  --color-btn-selected-bg: #e4e4e7;
+
+  /* 주 버튼 — "GitHub으로 로그인" */
+  --color-btn-primary-text: #ffffff;      /* --accent-fg */
+  --color-btn-primary-bg: #307252;        /* --accent-bg */
+  --color-btn-primary-border: rgb(24 24 27 / 8%);
+  --color-btn-primary-shadow: 0 0 transparent;
+  --color-btn-primary-inset-shadow: 0 0 transparent;
+  --color-btn-primary-hover-bg: #195e3f;  /* --accent-hover */
+  --color-btn-primary-hover-border: rgb(24 24 27 / 8%);
+  --color-btn-primary-selected-bg: #195e3f;
+  --color-btn-primary-selected-shadow: 0 0 transparent;
+  --color-btn-primary-disabled-text: rgb(255 255 255 / 80%);
+  --color-btn-primary-disabled-bg: rgb(48 114 82 / 50%);
+  --color-btn-primary-disabled-border: rgb(24 24 27 / 8%);
+
+  /* 작성하기 / 미리보기 탭 */
+  --color-segmented-control-bg: #f4f4f5;
+  --color-segmented-control-button-bg: #ffffff;
+  --color-segmented-control-button-selected-border: #d4d4d8;
+
+  --color-action-list-item-default-hover-bg: rgb(24 24 27 / 5%);
+  --color-primer-shadow-inset: 0 0 transparent;
+
+  /* 이모지 반응 칩 */
+  --color-social-reaction-bg-hover: #f4f4f5;
+  --color-social-reaction-bg-reacted-hover: rgb(48 114 82 / 18%);  /* --accent-soft */
+}
+
+/*! 글꼴 — 사이트와 같은 Nunito + Pretendard(한글).
+ *  코드(pre·code)는 giscus 기본 고정폭을 그대로 둔다. */
+main,
+main input,
+main textarea,
+main button,
+main .markdown-body {
+  font-family: 'Nunito', 'Pretendard Variable', -apple-system, BlinkMacSystemFont,
+    'Apple SD Gothic Neo', 'Segoe UI', sans-serif;
+}
+
+/* 상자 모서리를 사이트 --radius-sm(8px)에 맞춘다 — giscus 기본은 6px */
+main .gsc-comment > div,
+main .gsc-comment-box,
+main .gsc-reply-box {
+  border-radius: 8px;
+}
+
+/* 댓글 수는 사이트 제목처럼 굵게 */
+main .gsc-comments-count {
+  font-weight: 800;
+}
