@@ -1,0 +1,68 @@
+---
+// 글 아래 댓글 — giscus (GitHub Discussions). GitHub 로그인만 하면 누구나 남길 수 있다.
+// 스레드는 URL 경로(mapping=pathname)로 잡히므로 /en/ 과 /ko/ 판이 각각 따로 쌓인다.
+// 설정값은 design/post.md "댓글" 참고. 레포/카테고리를 옮기면 아래 네 값을 같이 바꾼다.
+import { ui, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = ui[lang];
+
+const giscus = {
+  repo: 'jieun9999/jieun9999.github.io',
+  'repo-id': 'R_kgDOTON5cA',
+  category: 'Announcements',
+  'category-id': 'DIC_kwDOTON5cM4DGEZB',
+  mapping: 'pathname',
+  strict: '1',
+  'reactions-enabled': '1',
+  'emit-metadata': '0',
+  'input-position': 'bottom',
+  lang,
+  loading: 'lazy',
+};
+---
+
+<section class="post-comments" aria-label={t.comments}>
+  <p class="eyebrow">{t.comments}</p>
+  <div class="giscus-mount"></div>
+</section>
+
+<style>
+  .post-comments {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 56px;
+    padding-top: 40px;
+    border-top: 1px solid var(--border);
+  }
+  /* 아직 안 뜬 댓글창 자리를 잡아둔다 — 스크롤이 튀지 않게 */
+  .giscus-mount { min-height: 200px; }
+</style>
+
+<script is:inline define:vars={{ giscus }}>
+  (() => {
+    const mount = document.querySelector('.post-comments .giscus-mount');
+    if (!mount) return;
+    const de = document.documentElement;
+    // 사이트 다크 팔레트는 giscus 기본 테마보다 어둡다 — 배경이 비치는 테마를 써서 면을 맞춘다
+    const theme = () => (de.classList.contains('dark') ? 'transparent_dark' : 'light');
+
+    const s = document.createElement('script');
+    s.src = 'https://giscus.app/client.js';
+    s.async = true;
+    s.crossOrigin = 'anonymous';
+    for (const [k, v] of Object.entries({ ...giscus, theme: theme() })) s.setAttribute(`data-${k}`, v);
+    mount.appendChild(s);
+
+    // 헤더 토글·시각에 따른 자동 전환 모두 html.dark 로 나타난다 — 그 변화를 댓글창에 넘긴다
+    new MutationObserver(() => {
+      const frame = document.querySelector('iframe.giscus-frame');
+      if (!frame) return;
+      frame.contentWindow.postMessage({ giscus: { setConfig: { theme: theme() } } }, 'https://giscus.app');
+    }).observe(de, { attributes: true, attributeFilter: ['class'] });
+  })();
+</script>
