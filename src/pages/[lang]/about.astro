@@ -23,9 +23,9 @@ const copy = {
   ko: {
     greeting: '안녕하세요 개발자 정지은입니다.',
     photoAlt: '정지은',
-    summary: '사람들이 실제로 계속 사용하는 서비스를 만드는 일을 개발의 기준으로 삼고 있습니다.',
+    summary: '서비스는 사람들이 실제로 계속 사용할 때 비로소 의미가 있다고 생각합니다.',
     bio: [
-      '사람들이 실제로 계속 사용하는 서비스를 만드는 일을 개발의 기준으로 삼고 있습니다.',
+      '==서비스는 사람들이 실제로 계속 사용할 때 비로소 의미가 있다고 생각합니다.==',
       '자동화 블로그 SaaS인 위블로그를 만들면서, 글이 어떤 구조를 가져야 구글에 잘 색인되는지, 사람들이 실제로 검색하는 글 제목은 무엇인지, 매일 글을 발행하는 운영자가 무엇을 가장 오래 고민하는지 살폈습니다.',
       '==기능을 많이 붙이는 일보다 먼저 해야 할 일은, 블로그를 운영하는 사람이 어디에서 막히는지 알아내고 그 문제를 해결하는 것이라고 생각합니다.==',
       '자동화하더라도 사람의 판단까지 없애고 싶지는 않습니다. 사람이 고른 자료와 내린 결정은 남겨두고, 반복되는 수집·생성·발행은 시스템에 맡기는 쪽을 좋아합니다. 검증에 필요한 지표가 충분히 쌓이지 않았다면 성과를 쉽게 말하지 않습니다.',
@@ -34,12 +34,16 @@ const copy = {
     ],
   },
   en: {
-    greeting: "Hi, I'm Jieun Jeong",
+    greeting: "Hello, I'm Jieun Jeong, a developer.",
     photoAlt: 'Jieun Jeong',
-    summary: 'A backend engineer who owns a service end to end, from design to deployment and operations.',
+    summary: 'I believe a service only has meaning when people keep using it in practice.',
     bio: [
-      "I'm a backend engineer who owns a service end to end, from design to deployment and operations.",
-      "Building a blog automation SaaS from scratch, I designed the pipeline that runs from keyword discovery to publishing on a custom domain, along with zero-downtime deploys. I'm strongest at choosing by measuring cost and speed, and at moving slow work off the request path. I write up what I fixed along the way on this blog.",
+      "==I believe a service only has meaning when people keep using it in practice.==",
+      "While building WeBlog, an automated blogging SaaS, I kept asking what structure helps posts get indexed by Google, what titles people actually search for, and what operators publishing every day spend the most time worrying about.",
+      "==Before adding more features, I believe the first thing to do is find where the person running the blog gets stuck and solve that problem.==",
+      "Even when automating, I don't want to remove human judgment. I prefer leaving the materials people choose and the decisions they make in place, while handing repetitive collection, generation, and publishing to the system. If there isn't enough data to validate the result, I don't make easy claims about performance.",
+      "==I treat the costs, delays, and possibilities of failure that arise in real operation as part of the design.==",
+      "Ultimately, I don't want a service that only looks technically impressive. ==I want a service that is easy for users to use, manageable for operators, and able to recover when something goes wrong.== This blog records what I chose, what I gave up, and why I later changed those decisions while building services like that.",
     ],
   },
 } satisfies Record<Lang, { greeting: string; photoAlt: string; summary: string; bio: string[] }>;
