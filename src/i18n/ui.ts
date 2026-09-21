@@ -19,6 +19,7 @@ export const ui = {
     minRead: 'min read',
     backToTop: 'Back to top',
     seriesLabel: 'Series',
+    comments: 'Comments',
     // 내비게이션·섹션 라벨
     home: 'Home',
     articles: 'Articles',
@@ -51,6 +52,7 @@ export const ui = {
     minRead: '분 분량',
     backToTop: '맨 위로',
     seriesLabel: '시리즈',
+    comments: '댓글',
     home: '홈',
     articles: '글',
     tags: '태그',

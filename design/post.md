@@ -6,7 +6,7 @@
 | --- | --- |
 | URL | `/[lang]/blog/<slug>/` (slug = 파일명, CLAUDE.md "새 글 쓸 때 규칙") |
 | 소스 | 경로 `src/pages/[lang]/blog/[...slug].astro` → 화면 `src/layouts/PostLayout.astro` |
-| 컴포넌트 | `PostMeta`, `ProfileWidget`, `SocialLinks`, `BackToTop` + 본문 스타일 `global.css .prose` |
+| 컴포넌트 | `PostMeta`, `ProfileWidget`, `SocialLinks`, `BackToTop`, `Comments` + 본문 스타일 `global.css .prose` |
 | 헤더 현재 메뉴 | 홈 |
 | 검색 노출 | ✓ (canonical 은 self — CLAUDE.md) |
 | 페이지 제목 | "<글 제목> · Jieun" / 설명 = frontmatter `description` / 공유 이미지 = [`og-card.md`](./og-card.md) |
@@ -42,6 +42,11 @@
 │ │ #tag  #tag  #tag                         │ ┆                       │
 │ │ NEXT ARTICLE                             │ ┆                       │
 │ │ ┌[이미지 118]  다음 글 제목 18/800 ─────┐ │ ┆                       │
+│ │ ───────────────────────────────────────  │ ┆                       │
+│ │ 댓글                                      │ ┆                       │
+│ │ ┌ giscus (GitHub Discussions) ───────┐    │ ┆                       │
+│ │ │ 댓글 N개 · 로그인해서 댓글 남기기    │    │ ┆                       │
+│ │ └──────────────────────────────────┘    │ ┆                       │
 │ └──────────────────────────────────────────┘ ┆                       │
 │                    ┆ = 1px 세로선 (위아래로 흐려지는 그라데이션), 간격 48 │
 └ Footer ─────────────────────────────────────────────────────────────┘
@@ -55,7 +60,7 @@
 │ │ 2  원인                              │
 │ │    …                                 │
 └──────────────────────────────────────┘
-본문 · 태그 · 다음 글
+본문 · 태그 · 다음 글 · 댓글
 프로필 위젯 (최대 360px)
 ```
 
@@ -120,6 +125,23 @@ frontmatter `series` 가 있을 때만. 위 32px.
 - **"다음 글" = 이어서 읽을 더 오래된 글.** 가장 오래된 글이면 대신 더 최신 글을 "최신 글 / Newer Article" 로 건다.
 - 카드: `--bg-2` 면 + `--border` + `--radius-lg`, 안쪽 14px, hover `--surface`. 왼쪽 커버 118px(비율 1.5, `--radius-sm`, 커버 없으면 생략) + 제목 18px/800.
 
+### 댓글 — `.post-comments` (`src/components/Comments.astro`)
+
+다음 글 아래 56px, 위에 `--border` 구분선 + 40px 여백. 라벨 `.eyebrow`("댓글 / Comments") 아래 **giscus** 창.
+
+- **giscus = GitHub Discussions 로 굴러가는 댓글.** 방문자는 GitHub 로그인만 하면 남길 수 있고, 답글·이모지 리액션도 된다. 별도 서버·DB 가 없다.
+- 설정은 `Comments.astro` 위쪽 `giscus` 객체 한 곳에 모아 두었다.
+
+  | 값 | 지금 | 뜻 |
+  | --- | --- | --- |
+  | `repo` · `repo-id` | `jieun9999/jieun9999.github.io` · `R_kgDOTON5cA` | 댓글이 쌓이는 레포 |
+  | `category` · `category-id` | `Announcements` · `DIC_kwDOTON5cM4DGEZB` | 글마다 디스커션 하나. 관리자만 새로 못 열게 잠긴 카테고리라 스팸이 덜하다 |
+  | `mapping` · `strict` | `pathname` · `1` | **URL 경로로 스레드를 잡는다** → `/en/` 과 `/ko/` 판은 댓글이 따로 쌓인다. `strict` 는 비슷한 제목에 잘못 붙는 걸 막는다 |
+  | `lang` | 글 언어 | 댓글창 UI 언어도 글을 따라간다 |
+  | `loading` | `lazy` | 화면에 들어올 때 뜬다. 자리는 `min-height: 200px` 로 미리 잡아 스크롤이 튀지 않게 |
+
+- 창이 뜨기 전에 현재 테마를 읽어 `data-theme` 으로 넘기고, 그 뒤 `html.dark` 변화를 `MutationObserver` 로 지켜보다 `postMessage` 로 넘긴다 (헤더 토글·시각에 따른 자동 전환 둘 다).
+
 ### 사이드바 — 데스크톱만 옆에
 
 - 폭 240px, 화면 위 30px 에 붙어 따라온다. 내용이 길면 사이드바 안에서 스크롤(막대는 숨김). 항목 간격 48px.
@@ -173,7 +195,7 @@ frontmatter `series` 가 있을 때만. 위 32px.
 
 ### 2. 그 아래 — 화면에 들어올 때 (ScrollTrigger.batch)
 
-- 대상: 본문의 **소제목(h2·h3) · 코드 블록 · 표 · 인용 · 콜아웃 · 그림**, 태그, 다음 글. 좁은 화면(≤1199)에선 맨 아래로 내려간 사이드바(프로필)도.
+- 대상: 본문의 **소제목(h2·h3) · 코드 블록 · 표 · 인용 · 콜아웃 · 그림**, 태그, 다음 글, 댓글. 좁은 화면(≤1199)에선 맨 아래로 내려간 사이드바(프로필)도.
 - **문단은 움직이지 않는다.** 긴 글을 읽는 흐름을 끊지 않게.
 - 화면 아래 92% 선에 닿으면 y 32 → 0 으로 떠오른다. 한 번만.
 - **처음에 화면 아래 있던 것만 숨긴다.** 이미 보이는 걸 숨겼다 띄우면 깜빡인다.
@@ -202,11 +224,12 @@ frontmatter `series` 가 있을 때만. 위 32px.
 - 코드 블록이 `github-dark` 로 바뀐다 (`html.dark` 기준).
 - 콜아웃 의미 색이 밝은 쪽으로 바뀐다.
 - 진행바·지금 챕터 레일은 밝은 초록.
+- 댓글창(giscus)은 라이트에서 `light`, 다크에서 **`transparent_dark`** 를 쓴다 — 사이트 다크 배경이 giscus 기본 다크보다 어두워서, 배경이 비치는 테마라야 면이 이어진다.
 
 ## 한/영 차이
 
 - 번역이 있으면 헤더 언어 버튼이 **그 번역 글**로, 없으면 다른 언어 홈으로 간다. `hreflang` 은 실제 있는 번역만 건다.
-- 라벨: "On this page / 목차", "Series / 시리즈", "Next Article / 다음 글", "Newer Article / 최신 글", "min read / 분 분량", "Updated / 수정".
+- 라벨: "On this page / 목차", "Series / 시리즈", "Next Article / 다음 글", "Newer Article / 최신 글", "min read / 분 분량", "Updated / 수정", "Comments / 댓글".
 - 날짜 형식은 언어별.
 
 ## 규칙
@@ -217,8 +240,12 @@ frontmatter `series` 가 있을 때만. 위 32px.
 - 목차가 보기 좋으려면 h2 를 `1. 주제 — 부제` (앞뒤 공백 있는 em dash) 로 쓴다.
 - 캡션을 달고 싶은 이미지는 **문단에 이미지만** 두고 alt 에 캡션 문장을 쓴다.
 - 새 본문 요소를 만들면 `.prose` 에 넣고 이 문서의 본문 표에 한 줄 추가한다.
+- 🔴 **글 URL 을 바꾸면 그 글에 달린 댓글이 끊긴다.** `mapping=pathname` 이라 경로가 곧 스레드 열쇠다. 옮겨야 하면 해당 디스커션 제목을 새 경로로 고친다.
+- 🔴 댓글 레포·카테고리를 옮기면 `Comments.astro` 의 네 값(`repo`·`repo-id`·`category`·`category-id`)을 **같이** 바꾸고 이 문서 표도 고친다. 옛 댓글은 따라오지 않는다.
 
 ## 알아둘 것
 
 - 사이드바 목차는 챕터 묶기·읽은 챕터 표시·위치 숫자까지 붙인 버전이다(`0f86477`). 예전엔 h2·h3 를 평평하게 나열했다.
 - 태블릿·모바일의 접는 목차는 처음엔 h2·h3 를 평평하게 나열했다(h3 만 들여쓰기). 사이드바와 같은 `chapters` 데이터로 챕터별로 묶었다 (2026-09-19). 스크롤 추적 스크립트는 `.toc .chapter` 만 보므로 접는 목차에는 걸리지 않는다.
+- 댓글은 올리브영 기술블로그처럼 GitHub 로그인 방식으로 붙였다 (2026-09-21). 거기 쓰인 **utterances**(Issues 기반) 대신 후속판인 **giscus**(Discussions 기반)를 골랐다 — utterances 는 2022 년 이후 사실상 관리가 멈췄고, 답글 스레드·한국어 UI·테마 전환이 없다. Discussions 를 쓰면 블로그 코드 이슈와 댓글이 탭으로 갈린다.
+- giscus 창 안쪽은 GitHub 기본 생김새다(글꼴·초록 포인트색이 사이트와 다르다). 맞추려면 giscus 커스텀 테마 CSS 를 `public/` 에 올리고 `data-theme` 을 그 URL 로 주면 된다 — 지금은 안 했다.
