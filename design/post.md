@@ -139,8 +139,27 @@ frontmatter `series` 가 있을 때만. 위 32px.
   | `mapping` · `strict` | `pathname` · `1` | **URL 경로로 스레드를 잡는다** → `/en/` 과 `/ko/` 판은 댓글이 따로 쌓인다. `strict` 는 비슷한 제목에 잘못 붙는 걸 막는다 |
   | `lang` | 글 언어 | 댓글창 UI 언어도 글을 따라간다 |
   | `loading` | `lazy` | 화면에 들어올 때 뜬다. 자리는 `min-height: 200px` 로 미리 잡아 스크롤이 튀지 않게 |
+  | `theme` | `/giscus/light.css` · `/giscus/dark.css` | **사이트 팔레트·글꼴로 맞춘 커스텀 테마** (아래) |
 
 - 창이 뜨기 전에 현재 테마를 읽어 `data-theme` 으로 넘기고, 그 뒤 `html.dark` 변화를 `MutationObserver` 로 지켜보다 `postMessage` 로 넘긴다 (헤더 토글·시각에 따른 자동 전환 둘 다).
+
+#### 댓글창 테마 — `public/giscus/light.css` · `dark.css`
+
+giscus 기본 생김새(GitHub 파랑 링크 · GitHub 초록 버튼 · 시스템 글꼴)는 글 아래 붙은 남의 위젯처럼 보인다.
+그래서 **커스텀 테마 CSS 두 장**으로 댓글창 안쪽을 사이트에 맞췄다.
+
+- 각 파일은 giscus 공식 테마(`light` · `transparent_dark`)를 그대로 옮겨 놓고, 그 아래 블록에서
+  `global.css` 와 **같은 값**으로 덮는다. 링크·버튼은 상록 초록(`--accent`), 면·선은 사이트 토큰.
+  다크는 `--color-canvas-*` 를 투명하게 둬서 사이트 배경(`#040405`)이 그대로 비친다.
+- 주 버튼("GitHub으로 로그인")은 사이트와 같은 뒤집기 — 라이트는 초록 면에 흰 글자, 다크는 밝은 초록 면에 검은 글자.
+- 글꼴은 사이트와 같은 Nunito + Pretendard 를 **CDN 에서** 불러온다. 번들한 글꼴은 Astro 가 해시 이름을 붙여
+  iframe 안에서 가리킬 수 없다. 코드(`pre`·`code`)는 giscus 기본 고정폭을 그대로 둔다.
+- 코드 하이라이트 색(`--color-prettylights-*`)은 giscus 기본을 둔다 — 본문 코드 블록도 같은 GitHub 테마라 결이 맞는다.
+
+**고칠 때 알아둘 것**: 이 CSS 는 giscus.app 이 `jieun.dev` 에서 직접 받아간다.
+그래서 **배포된 것만 쓰인다** — 로컬에서 고쳐도 배포 전엔 댓글창에 반영되지 않는다.
+미리 보려면 브랜치를 푸시하고 jsdelivr(`cdn.jsdelivr.net/gh/<owner>/<repo>@<sha>/public/giscus/<name>.css`)로
+`data-theme` 을 잠깐 돌려 확인하면 된다.
 
 ### 사이드바 — 데스크톱만 옆에
 
@@ -224,7 +243,7 @@ frontmatter `series` 가 있을 때만. 위 32px.
 - 코드 블록이 `github-dark` 로 바뀐다 (`html.dark` 기준).
 - 콜아웃 의미 색이 밝은 쪽으로 바뀐다.
 - 진행바·지금 챕터 레일은 밝은 초록.
-- 댓글창(giscus)은 라이트에서 `light`, 다크에서 **`transparent_dark`** 를 쓴다 — 사이트 다크 배경이 giscus 기본 다크보다 어두워서, 배경이 비치는 테마라야 면이 이어진다.
+- 댓글창(giscus)은 커스텀 테마 두 장을 갈아 끼운다(`/giscus/light.css` · `/giscus/dark.css`). 다크 쪽은 면을 투명하게 둬서 사이트 배경이 그대로 비친다 — giscus 기본 다크는 사이트보다 밝아 면이 떠 보인다.
 
 ## 한/영 차이
 
@@ -242,10 +261,11 @@ frontmatter `series` 가 있을 때만. 위 32px.
 - 새 본문 요소를 만들면 `.prose` 에 넣고 이 문서의 본문 표에 한 줄 추가한다.
 - 🔴 **글 URL 을 바꾸면 그 글에 달린 댓글이 끊긴다.** `mapping=pathname` 이라 경로가 곧 스레드 열쇠다. 옮겨야 하면 해당 디스커션 제목을 새 경로로 고친다.
 - 🔴 댓글 레포·카테고리를 옮기면 `Comments.astro` 의 네 값(`repo`·`repo-id`·`category`·`category-id`)을 **같이** 바꾸고 이 문서 표도 고친다. 옛 댓글은 따라오지 않는다.
+- 🔴 사이트 색 토큰을 바꾸면 `public/giscus/*.css` 의 덮어쓰기 블록도 같이 바꾼다. 거기 값은 `global.css` 를 손으로 베껴 둔 것이라 자동으로 따라오지 않는다 (SNS 카드 템플릿과 같은 사정 — [`og-card.md`](./og-card.md)).
 
 ## 알아둘 것
 
 - 사이드바 목차는 챕터 묶기·읽은 챕터 표시·위치 숫자까지 붙인 버전이다(`0f86477`). 예전엔 h2·h3 를 평평하게 나열했다.
 - 태블릿·모바일의 접는 목차는 처음엔 h2·h3 를 평평하게 나열했다(h3 만 들여쓰기). 사이드바와 같은 `chapters` 데이터로 챕터별로 묶었다 (2026-09-19). 스크롤 추적 스크립트는 `.toc .chapter` 만 보므로 접는 목차에는 걸리지 않는다.
 - 댓글은 올리브영 기술블로그처럼 GitHub 로그인 방식으로 붙였다 (2026-09-21). 거기 쓰인 **utterances**(Issues 기반) 대신 후속판인 **giscus**(Discussions 기반)를 골랐다 — utterances 는 2022 년 이후 사실상 관리가 멈췄고, 답글 스레드·한국어 UI·테마 전환이 없다. Discussions 를 쓰면 블로그 코드 이슈와 댓글이 탭으로 갈린다.
-- giscus 창 안쪽은 GitHub 기본 생김새다(글꼴·초록 포인트색이 사이트와 다르다). 맞추려면 giscus 커스텀 테마 CSS 를 `public/` 에 올리고 `data-theme` 을 그 URL 로 주면 된다 — 지금은 안 했다.
+- 처음엔 giscus 기본 테마(`light`·`transparent_dark`)를 썼고, 하루 뒤 커스텀 테마 CSS 로 사이트 팔레트·글꼴에 맞췄다 (2026-09-21).

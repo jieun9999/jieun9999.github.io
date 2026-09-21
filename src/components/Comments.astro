@@ -10,6 +10,11 @@ interface Props {
 const { lang } = Astro.props;
 const t = ui[lang];
 
+// 댓글창 안쪽 생김새는 public/giscus/{light,dark}.css 가 맡는다. giscus.app 이 이 URL 을
+// 직접 받아가므로 **배포된 절대 URL** 이어야 한다 — 로컬에서 고친 CSS 는 배포 전엔 안 보인다.
+const themeURL = (name: 'light' | 'dark') => new URL(`/giscus/${name}.css`, Astro.site).href;
+const themes = { light: themeURL('light'), dark: themeURL('dark') };
+
 const giscus = {
   repo: 'jieun9999/jieun9999.github.io',
   'repo-id': 'R_kgDOTON5cA',
@@ -43,13 +48,12 @@ const giscus = {
   .giscus-mount { min-height: 200px; }
 </style>
 
-<script is:inline define:vars={{ giscus }}>
+<script is:inline define:vars={{ giscus, themes }}>
   (() => {
     const mount = document.querySelector('.post-comments .giscus-mount');
     if (!mount) return;
     const de = document.documentElement;
-    // 사이트 다크 팔레트는 giscus 기본 테마보다 어둡다 — 배경이 비치는 테마를 써서 면을 맞춘다
-    const theme = () => (de.classList.contains('dark') ? 'transparent_dark' : 'light');
+    const theme = () => (de.classList.contains('dark') ? themes.dark : themes.light);
 
     const s = document.createElement('script');
     s.src = 'https://giscus.app/client.js';
