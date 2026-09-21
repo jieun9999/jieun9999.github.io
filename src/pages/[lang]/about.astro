@@ -15,6 +15,10 @@ export function getStaticPaths() {
 const { lang } = Astro.params as { lang: Lang };
 const t = ui[lang];
 
+function emphasisParts(value: string) {
+  return value.split(/(\*\*[^*]+\*\*)/g);
+}
+
 const copy = {
   ko: {
     greeting: '안녕하세요, 정지은입니다',
@@ -22,9 +26,9 @@ const copy = {
     summary: '사람들이 실제로 계속 사용할 수 있는 서비스를 만들고 싶습니다.',
     bio: [
       '저는 사람들이 실제로 계속 사용할 수 있는 서비스를 만들고 싶습니다.',
-      '자동화 블로그 SaaS인 위블로그를 만들면서, 글이 어떤 구조를 가져야 구글에 잘 색인되는지, 사람들이 실제로 검색하는 글 제목은 무엇인지, 매일 글을 발행하는 운영자가 무엇을 가장 오래 고민하는지 살폈습니다. 기능을 많이 붙이는 일보다 먼저 해야 할 일은, 블로그를 운영하는 사람이 어디에서 막히는지 알아내고 그 문제를 해결하는 것이라고 생각합니다.',
-      '자동화하더라도 사람의 판단까지 없애고 싶지는 않습니다. 사람이 고른 자료와 내린 결정은 남겨두고, 반복되는 수집·생성·발행은 시스템에 맡기는 쪽을 좋아합니다. 검증에 필요한 지표가 충분히 쌓이지 않았다면 성과를 쉽게 말하지 않고, 서비스가 실제로 운영되는 과정에서 생기는 비용·지연시간·실패 가능성까지 설계의 일부로 봅니다.',
-      '결국 제가 만들고 싶은 건 기술적으로만 그럴듯한 서비스가 아닙니다. 사용자가 편하게 쓰고, 운영자가 감당할 수 있고, 문제가 생겨도 다시 회복할 수 있는 서비스입니다. 이 블로그에는 그런 서비스를 만들어 가며 무엇을 선택했고, 무엇을 포기했고, 그 선택을 왜 다시 바꾸었는지를 기록합니다.',
+      '**자동화 블로그 SaaS인 위블로그**를 만들면서, 글이 어떤 구조를 가져야 **구글에 잘 색인되는지**, **사람들이 실제로 검색하는 글 제목**은 무엇인지, **매일 글을 발행하는 운영자**가 무엇을 가장 오래 고민하는지 살폈습니다. 기능을 많이 붙이는 일보다 먼저 해야 할 일은, 블로그를 운영하는 사람이 어디에서 막히는지 알아내고 그 문제를 해결하는 것이라고 생각합니다.',
+      '자동화하더라도 **사람의 판단**까지 없애고 싶지는 않습니다. 사람이 고른 자료와 내린 결정은 남겨두고, **반복되는 수집·생성·발행**은 시스템에 맡기는 쪽을 좋아합니다. 검증에 필요한 지표가 충분히 쌓이지 않았다면 성과를 쉽게 말하지 않고, 서비스가 실제로 운영되는 과정에서 생기는 **비용·지연시간·실패 가능성**까지 설계의 일부로 봅니다.',
+      '결국 제가 만들고 싶은 건 기술적으로만 그럴듯한 서비스가 아닙니다. **사용자가 편하게 쓰고**, **운영자가 감당할 수 있고**, **문제가 생겨도 다시 회복할 수 있는** 서비스입니다. 이 블로그에는 그런 서비스를 만들어 가며 무엇을 선택했고, 무엇을 포기했고, 그 선택을 왜 다시 바꾸었는지를 기록합니다.',
     ],
   },
   en: {
@@ -51,7 +55,13 @@ const words = c.greeting.split(/\s+/).filter(Boolean);
           <h1 id="about-title">
             {words.map((w, i) => <>{i > 0 && ' '}<span>{w}</span></>)}
           </h1>
-          {c.bio.map((paragraph) => <p class="bio">{paragraph}</p>)}
+          {c.bio.map((paragraph) => (
+            <p class="bio">
+              {emphasisParts(paragraph).map((part) =>
+                part.startsWith('**') ? <strong>{part.slice(2, -2)}</strong> : part
+              )}
+            </p>
+          ))}
           <div class="links">
             <SocialLinks toast="start" muted />
           </div>
@@ -76,10 +86,10 @@ const words = c.greeting.split(/\s+/).filter(Boolean);
     padding-block: 40px 88px;
   }
   .card {
-    display: grid;
-    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 56px;
+    gap: 34px;
     padding: 44px;
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
@@ -87,8 +97,8 @@ const words = c.greeting.split(/\s+/).filter(Boolean);
   }
   .photo {
     display: block;
-    width: 100%;
-    max-width: 100%;
+    width: min(100%, 280px);
+    max-width: 280px;
     height: auto;
     aspect-ratio: 1 / 1;
     object-fit: cover;
@@ -96,7 +106,7 @@ const words = c.greeting.split(/\s+/).filter(Boolean);
     border: 1px solid var(--hairline);
     background: var(--surface);
   }
-  .intro { display: flex; flex-direction: column; }
+  .intro { display: flex; flex-direction: column; width: min(100%, 780px); }
   .intro h1 {
     font-size: clamp(28px, 3.4vw, 38px);
     font-weight: 900;
@@ -114,6 +124,7 @@ const words = c.greeting.split(/\s+/).filter(Boolean);
     word-break: keep-all;
   }
   .bio + .bio { margin-top: 18px; }
+  .bio strong { color: var(--text); font-weight: 800; }
   /* 아이콘 원 안쪽 여백만큼 당겨 글줄 왼쪽 끝에 맞춘다 */
   .links { margin: 28px 0 0 -6px; }
 
@@ -123,12 +134,12 @@ const words = c.greeting.split(/\s+/).filter(Boolean);
   :global(html.gsap-enter) .field > :global(*) { opacity: 0; }
 
   @media (max-width: 1199px) {
-    .card { gap: 40px; padding: 32px; }
+    .card { gap: 30px; padding: 32px; }
   }
   @media (max-width: 809px) {
     .about { padding-block: 16px 56px; }
-    .card { grid-template-columns: minmax(0, 1fr); gap: 28px; padding: 20px 20px 24px; }
-    .photo { max-width: 360px; }
+    .card { gap: 28px; padding: 20px 20px 24px; }
+    .photo { width: min(100%, 240px); max-width: 240px; }
     .bio { margin-top: 16px; font-size: 16px; line-height: 1.85; }
     .links { margin-top: 22px; }
   }
