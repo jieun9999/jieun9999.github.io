@@ -24,6 +24,8 @@ pubDate: 2026-07-08
 tags: ['tag-one', 'tag-two']     # 소문자-하이픈 권장. 오른쪽 TAGS 패널/태그 페이지에 자동 반영. 목록엔 앞 3개만 보이니 대표 태그를 앞에
 category: systems               # systems | scaling | reliability | devops
 # cover: /covers/my-post.webp    # (선택) 커버 이미지. 없으면 자동 블루 타일 + 제목 이니셜
+# coverFit: contain             # (선택) 목록에서 도식·스크린샷 전체 표시. 기본은 cover(영역 채우기)
+# coverBackground: light        # (선택) 이미지 여백 배경: light 또는 dark. 화면 테마와 무관
 # coverAlt: '커버 이미지 설명'
 # series: my-series              # (선택) 시리즈로 묶기 (같은 값끼리 그룹)
 # seriesOrder: 1                 #        시리즈 내 순서

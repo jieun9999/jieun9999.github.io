@@ -6,6 +6,8 @@ pubDate: 2026-05-17
 tags: ['fcm', 'bullmq', 'sentry', 'observability', 'node-js', 'concurrency', 'architecture']
 category: reliability
 cover: /covers/fcm-push-hiding-in-the-message-send-api-moving-it-to-a-dedicated-worker-queue.webp
+coverFit: contain
+coverBackground: light
 coverAlt: '메시지 전송 API의 FCM 푸시를 큐로 분리하고, 삼키던 실패는 Sentry로 관측한 이야기'
 coverCaption: '위 이미지는 Sentry 기반 모니터링 대시보드의 일부입니다.'
 series: messenger-load-test

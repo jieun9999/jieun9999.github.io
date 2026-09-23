@@ -15,6 +15,8 @@ tags:
   ]
 category: systems
 cover: /covers/sourcing-keywords-from-search-autocomplete.webp
+coverFit: contain
+coverBackground: light
 coverAlt: "어드민 키워드 설정 화면 — 검색창 자동완성에서 발굴한 키워드 7개가 구글·네이버 출처 배지와 함께 목록으로 표시된다"
 coverCaption: '"건강검진 대상자"를 넣고 [가져오기]를 누르면 0.2초 뒤 이 목록이 뜹니다. 오른쪽 아이콘이 어느 검색창에서 나온 말인지 알려줍니다.'
 ---
