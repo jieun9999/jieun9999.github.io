@@ -1,21 +1,21 @@
 ---
-title: "[WeBlog Part 2] Redefining the Product Direction After Beta Feedback"
-description: "How beta users' questions and behavior changed WeBlog's customer hypothesis, onboarding, B2C/B2B direction, and value proposition."
+title: "[Wiblog Part 2] Redefining the Product Direction After Beta Feedback"
+description: "How beta users' questions and behavior changed Wiblog's customer hypothesis, onboarding, B2C/B2B direction, and value proposition."
 pubDate: 2026-09-23
 updatedDate: 2026-09-23
 tags: ["product-development", "pivot", "seo", "observability"]
 category: systems
 cover: /images/poc-pivot/pivot-whiteboard.jpg
-coverAlt: "A whiteboard discussion comparing B2C and B2B directions for WeBlog"
+coverAlt: "A whiteboard discussion comparing B2C and B2B directions for Wiblog"
 coverCaption: "September 2026, comparing B2C and B2B business directions."
-series: weblog-development
+series: wiblog-development
 seriesOrder: 2
-seriesTitle: "Building WeBlog"
+seriesTitle: "Building Wiblog"
 ---
 
 ## Introduction
 
-[Part 1](/en/blog/from-content-automation-poc-to-product-pivot/) covered how WeBlog took a user's topic idea, turned it into a source-backed post, published it, and observed search and AI access. Before the beta, the question was whether the system could work. After opening the beta on August 18, 2026, the question changed.
+[Part 1](/en/blog/from-content-automation-poc-to-product-pivot/) covered how Wiblog took a user's topic idea, turned it into a source-backed post, published it, and observed search and AI access. Before the beta, the question was whether the system could work. After opening the beta on August 18, 2026, the question changed.
 
 **Did users actually want this working service? If so, who would pay for what result?**
 

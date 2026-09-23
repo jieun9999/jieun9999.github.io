@@ -1,24 +1,24 @@
 ---
-title: "[WeBlog Part 1] From Topic Idea to Generated, Published, Search-Visible Content"
-description: "How WeBlog took a user's topic idea, collected sources, generated a post, published it, and observed whether Google and AI crawlers could discover it."
+title: "[Wiblog Part 1] From Topic Idea to Generated, Published, Search-Visible Content"
+description: "How Wiblog took a user's topic idea, collected sources, generated a post, published it, and observed whether Google and AI crawlers could discover it."
 subtitle: "From topic ideas to publishing and search visibility"
 pubDate: 2026-09-18
 updatedDate: 2026-09-23
 tags: ["poc", "llm", "seo", "observability"]
 category: systems
 cover: /images/poc-pivot/publishing-flow.jpg
-coverAlt: "The WeBlog personal console showing the flow from keyword selection to publishing"
+coverAlt: "The Wiblog personal console showing the flow from keyword selection to publishing"
 coverCaption: "The personal console flow from choosing a keyword to publishing."
-series: weblog-development
+series: wiblog-development
 seriesOrder: 1
-seriesTitle: "Building WeBlog"
+seriesTitle: "Building Wiblog"
 ---
 
 <a id="1-before-the-beta--can-a-post-make-it-into-search-results"></a>
 
 ## Introduction
 
-WeBlog is an AI blog service where a user enters a topic or keyword, and the product finds topic candidates, collects sources, generates a post, and publishes it to a blog. The user chooses the topic and generation conditions. The service gathers references, enforces the article structure, and publishes the result at a public URL. The question I worked on was not simply "can an LLM write?"
+Wiblog is an AI blog service where a user enters a topic or keyword, and the product finds topic candidates, collects sources, generates a post, and publishes it to a blog. The user chooses the topic and generation conditions. The service gathers references, enforces the article structure, and publishes the result at a public URL. The question I worked on was not simply "can an LLM write?"
 
 **How do you turn a user's desired topic into content that can be published and discovered in search?**
 
@@ -111,7 +111,7 @@ The publishing flow also needed safer deployments. When a customer domain pointe
 
 ## Making Custom Domains a Requirement for the Search Strategy
 
-Generating a post and publishing it at a public URL did not ensure discovery in search. For blogs operated with Google indexing as the goal, WeBlog made custom-domain connection a requirement of its publishing strategy and discouraged continued use of `witim.blog` subdomains. This was an operating decision, not merely a customization option.
+Generating a post and publishing it at a public URL did not ensure discovery in search. For blogs operated with Google indexing as the goal, Wiblog made custom-domain connection a requirement of its publishing strategy and discouraged continued use of `witim.blog` subdomains. This was an operating decision, not merely a customization option.
 
 I checked posts published at the default address and at a personal domain with a `site:` query. The share of posts I could find in search was very different.
 
@@ -124,7 +124,7 @@ I checked posts published at the default address and at a personal domain with a
 
 These were numbers from a `site:` search at the time. Search-result counts are not the complete index, and this was not a controlled experiment matching topic, publication date, and external links. The comparison did not isolate the domain as the cause. It did inform the decision to validate search visibility on custom domains instead of continuing to rely on the default subdomains.
 
-This was WeBlog's operating judgment, not a claim that Google cannot index subdomains. [Google's official FAQ](https://developers.google.com/search/help/crawling-index-faq) states that it has no preference between subfolders and subdomains for indexing and ranking. Connecting a custom domain does not guarantee indexing or high rankings.
+This was Wiblog's operating judgment, not a claim that Google cannot index subdomains. [Google's official FAQ](https://developers.google.com/search/help/crawling-index-faq) states that it has no preference between subfolders and subdomains for indexing and ranking. Connecting a custom domain does not guarantee indexing or high rankings.
 
 ![The decision that connected indexing observations to domain purchase and connection. Search → payment → registration → connection became one flow.](/images/poc-pivot/domain-purchase-flow.png)
 
@@ -147,9 +147,9 @@ Those screenshots show **that the posts appeared in ordinary search results**. T
 
 I also examined AI-answer citations and crawler access separately from ordinary search visibility.
 
-I saw a source-backed WeBlog post cited in a Google AI Overview. That became the technical starting point when we later narrowed the PoC to hospitals and real-estate businesses.
+I saw a source-backed Wiblog post cited in a Google AI Overview. That became the technical starting point when we later narrowed the PoC to hospitals and real-estate businesses.
 
-![A Google AI Overview citing a WeBlog article as a source. Searching for “marriage vow sample writing order” shows the generated article in the source card on the right. An AEO success case.](/images/poc-pivot/aeo-citation-success.png)
+![A Google AI Overview citing a Wiblog article as a source. Searching for “marriage vow sample writing order” shows the generated article in the source card on the right. An AEO success case.](/images/poc-pivot/aeo-citation-success.png)
 
 We also watched which AI crawlers accessed which posts through server access logs. It gave users a product view of external access that does not appear in a search-ranking table.
 
@@ -175,4 +175,4 @@ Part 1 confirms one thing: a user's topic could become a source-backed post, be 
 
 The limits are just as important. A `site:` result count is not the full index, a crawler visit is not a verified citation, and search visibility is not sustained ranking or traffic. A technically working service did not tell us who would keep paying for it.
 
-That question only became clear after meeting beta users. [Part 2 covers how their questions and behavior changed WeBlog's customer hypothesis, onboarding, and value proposition](/en/blog/redefining-ai-blog-product-after-beta-feedback/).
+That question only became clear after meeting beta users. [Part 2 covers how their questions and behavior changed Wiblog's customer hypothesis, onboarding, and value proposition](/en/blog/redefining-ai-blog-product-after-beta-feedback/).

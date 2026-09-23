@@ -8,13 +8,13 @@ category: systems
 cover: /covers/from-shared-subdomains-to-custom-domains-for-search-indexing.png
 coverFit: contain
 coverBackground: light
-coverAlt: "The domain search and purchase screen in WeBlog"
+coverAlt: "The domain search and purchase screen in Wiblog"
 coverCaption: "Domain search results show recommendations alongside registration and renewal prices."
 ---
 
 ## Introduction
 
-WeBlog, the service I was developing, collected material from a user's topic and keywords, generated articles using reference sources, and published them to a blog. Users could read their posts at a public URL without setting up a server or deployment environment themselves.
+Wiblog, the service I was developing, collected material from a user's topic and keywords, generated articles using reference sources, and published them to a blog. Users could read their posts at a public URL without setting up a server or deployment environment themselves.
 
 But publishing an article did not automatically make it discoverable through search. Pages loaded successfully and had sitemaps, yet search engines sometimes did not fetch the articles, or removed pages they had previously indexed. Validating article generation and validating a blog's discoverability were separate problems.
 
