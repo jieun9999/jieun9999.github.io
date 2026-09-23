@@ -1,7 +1,7 @@
 ---
 title: '[메신저 부하 테스트 2편] AI가 생성한 코드에 deadlock이 숨어 있었다 — `unreadCount`를 `lastReadAt`으로 교체한 이야기'
 description: '부하 테스트 시작 9분 만에 HTTP 오류율 42.8%, 목표 TPS의 12%. 범인은 AI 보조 코딩 중 무심코 작성한 단 한 줄의 updateMany였습니다.'
-subtitle: "9분 만에 오류율 42.8%, 범인은 updateMany 한 줄"
+subtitle: "메신저 부하 테스트에서 오류율이 42.8%까지 높아진 원인을 추적하니 읽지 않은 메시지 수를 갱신하는 쿼리에 교착 상태가 있었습니다. 반복 갱신이 필요했던 unreadCount 대신 마지막으로 읽은 시점인 lastReadAt을 사용하는 구조로 전환했습니다."
 pubDate: 2026-05-11
 tags: ['postgresql', 'prisma', 'databases', 'concurrency', 'node-js', 'debugging']
 category: reliability

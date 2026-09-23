@@ -9,7 +9,7 @@ const blog = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string(),
-    // 목록에서 제목 아래 보이는 한 줄 부제(선택). 한글 30자·영어 60자 안팎. 없으면 description 을 쓴다.
+    // 목록 설명(선택). 한국어는 본문을 요약하는 정중한 두 문장(약 80~140자), 영어는 짧은 부제.
     subtitle: z.string().optional(),
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),
