@@ -1,0 +1,39 @@
+---
+// 통합 전 URL은 유지하되 게시물 컬렉션에서는 제외한다.
+// GitHub Pages 정적 배포이므로 HTML 이동 안내와 실제 링크를 함께 제공한다.
+import type { Lang } from '../../../i18n/ui';
+
+export function getStaticPaths() {
+  return ['ko', 'en'].map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const destination = `/${lang}/blog/part2-four-people-one-dev-machine/`;
+const target = `${destination}#restricted-api-tunnel`;
+const canonical = new URL(destination, Astro.site).href;
+const title = lang === 'ko' ? '공용 개발 환경 시리즈로 통합한 글입니다' : 'This article is now part of the shared development environment series';
+const description = lang === 'ko'
+  ? 'BFF 개념은 1편에, 제한된 SSH 접근과 운영 API 터널 설계는 2편에 통합했습니다.'
+  : 'The BFF explanation is in Part 1. Restricted SSH access and the production API tunnel design are in Part 2.';
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content="noindex" />
+    <meta http-equiv="refresh" content={`0;url=${target}`} />
+    <link rel="canonical" href={canonical} />
+  </head>
+  <body>
+    <h1>{title}</h1>
+    <p>{description}</p>
+    <p><a href={target}>{lang === 'ko' ? '2편: 제한된 SSH 접근과 운영 API 터널' : 'Part 2: Restricted SSH access and the production API tunnel'}</a></p>
+    <p><a href={`/${lang}/blog/part1-three-tier-dev-environment/`}>{lang === 'ko' ? '1편: BFF와 개발 환경 구조' : 'Part 1: The BFF and development environment'}</a></p>
+    <script is:inline define:vars={{ target }}>
+      location.replace(target);
+    </script>
+  </body>
+</html>

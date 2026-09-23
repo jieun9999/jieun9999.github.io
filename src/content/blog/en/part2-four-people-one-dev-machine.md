@@ -3,8 +3,9 @@ title: "Part 2 — Four People Sharing One VPS — Role-Based Access, Homes, and
 description: "Developers Jieun and Sungsuk, designer Juhee, and marketer Jina started sharing the 96GB, 18-core server we rented after hitting the limits of 16GB MacBooks. We separated permissions, project homes, and ports by role, and isolated production access behind a shared tunnel service."
 subtitle: "Two developers, a designer, and a marketer on one server"
 pubDate: 2026-09-16
+updatedDate: 2026-09-24
 tags:
-  ["linux", "cron", "systemd", "git-worktree", "ssh", "devops", "automation"]
+  ["linux", "cron", "systemd", "git-worktree", "ssh", "devops", "automation", "least-privilege"]
 category: systems
 cover: /covers/part2-four-people-one-dev-machine-en.webp
 coverAlt: "Diagram of separate accounts, home directories, and ports inside a shared VPS, with a common service-owned :8787 tunnel to the production API on :8987"
@@ -122,7 +123,11 @@ listening() { ss -ltn  | grep -q "127\.0\.0\.1:$1 "; }
 mine()      { ss -ltnp | grep ":$1 " | grep -q 'users:'; }
 ```
 
+This folds the older `/local` procedure into one path. The old habit was to remember the sequence manually: check the tunnel, check the port, start the dev server, then curl the response before reporting a URL. The script makes that order repeatable. Running `pnpm dev` directly is still possible, but it is easy to misread a down tunnel as a UI bug, or to let Next.js slide to another port and keep looking at the wrong screen.
+
 ---
+
+<a id="restricted-api-tunnel"></a>
 
 ## 4. We moved production access out of human accounts
 
@@ -139,7 +144,7 @@ $ ss -ltnp | grep :8787
 
 `sshd` was holding it. The server had not connected outward. **Someone had connected inward and pushed the port in.** One person's MacBook was running reverse forwarding with `ssh -R`.
 
-One of the criteria from the previous post was "my laptop should not be involved." In reality, that criterion was not being met.
+One of the earlier criteria was "my laptop should not be involved." In reality, that criterion was not being met.
 
 ### It was a workaround, not a mistake
 
@@ -206,7 +211,67 @@ RestartSec=5
 WantedBy=multi-user.target
 ```
 
-**Even if the whole key leaks, what it gives is one pipe to `8987`.** It uses the same idea as the key issued to the designer in the previous post.
+The local `wdot-tunnel` account owns the process on the VPS. Separately, the key options in the production server’s `authorized_keys` restrict what that SSH key can do after authentication. These are two different account boundaries.
+
+### The older designer key showed the boundary we needed
+
+In August, before the shared VPS version, Juhee was developing on her own MacBook. That required a different shape: her laptop needed the UI server locally, but the API still lived behind the production server. The useful part of that setup was not the laptop-specific workflow. It was the SSH boundary: authenticate the person, then authorize only the one tunnel the screen needs.
+
+Those are separate layers.
+
+```plaintext
+someone knocks on port 22
+   │
+   ├─ no registered private key  →  Permission denied (publickey)
+   │
+   └─ has the allowed key        →  authenticated
+                                     └─ key options apply → one tunnel, no shell
+```
+
+The restriction is not what keeps strangers out. Public-key authentication does that first. The restriction narrows what an authenticated key can do after it is accepted.
+
+The reason this works is that a single SSH connection can carry different channel types.
+
+```plaintext
+one SSH connection
+├── session channel      → shell or command execution
+└── direct-tcpip channel → local port forwarding with -L
+```
+
+So the shell can be blocked while local port forwarding still works. The older key was written as a per-key rule in `authorized_keys`.
+
+```plaintext
+restrict,port-forwarding,permitopen="127.0.0.1:8987",command="/bin/false" ssh-ed25519 AAAA... designer
+```
+
+Each option had a specific job.
+
+| Option | Role |
+| --- | --- |
+| `restrict` | Turns off optional SSH features by default, including pty, X11, agent forwarding, user rc, and forwarding |
+| `port-forwarding` | Turns forwarding back on for this key |
+| [`permitopen="127.0.0.1:8987"`](https://man.openbsd.org/sshd.8#permitopen) | Limits `-L` forwarding destinations to this host-side API address |
+| `command="/bin/false"` | Prevents a useful shell or command path if a session channel is requested |
+
+That example is about local forwarding with `-L`. It should not be overread as proof that every possible reverse-forwarding shape is blocked by `permitopen` alone; OpenSSH documents the separate [`permitlisten`](https://man.openbsd.org/sshd.8#permitlisten) option for reverse-forward listeners. The actual point was narrower and more useful. For a designer preview, the key could create one client-local tunnel to the API endpoint, and could not be used as a normal shell key.
+
+The recorded verification was also narrow. Shell login and command execution were checked and blocked for that key. The one-destination tunnel, revocation path, and service-owned shared tunnel are configuration boundaries described by the key options and systemd unit, not a claim that every route was freshly tested in production.
+
+The fixed `127.0.0.1:8987` endpoint mattered. The API container itself had an address that could move after deploys, so the first version tried to discover the container IP before starting the tunnel. That made the restriction hard to express. Publishing the API only on the production host's loopback solved that part.
+
+```yaml
+ports: ["127.0.0.1:8987:8787"]
+```
+
+The internet still could not reach it, because the port bound only to loopback. But SSH could now pin the destination to a stable host address. In `ssh -L 8787:127.0.0.1:8987 server`, that destination is resolved on the server side, not on the laptop.
+
+Revocation was also deliberately small. Removing that one `authorized_keys` line prevents new authentications with the key. An established SSH connection still needs to be terminated separately; removing the key does not close its existing channels or prevent it from requesting another channel.
+
+The September shared-VPS design kept the same principle and changed the owner. Instead of a designer's personal key opening a tunnel from a MacBook, a `nologin` service account now owns the shared `:8787` tunnel from the VPS. Human accounts use the API through the shared loopback port, while the production key lives with the service boundary.
+
+A separate preview environment was another option. It would have removed this production dependency, but reproducing the data needed by the screens required additional setup. The restricted tunnel was the compromise for the current workflow, not a replacement for a separate test environment.
+
+This does not replace application authorization. If the API route itself allows saving, publishing, or deleting, the route still needs its own auth and write-permission checks. SSH isolation only controls the pipe to the API, not what the API allows after a request arrives.
 
 ---
 

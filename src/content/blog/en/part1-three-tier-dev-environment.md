@@ -3,8 +3,9 @@ title: "Part 1 — Why We Chose a 96GB VPS Instead of Four 16GB MacBooks"
 description: "The code lives on the server, the server compiles it, and the MacBook only runs the browser. Once four people started sharing one machine, we had to re-check where this structure is sound and where it is a compromise. Seeing one dev server grow from 1.2GB to 3.7GB in four hours made it clear what belongs on the server."
 subtitle: "A dev server that grew from 1.2GB to 3.7GB in 4 hours"
 pubDate: 2026-09-15
+updatedDate: 2026-09-24
 tags:
-  ["ssh", "port-forwarding", "nextjs", "remote-development", "e2e", "devops"]
+  ["ssh", "port-forwarding", "nextjs", "remote-development", "e2e", "devops", "bff"]
 category: systems
 cover: /covers/part1-three-tier-dev-environment-en.webp
 coverAlt: "Diagram of a MacBook connecting by SSH to a development server, with the current :3100 app using a :8787 tunnel to production API and DB, and a future :39xx local API, DB, Redis, and Playwright stack inside the development server"
@@ -41,11 +42,17 @@ Server                      next dev :3100  ← frontend + BFF both here
 Production server           api :8987 → production DB      ★ production
 ```
 
-### The MacBook is not a "screen machine"
+<a id="the-macbook-is-not-a-screen-machine"></a>
 
-`next dev` includes Server Components and route handlers. That is the layer I called the admin BFF in the previous post. **Half of the backend runs on the server.** The MacBook runs the browser that renders the UI; the backend processes run on the VPS.
+### The screen server also needs an API connection
 
-So this is not a two-part split. It is three parts: browser, all development processes, and production data. Once I counted it that way, the third tier was clearly the problem.
+Here, `next dev` is not just serving static screens. Admin serves as a BFF, or Backend For Frontend. Before the browser gets the screen, the [Next.js server component path](https://nextjs.org/docs/app/getting-started/server-and-client-components) calls the API and renders UI from that response. The API and DB live in a separate backend, while admin stands in front of them and shapes the data for the screen.
+
+That split exists because of the credential boundary. Admin does not hold `DATABASE_URL`; DB credentials stay with the API and worker side. If the screen server is compromised, it should not yield direct DB connection details from that layer. Screens that depend on API data still need an API connection while rendering. Server-side execution also does not make every value private: data serialized into client props can reach the browser, so secrets must stay on the server.
+
+So even if we boot only admin on a local or remote development server, screens do not render properly without an API connection. Lists, stats, and cards either become empty shells or fail with a 500. A separate local DB and enough seed data would have removed the need to point at the production API, but that setup did not exist at the time.
+
+That is why the current structure is not a two-part split. It is three parts: browser, development processes, and production data. Keeping the browser on the MacBook and moving development processes to the VPS solved the working-environment problem, but the third tier being the production API remained a compromise that needed a separate decision.
 
 ---
 

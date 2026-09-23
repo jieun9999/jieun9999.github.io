@@ -145,7 +145,8 @@ export default defineConfig({
       },
       // 루트 '/' 는 noindex 스텁이라 사이트맵에 넣지 않는다. 색인하지 말라고 해놓고
       // 사이트맵으로 내미는 건 서로 어긋나는 신호다.
-      filter: (page) => page !== `${SITE}/`,
+      filter: (page) => page !== `${SITE}/` &&
+        !new URL(page).pathname.endsWith('/blog/isolated-dev-access-for-an-outside-collaborator/'),
       // 글 URL 에만 lastmod 를 붙인다. 태그·목록 페이지는 "언제 바뀌었나"를
       // 정직하게 답할 수 없어 비워둔다(빠진 lastmod 는 크롤러가 그냥 무시한다).
       serialize(item) {
