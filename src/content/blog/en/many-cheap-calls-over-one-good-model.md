@@ -15,6 +15,8 @@ tags:
   ]
 category: systems
 cover: /covers/many-cheap-calls-over-one-good-model.webp
+coverFit: contain
+coverBackground: dark
 coverAlt: "A diagram comparing one 8,000-character request against eight 1,200-character requests — the left converges near 2,000 characters and peaks at 3,182, the right assembles eight fragments into 8,995"
 coverCaption: "Same model. On the left, one request for 8,000 characters. On the right, eight requests for 1,200 each, assembled."
 ---

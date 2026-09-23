@@ -15,6 +15,8 @@ tags:
   ]
 category: systems
 cover: /covers/sourcing-keywords-from-search-autocomplete.webp
+coverFit: contain
+coverBackground: light
 coverAlt: "Admin keyword settings screen showing seven keywords discovered from search autocomplete, each tagged with a Google or Naver source icon"
 coverCaption: "Type a seed, hit Fetch, and this list appears about 200ms later. The icon on the right says which search box the phrase came from."
 ---

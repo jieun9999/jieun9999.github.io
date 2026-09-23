@@ -15,6 +15,8 @@ tags:
   ]
 category: systems
 cover: /covers/escaping-in-app-browsers-so-login-does-not-lose-users-en.webp
+coverFit: contain
+coverBackground: dark
 coverAlt: "Two Kakao login screens side by side. The Threads in-app browser shows only an ID and password form; Safari shows the 'Log in with Kakao Talk' button on top"
 coverCaption: "Same URL, same login page. The only difference is which browser you arrived in."
 ---
