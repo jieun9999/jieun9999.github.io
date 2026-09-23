@@ -1,6 +1,7 @@
 ---
 title: "Keyword Discovery: 25 Seconds Down to 0.2, by Calling Search Autocomplete"
 description: "We mined Naver Q&A threads for keyword fragments and cleaned them up with two LLM calls. Replacing that with Google and Naver autocomplete took the button press from 25.1s to 0.2s and removed the LLM entirely. Google told people to stop using this endpoint in 2015, so there was something to settle before performance."
+subtitle: "Replacing two LLM calls with one autocomplete request"
 pubDate: 2026-08-10
 tags:
   [

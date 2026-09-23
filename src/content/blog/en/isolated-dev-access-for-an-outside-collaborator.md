@@ -1,6 +1,7 @@
 ---
 title: "How Much Do You Open Up to an Outside Collaborator? Designing Isolated Dev Access Behind a BFF"
 description: "The platform has exactly one door open to the internet, and every credential that touches data stays behind it. When a designer asked to run the UI locally, that collided with the design. I wrote down what to open and what to lock first, then issued an SSH key that can forward one port and nothing else."
+subtitle: "A key that blocks the shell and leaves only the tunnel"
 pubDate: 2026-08-07
 tags:
   [

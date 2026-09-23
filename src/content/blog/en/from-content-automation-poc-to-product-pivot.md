@@ -1,6 +1,7 @@
 ---
 title: "Two Months Building an AI Blog Service — From 'Can We Build It?' to 'Who Will Use It?'"
 description: "A two-month retrospective on an AI blog service: validating search indexing, source-backed writing, keyword discovery, cost, UX, deployment, channel risk, retention, operations, and a pivot toward a B2B model for hospitals and real-estate businesses."
+subtitle: "Two months that turned 'Will it work?' into 'Who will use it?'"
 pubDate: 2026-09-18
 tags: ["poc", "product-development", "pivot", "llm", "seo", "observability"]
 category: systems

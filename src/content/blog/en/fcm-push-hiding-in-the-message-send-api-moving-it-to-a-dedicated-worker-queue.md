@@ -1,6 +1,7 @@
 ---
 title: '[Messenger Load-Testing, Part 3] FCM to a Queue, Swallowed Failures to Sentry — Cleaning Up the Message-Send Handler'
 description: 'Part 3 of load-testing a messenger: pulling FCM push out of the message-send handler into a dedicated worker queue, and surfacing the failures that used to vanish into empty catches through Sentry. Two axes — isolating external I/O and handling error logs.'
+subtitle: "Isolating external I/O and surfacing swallowed errors"
 pubDate: 2026-05-17
 tags: ['fcm', 'bullmq', 'sentry', 'observability', 'node-js', 'concurrency', 'architecture']
 category: reliability

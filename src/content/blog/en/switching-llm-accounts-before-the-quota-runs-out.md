@@ -1,6 +1,7 @@
 ---
 title: "Switching LLM Accounts at 88% — Manually First, Then Automatic Failover at 80%"
 description: "I saw the primary account hit 88% on Grafana, worked out when it would run dry, and switched by hand at dawn when nobody was publishing. Then I gave the accounts an order so the sub only takes traffic when the primary is empty or over its limit."
+subtitle: "From a Grafana 88% alert to automatic failover at 80%"
 pubDate: 2026-09-08
 tags:
   [

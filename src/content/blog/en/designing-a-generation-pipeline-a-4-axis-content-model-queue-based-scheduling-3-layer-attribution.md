@@ -1,6 +1,7 @@
 ---
 title: '[Threads Marketing Agent, Part 2] Designing a Generation Pipeline — A 4-Axis Content Model, Queue-Based Scheduling, 3-Layer Attribution'
 description: 'Part 2 of an engineering log on building a Threads marketing agent: a content model decomposed into four axes, an idempotent publish worker, and 3-layer attribution where 90% of clicks were bots.'
+subtitle: "A 4-axis content model, an SQLite queue, and 90% bot clicks"
 pubDate: 2026-07-06
 tags: ['threads', 'system-design', 'fastapi', 'sqlite', 'datamodeling', 'kpi', 'automation']
 category: systems

@@ -1,6 +1,7 @@
 ---
 title: 'Scaling QPS 10x in Production: 3 Strategies That Actually Move the Needle'
 description: '"Make it faster" sounds vague. It isn''t — it comes down to the same three moves: caching, database optimization, and pulling non-essential work out of the request.'
+subtitle: "Caching, database tuning, and moving side work off the request"
 pubDate: 2026-05-29
 tags: ['system-design', 'caching', 'performance', 'optimization']
 category: scaling

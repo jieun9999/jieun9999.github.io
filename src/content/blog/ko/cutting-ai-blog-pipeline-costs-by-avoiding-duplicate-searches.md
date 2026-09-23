@@ -1,6 +1,7 @@
 ---
 title: "중복 검색과 실패할 재시도를 줄여 AI 블로그 생성 비용을 낮췄다"
 description: "춘천 운영 서버 로그로 글감 15건의 검색·본문 파싱 비용을 다시 계산했다. 실제 비용은 약 150원, 생략 호출을 되살린 비교값은 약 309원이었다."
+subtitle: "글감 15건 로그로 다시 계산한 309원 → 150원"
 pubDate: 2026-08-18
 updatedDate: 2026-09-16
 tags: ["observability", "caching", "pipeline", "cost"]

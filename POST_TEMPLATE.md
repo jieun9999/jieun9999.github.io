@@ -14,9 +14,10 @@
 ---
 title: '글 제목'
 description: '검색결과·카드에 보이는 한 줄 요약 (한두 줄).'
+subtitle: '목록에서 제목 아래 보이는 짧은 부제'  # 한글 30자·영어 60자 안팎. 넘치면 말줄임. 없으면 description 을 한 줄로 잘라 씀
 pubDate: 2026-07-08
 # updatedDate: 2026-07-10        # (선택) 수정일
-tags: ['tag-one', 'tag-two']     # 소문자-하이픈 권장. 오른쪽 TAGS 패널/태그 페이지에 자동 반영
+tags: ['tag-one', 'tag-two']     # 소문자-하이픈 권장. 오른쪽 TAGS 패널/태그 페이지에 자동 반영. 목록엔 앞 3개만 보이니 대표 태그를 앞에
 category: building               # building | open-source | fundamentals | career
 # cover: /covers/my-post.webp    # (선택) 커버 이미지. 없으면 자동 블루 타일 + 제목 이니셜
 # coverAlt: '커버 이미지 설명'

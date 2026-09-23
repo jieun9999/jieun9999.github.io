@@ -1,6 +1,7 @@
 ---
 title: '프로덕션에서 QPS를 10배로: 실제로 효과가 있는 3가지 전략'
 description: '"더 빠르게 만들어라"는 막연해 보이지만 아닙니다. 결국 같은 세 가지 수로 수렴합니다 — 캐싱, 데이터베이스 최적화, 그리고 요청에서 부수적인 일을 들어내기.'
+subtitle: "캐싱, DB 최적화, 요청에서 부수 작업 덜어내기"
 pubDate: 2026-05-29
 tags: ['system-design', 'caching', 'performance', 'optimization']
 category: scaling
