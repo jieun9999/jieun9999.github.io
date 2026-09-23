@@ -9,7 +9,7 @@ category: systems
 cover: /images/poc-pivot/pivot-whiteboard.jpg
 coverAlt: "B2C와 B2B 방향성을 화이트보드에 나눠 적으며 위블로그 제품 방향을 논의하는 모습"
 coverCaption: "2026년 9월, B2C와 B2B 비즈니스 방향성을 비교하던 자리."
-series: weblog-development
+series: wiblog-development
 seriesOrder: 2
 seriesTitle: "위블로그 개발기"
 ---

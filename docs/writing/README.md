@@ -40,7 +40,7 @@
 | [인앱 브라우저 로그인](../../src/content/blog/ko/escaping-in-app-browsers-so-login-does-not-lose-users.md) | 03 | 재현 조건, 확인한 원인, 폴백의 한계를 구분했나? |
 | [개발 환경 1편](../../src/content/blog/ko/part1-three-tier-dev-environment.md) | 04, 05 | 자원·비용 제약이 배치 결정과 타협을 설명하나? |
 | [개발 환경 2편](../../src/content/blog/ko/part2-four-people-one-dev-machine.md) | 05 | 협업자의 작업을 이해한 뒤 권한·홈·포트 구성을 만나는가? |
-| [외부 협업자 접근 격리](../../src/content/blog/ko/isolated-dev-access-for-an-outside-collaborator.md) | 02, 05 | 협업 요청과 필요한 접근 범위를 먼저 설명했나? |
+| 외부 협업자 접근 격리 → [개발 환경 1편](../../src/content/blog/ko/part1-three-tier-dev-environment.md)·[2편](../../src/content/blog/ko/part2-four-people-one-dev-machine.md)으로 통합 | 02, 05 | BFF의 연결 요구와 제한 키·공유 터널의 접근 범위를 구분했나? |
 | [회의 녹음 파이프라인](../../src/content/blog/ko/building-a-crash-resilient-end-to-end-meeting-recording-pipeline-in-the-browser.md) | 02, 05 | 사용자 흐름, 손실 상황, 복구 설계가 연결되나? |
 | [부하 테스트 환경](../../src/content/blog/ko/building-a-reusable-load-test-environment-for-a-messenger-service-make-based-iac-observability-and-auth-seeding.md) | 05 | 무엇을 측정하려는지 밝힌 뒤 환경과 측정 지점을 설명하나? |
 | [deadlock 해결](../../src/content/blog/ko/there-was-a-deadlock-hiding-in-ai-generated-code-how-we-replaced-unreadcount-with-lastreadat.md) | 03 | 관측과 추론을 구분하고 원인·해결 주장을 검증했나? |

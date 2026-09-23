@@ -120,10 +120,10 @@ prettier가 `11~~14초`처럼 물결표를 붙여 정규화해두면 이 grep에
 - 새 글/SEO 변경 후 확인: 빌드된 `dist/en/blog/<slug>/index.html`에서
   `<link rel="canonical">`이 **self**인지, hreflang이 정상인지.
   전수 검사: 각 `dist/**/index.html`의 canonical 이 자기 URL 과 같은지 비교하면 된다
-  (다른 게 나오면 `/`(리디렉션 스텁) 하나뿐이어야 정상).
+  (예외는 `/`와 아래 통합 안내 페이지처럼 명시적으로 이동시키는 경로다).
 - **색인 모니터링(팔로업)**: canonical 회수 후 영문 7편이 Google Search Console 에서
   "대체 페이지"에서 빠지고 색인으로 넘어오는지 확인(수 주 걸림).
-- GSC 의 **"'NOINDEX' 태그에 의해 제외"는 `https://jieun.dev/` 한 건이 정상**이다.
+- GSC 의 **"'NOINDEX' 태그에 의해 제외"에는 루트와 아래 통합 안내 페이지가 포함될 수 있다**.
   루트는 `src/pages/index.astro` 가 그리는 meta-refresh 스텁(→ `/ko/`)이고 `noindex` 가 붙어 있다.
   GitHub Pages 는 서버 301 을 못 써서 meta-refresh 가 유일한 수단 — 고장이 아니니 손대지 말 것.
   - 예전엔 `astro.config.mjs` 의 `redirects` 가 만들어 줬는데, **그 스텁엔 `og:` 태그가 없어서**
@@ -134,3 +134,10 @@ prettier가 `11~~14초`처럼 물결표를 붙여 정규화해두면 이 grep에
   - 루트는 **사이트맵에서 뺀다**(`sitemap` 의 `filter`). noindex 라고 해놓고 사이트맵으로
     내미는 건 어긋나는 신호다.
 - Search Console: `jieun.dev` 도메인 속성 등록됨, sitemap `sitemap-index.xml` 제출됨.
+
+## 통합한 게시물의 기존 URL
+
+- `/{en,ko}/blog/isolated-dev-access-for-an-outside-collaborator/`는 게시물 목록에서 제거하고 같은 언어의 `part2-four-people-one-dev-machine/#restricted-api-tunnel`로 이동한다.
+- 이동 페이지는 `src/pages/[lang]/blog/isolated-dev-access-for-an-outside-collaborator.astro`에서 생성한다. GitHub Pages에서는 서버 301 대신 meta refresh와 `location.replace`를 사용한다.
+- 이동 페이지의 canonical은 도착 글이며, `noindex`와 사이트맵 제외를 적용한다. 기존 공유 이미지 파일은 유지한다.
+- BFF 개념은 Part 1, 제한 키와 공유 터널 설계는 Part 2에 통합했다. 삭제 전 GitHub Discussions 조회에서 해당 한·영 URL의 댓글 스레드는 없었다(2026-09-24 확인).

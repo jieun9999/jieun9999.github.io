@@ -9,7 +9,7 @@ category: systems
 cover: /images/poc-pivot/topic-review-publishing-cover.png
 coverAlt: "글감별 설명·목차·출처와 발행 대기 상태를 보여주는 위블로그 콘솔 화면"
 coverCaption: "생성된 글감의 설명·목차·출처를 검토하고, 예약 또는 즉시 발행으로 이어지는 위블로그 화면입니다."
-series: weblog-development
+series: wiblog-development
 seriesOrder: 1
 seriesTitle: "위블로그 개발기"
 ---
