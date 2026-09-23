@@ -293,7 +293,9 @@ I forcefully killed the Primary and measured recovery time.
 
 * * *
 
-## Lessons Learned
+<a id="lessons-learned"></a>
+
+## Conclusion
 
 The takeaways from this migration are clear.
 

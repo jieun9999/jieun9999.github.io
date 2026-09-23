@@ -12,7 +12,9 @@ seriesOrder: 3
 seriesTitle: 'Building a Threads Marketing Agent'
 ---
 
-## TL;DR
+<a id="tldr"></a>
+
+## Introduction
 
 This is the final part of the Threads marketing agent series. Part 1 covered the crawling that secures the raw material; Part 2 covered the pipeline that turns it into posts, publishes them, and measures performance. This part is about attaching reactions to published posts — sub-accounts adding comments and likes in distinct voices.
 
@@ -193,7 +195,9 @@ The reason for second-level granularity: cutting at the minute (5 min, 10 min) i
 
 * * *
 
-## 4\. Reliability, limits, and what I learned
+<a id="4-reliability-limits-and-what-i-learned"></a>
+
+## Conclusion
 
 ### Idempotent queue and retries
 

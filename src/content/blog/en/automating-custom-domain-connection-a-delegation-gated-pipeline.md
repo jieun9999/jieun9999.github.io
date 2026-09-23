@@ -20,6 +20,8 @@ coverAlt: "A confirmation modal for buying and attaching a custom domain in the 
 coverCaption: "Behind one buy button: DNS delegation, certificate issuance, and search-engine registration, all automatic."
 ---
 
+## Introduction
+
 > [!NOTE]
 > Click "Buy" and the feature purchases a domain and attaches it to a blog. I thought one click was all it took. Behind it was **a wait we can't shorten with code.**
 
@@ -131,7 +133,9 @@ One more thing: **before completion, we don't render the new domain as a link.**
 
 ---
 
-## 6\. Result — from three manual steps to zero
+<a id="6-result--from-three-manual-steps-to-zero"></a>
+
+## Conclusion
 
 First domain vs. last domain:
 

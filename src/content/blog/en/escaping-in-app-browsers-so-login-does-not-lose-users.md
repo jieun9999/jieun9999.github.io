@@ -19,6 +19,8 @@ coverAlt: "Two Kakao login screens side by side. The Threads in-app browser show
 coverCaption: "Same URL, same login page. The only difference is which browser you arrived in."
 ---
 
+## Introduction
+
 Login is the thinnest gate in a product. Block someone once and they don't investigate why — they just leave.
 
 And that gate looked different **depending on where the user came from.** People who tapped a link inside Threads never saw the "Log in with Kakao Talk" button at all.
@@ -165,7 +167,9 @@ const onClick = (e: MouseEvent<HTMLAnchorElement>) => {
 
 ---
 
-## 4\. Why I Removed the Banner
+<a id="4-why-i-removed-the-banner"></a>
+
+## Conclusion
 
 The first version had an explanatory banner. On detecting an in-app browser it showed an "Open in Safari" button with a line of copy. I assumed that telling people why it was broken would let them handle it.
 

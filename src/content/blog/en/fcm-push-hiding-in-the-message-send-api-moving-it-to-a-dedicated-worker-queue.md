@@ -13,7 +13,9 @@ seriesOrder: 3
 seriesTitle: 'Load-Testing a Messenger'
 ---
 
-## TL;DR
+<a id="tldr"></a>
+
+## Introduction
 
 In Part 1 I built the load-testing environment, and in Part 2 I fixed a PostgreSQL deadlock in the message-send handler. Part 3 covers the **second problem I found in that same handler while diagnosing the deadlock**. Both the problem and the fix have two axes.
 
@@ -176,7 +178,9 @@ Pulling push out of the request path into a queue, and making failures observabl
 
 -   **Visibility of failure** — push is a core retention channel. When Firebase has a partial outage, users miss notifications — and if that runs **without a signal** for days, that's the real incident. Failures must be observable.
 
-## 6\. Takeaways
+<a id="6-takeaways"></a>
+
+## Conclusion
 
 -   **An empty `catch` isn't "no error" — it's "no signal."** Swallow external I/O silently, and the signal you need most disappears exactly when it starts hurting. Moving to a queue and leaving failures in Sentry are **one set**, not two separate chores.
 

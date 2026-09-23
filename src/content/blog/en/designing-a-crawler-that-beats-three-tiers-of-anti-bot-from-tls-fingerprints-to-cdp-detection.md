@@ -12,7 +12,9 @@ seriesOrder: 1
 seriesTitle: 'Building a Threads Marketing Agent'
 ---
 
-## TL;DR
+<a id="tldr"></a>
+
+## Introduction
 
 In an agent that turns Korean car-community posts into Threads content, **the real bottleneck wasn't LLM generation — it was data acquisition (crawling).** Each target site enforces a different level of anti-bot protection, so no single collection strategy covers them all.
 
@@ -237,7 +239,9 @@ Also: a hard-reject filter (death/serious injury, legal disputes, politics, hate
 
 * * *
 
-## 7\. Retrospective
+<a id="7-retrospective"></a>
+
+## Conclusion
 
 -   **Threat-model-first design paid off.** Classifying by "what the anti-bot inspects" rather than "how do I scrape" means a new site drops cleanly into a tier via the decision tree.
     

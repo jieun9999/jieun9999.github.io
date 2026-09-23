@@ -8,7 +8,9 @@ category: reliability
 cover: /covers/building-a-crash-resilient-end-to-end-meeting-recording-pipeline-in-the-browser.webp
 coverAlt: 'Building a Crash-Resilient, End-to-End Meeting Recording Pipeline in the Browser'
 ---
-## The Problem
+<a id="the-problem"></a>
+
+## Introduction
 
 The platform I worked on had a straightforward meeting recording feature: hit record in the browser, stop when you're done, upload the file, click a button to transcribe. It worked — but was deeply flawed.
 
@@ -256,7 +258,9 @@ This isn't premature optimization — it's the difference between a system that 
 
 * * *
 
-## Results
+<a id="results"></a>
+
+## Conclusion
 
 All six pipeline stages were completed and deployed as of March 25, 2026.
 

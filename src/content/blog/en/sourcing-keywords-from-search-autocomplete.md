@@ -19,6 +19,8 @@ coverAlt: "Admin keyword settings screen showing seven keywords discovered from 
 coverCaption: "Type a seed, hit Fetch, and this list appears about 200ms later. The icon on the right says which search box the phrase came from."
 ---
 
+## Introduction
+
 The first stage of an automated blog pipeline is picking keywords. If that stage is slow everything behind it waits, and **if it comes back empty there's nothing to build on.**
 
 The pipeline I worked on spent 25 seconds per keyword here. Everyone knew it was slow. The working theory was that Naver's API was the bottleneck. **Nobody had measured it.**
@@ -350,7 +352,9 @@ Three rules attached to it:
 
 ---
 
-## 5\. Does it belong in production
+<a id="5-does-it-belong-in-production"></a>
+
+## Conclusion
 
 ### 5.1 One question left
 

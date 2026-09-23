@@ -1,5 +1,7 @@
 # 새 글 쓰는 법 (요약)
 
+본문을 작성하거나 구조를 고칠 때는 [집필 기준](docs/writing/GUIDE.md)을 먼저 확인합니다. [참고 글 5편과 기존 글별 적용 제안](docs/writing/README.md)에서 맞는 구조 1~2개를 골라 사용합니다. 모든 글은 **들어가며 → 주제별 본론 → 마무리하며**를 유지합니다. 영어 글은 `Introduction`과 `Conclusion`을 사용하고, 본론 소제목은 내용에 맞게 바꿉니다.
+
 1. 이 파일을 복사해서 **파일 이름 = URL slug** 로 저장:
    - 영어: `src/content/blog/en/<slug>.md`
    - 한국어: `src/content/blog/ko/<slug>.md`  ← **같은 파일명**이면 EN↔KO 토글로 연결됨
@@ -18,7 +20,7 @@ subtitle: '목록에서 제목 아래 보이는 짧은 부제'  # 한글 30자·
 pubDate: 2026-07-08
 # updatedDate: 2026-07-10        # (선택) 수정일
 tags: ['tag-one', 'tag-two']     # 소문자-하이픈 권장. 오른쪽 TAGS 패널/태그 페이지에 자동 반영. 목록엔 앞 3개만 보이니 대표 태그를 앞에
-category: building               # building | open-source | fundamentals | career
+category: systems               # systems | scaling | reliability | devops
 # cover: /covers/my-post.webp    # (선택) 커버 이미지. 없으면 자동 블루 타일 + 제목 이니셜
 # coverAlt: '커버 이미지 설명'
 # series: my-series              # (선택) 시리즈로 묶기 (같은 값끼리 그룹)
@@ -27,12 +29,20 @@ category: building               # building | open-source | fundamentals | caree
 # draft: true                    # true면 배포에서 제외(초안). 지우거나 false면 발행
 ---
 
-첫 문단입니다. 여기부터 본문이에요.
+## 들어가며
+
+제품과 대상 사용자, 내가 맡은 역할을 소개합니다. 어떤 문제를 겪었고 이 글이 무엇을 설명하는지 짧게 안내합니다.
 
 > [!NOTE]
 > 콜아웃 박스. NOTE / TIP / IMPORTANT / WARNING / CAUTION 5종.
 
-## 섹션 제목 (## = h2, ### = h3 → 목차 자동 생성)
+## 문제와 기존 방식
+
+어떤 조건에서 문제가 생겼는지, 사용자나 시스템에 어떤 영향을 줬는지 설명합니다. 실제 글에서는 내용을 드러내는 구체적인 소제목으로 바꿉니다.
+
+## 선택한 해결 방법과 구현
+
+관찰한 근거와 제약이 선택한 방법으로 어떻게 이어지는지 설명합니다. 아래 문법 예시는 필요한 내용으로 교체하거나 삭제합니다. H2·H3는 목차에 자동 반영됩니다.
 
 **굵게**, _기울임_, `인라인 코드`, [링크](https://example.com), 그리고 표·목록 모두 됩니다.
 
@@ -48,3 +58,11 @@ export function greet(name: string) {
 alt를 적으면 캡션으로 표시되고, 본문 이미지는 클릭하면 크게 볼 수 있어요.
 
 ![이미지 캡션이 됩니다](/images/example.webp)
+
+## 검증 결과
+
+측정 조건과 비교 기준, 확인한 결과와 검증하지 못한 범위를 구분합니다.
+
+## 마무리하며
+
+핵심 문제를 어떻게 해결했는지와 그 판단의 의미를 정리합니다. 남은 한계나 다음 과제를 덧붙이고, 본론에 없던 새로운 성과는 추가하지 않습니다.

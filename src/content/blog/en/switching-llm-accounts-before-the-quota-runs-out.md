@@ -20,6 +20,8 @@ coverAlt: "Full dashboard view. The weekly quota panel in the top right has reac
 coverCaption: "The weekly quota is the panel in the top right. 33 hours until reset, 11% left."
 ---
 
+## Introduction
+
 > [!NOTE]
 > The service I own generates blog post bodies with an LLM. It runs on a subscription account rather than a metered API key, and subscriptions come with a weekly quota. Once that quota is full, no posts come out until the next reset. Users had posts scheduled throughout the day, so when the account hit 88% I caught it and switched to the sub account at dawn, while nothing was generating. It now moves to the sub on its own once the primary crosses 80%.
 
@@ -300,7 +302,9 @@ expr: (time() - max(grok_account_quota_updated_seconds)) or vector(999999)
 noDataState: Alerting
 ```
 
-## 5\. Results
+<a id="5-results"></a>
+
+## Conclusion
 
 The first generation block on the night of the switch went through without errors.
 

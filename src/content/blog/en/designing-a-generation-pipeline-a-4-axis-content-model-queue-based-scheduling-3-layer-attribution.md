@@ -12,7 +12,9 @@ seriesOrder: 2
 seriesTitle: 'Building a Threads Marketing Agent'
 ---
 
-## TL;DR
+<a id="tldr"></a>
+
+## Introduction
 
 Part 1 secured posts from arbitrary sites into a single normalized schema (`{title, body, comments[], images[]}`). Part 2 covers three design decisions that wire it into an **operable publish-and-measure pipeline.**
 
@@ -220,7 +222,9 @@ This is a record of a well-designed system, not a system with proven marketing o
 -   **What's proven vs not:** Proven — pipeline liveness (generate → queue → publish → 3-layer collection end-to-end), measurement integrity (double-counting / bot filter enforced at the schema), inbound real clicks starting after the bio link. Unproven — whether the content actually drives higher engagement/conversion (causation). That's the next phase's task.
     
 
-## 5\. Retrospective
+<a id="5-retrospective"></a>
+
+## Conclusion
 
 -   **A content model is a refactoring target.** enum conflation (TP1) → orthogonal decomposition (2) → filling a missing abstraction (4) is isomorphic to code refactoring. Tracing "why the same failure mode every time" reveals the missing axis.
     

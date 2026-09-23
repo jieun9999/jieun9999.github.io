@@ -14,6 +14,8 @@ seriesOrder: 2
 seriesTitle: "Sharing One Machine Among Four People"
 ---
 
+## Introduction
+
 In [Part 1](/en/blog/part1-three-tier-dev-environment/), I wrote about the three-tier structure split across MacBook, server, and production. This time I am writing about the middle tier: **how we divided roles and permissions inside one machine while four people actually shared it**.
 
 I am a developer, and Juhee is a designer. Connecting to the same server did not mean we should receive the same permissions or workspace. Developers need a shell and coding agents, but there is no reason to give a designer production-server keys or access to other people's folders.
@@ -298,7 +300,9 @@ So cron's job is **to clean finished workspaces every hour and reclaim dev proce
 
 ---
 
-## Scorecard
+<a id="scorecard"></a>
+
+## Conclusion
 
 | Criterion | Result |
 | --- | --- |

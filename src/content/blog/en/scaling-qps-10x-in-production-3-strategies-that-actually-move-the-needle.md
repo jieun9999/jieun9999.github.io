@@ -8,6 +8,9 @@ category: scaling
 cover: /covers/scaling-qps-10x-in-production-3-strategies-that-actually-move-the-needle.webp
 coverAlt: 'Scaling QPS 10x in Production: 3 Strategies That Actually Move the Needle'
 ---
+
+## Introduction
+
 > "Make it faster" sounds like a vague mandate. It isn't. Performance work turns out to be one of the most _learnable_ parts of backend engineering, because it almost always comes down to the same three moves. These are the three I shipped in production — and they took our QPS up more than 10x.
 
 Let me walk through them the way I actually think about them now: **why the bottleneck exists → how to fix it → how much it actually moved the needle.**
@@ -392,7 +395,9 @@ Blocking on the client is the cheapest optimization of all, because **the reques
 
 * * *
 
-## Wrapping up — why this order, and why the effects multiply
+<a id="wrapping-up--why-this-order-and-why-the-effects-multiply"></a>
+
+## Conclusion
 
 There's plenty beyond these three — horizontal scaling (load balancer + multiple servers), HTTP/2, gzip/brotli compression, separating static assets — but **applying just these three properly usually lifts QPS by 10x or more.** So when you start tuning, you almost always go in this order (best bang-for-buck first):
 

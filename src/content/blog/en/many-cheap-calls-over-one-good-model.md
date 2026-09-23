@@ -19,6 +19,8 @@ coverAlt: "A diagram comparing one 8,000-character request against eight 1,200-c
 coverCaption: "Same model. On the left, one request for 8,000 characters. On the right, eight requests for 1,200 each, assembled."
 ---
 
+## Introduction
+
 In a pipeline that writes blog posts automatically, the step after picking a keyword is deciding who writes. The step before is in [the keyword discovery post](/en/blog/sourcing-keywords-from-search-autocomplete/).
 
 The pipeline I worked on kept two engines in this slot for ten days. Same topics through both, every article read, and Codex won on quality. Ten days later Codex is what I deleted.
@@ -194,7 +196,9 @@ What changed was not the wording but where the block sits. A template telling th
 
 ---
 
-## 5. What came out, and what stayed
+<a id="5-what-came-out-and-what-stayed"></a>
+
+## Conclusion
 
 ### 5.1 Splitting and a serial lock multiply
 
