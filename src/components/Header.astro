@@ -97,13 +97,13 @@ const menu = [
     transition: background-color 0.2s ease;
   }
   /* 템플릿처럼 데스크톱에선 흘려보내고, 태블릿·모바일에선 위에 붙인다 */
-  @media (max-width: 1199px) {
+  @media (max-width: 1071px) {
     .site-header { position: sticky; top: 0; }
   }
   /* 홈·카테고리·태그는 히어로가, 소개는 점 바탕이 헤더 뒤까지 올라온다(Hero snug) — 헤더를 비워 점이 로고 뒤에서도 떠다니게.
      위에 붙는 폭에선 스크롤하거나 메뉴를 열면 뒤가 비치지 않게 다시 칠한다. */
   :global(body:has([data-under-header])) .site-header { background: transparent; }
-  @media (max-width: 1199px) {
+  @media (max-width: 1071px) {
     :global(body:has([data-under-header])) .site-header:is([data-solid], :has(.mobile-panel:not([hidden]))) {
       background: var(--bg);
     }
