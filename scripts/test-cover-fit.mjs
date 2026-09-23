@@ -89,6 +89,10 @@ try {
       }
       assert.equal(await evaluate(`getComputedStyle(document.querySelector('a.img[href="/ko/blog/redefining-ai-blog-product-after-beta-feedback/"] img')).objectFit`), 'cover', 'Other covers unchanged');
       assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'), true, 'No horizontal overflow');
+      assert.equal(await evaluate(`Array.from(document.querySelectorAll('.lead')).every(el => {
+        const sentences = Array.from(new Intl.Segmenter('ko', { granularity: 'sentence' }).segment(el.textContent.trim()));
+        return el.scrollHeight <= el.clientHeight + 1 && sentences.length === 2 && sentences.every(s => /니다\\.$/.test(s.segment.trim()));
+      })`), true, 'Korean summaries must show two complete polite sentences');
     }
   }
   console.log(`PASS: five covers, three widths, two themes, hover; screenshots: ${artifacts}`);

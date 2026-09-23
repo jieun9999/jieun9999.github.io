@@ -1,7 +1,7 @@
 ---
 title: '브라우저에서 크래시에 강한 엔드투엔드 회의 녹음 파이프라인 구축하기'
 description: '한 시간짜리 브라우저 녹음이 JS 힙을 300MB까지 밀어올렸고, 탭이 크래시하면 전부 손실됐습니다. 5분 세이브포인트를 둔 6단계 파이프라인으로 다시 만든 기록입니다.'
-subtitle: "힙 300MB와 탭 크래시를 5분 세이브포인트로 버티기"
+subtitle: "긴 브라우저 녹음에서 메모리 증가와 크래시 손실, 음성 인식 품질과 수동 처리 흐름이 문제였습니다. 5분 단위 저장과 클라우드 직접 업로드를 도입하고, 전사·회의록 요약·실시간 전달까지 이어지는 파이프라인을 구축했습니다."
 pubDate: 2026-03-26
 tags: ['web-audio-api', 'cloudflare', 'speech-recognition', 'ai', 'presignedurl', 'bullmq']
 category: reliability

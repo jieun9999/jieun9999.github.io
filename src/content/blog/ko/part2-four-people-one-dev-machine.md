@@ -1,7 +1,7 @@
 ---
 title: "Part 2 — VPS 한 대를 네 명이 나눠 씁니다 — 역할별 권한·홈·포트 격리 설계"
 description: "16GB 맥북의 한계를 느껴 빌린 96GB·18코어 서버를 개발자 Jieun·Sungsuk, 디자이너 Juhee, 마케터 Jina가 함께 쓰게 됐습니다. 역할에 따라 권한과 프로젝트 홈, 포트를 나누고 운영 서버는 공용 터널 서비스 뒤에 격리했습니다."
-subtitle: "개발자 둘, 디자이너, 마케터가 한 서버를 쓰는 방법"
+subtitle: "개발자 두 명과 디자이너, 마케터가 VPS 한 대를 함께 쓰면서 역할별로 계정과 홈, 포트를 나눴습니다. 각자의 작업공간은 분리하되, 운영 API 연결은 공용 터널 서비스가 담당하도록 구성했습니다."
 pubDate: 2026-09-16
 tags:
   ["linux", "cron", "systemd", "git-worktree", "ssh", "devops", "automation"]

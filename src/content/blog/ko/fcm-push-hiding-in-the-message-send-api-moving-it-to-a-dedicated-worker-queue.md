@@ -1,7 +1,7 @@
 ---
 title: '[메신저 부하 테스트 3편] 요청 경로의 FCM은 큐로, 삼키던 실패는 Sentry로 — 메시지 전송 핸들러 정리기'
 description: '메신저 부하 테스트 실전기 3편: 메시지 전송 핸들러에 섞여 있던 FCM 푸시를 전용 워커 큐로 분리하고, 빈 catch에 삼켜지던 실패를 Sentry로 관측 가능하게 만든 이야기입니다. 외부 I/O 격리와 에러 로그 처리, 두 축을 함께 다룹니다.'
-subtitle: "외부 I/O 격리와 삼켜지던 에러 드러내기"
+subtitle: "메시지 전송 요청에 섞여 있던 FCM 푸시를 전용 워커 큐로 분리했습니다. 요청 처리와 외부 호출의 책임을 나누고, 빈 catch에서 사라지던 실패를 Sentry로 관측할 수 있게 바꾸었습니다."
 pubDate: 2026-05-17
 tags: ['fcm', 'bullmq', 'sentry', 'observability', 'node-js', 'concurrency', 'architecture']
 category: reliability

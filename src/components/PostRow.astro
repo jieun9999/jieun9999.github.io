@@ -1,5 +1,5 @@
 ---
-// 글 한 줄 — 왼쪽 큰 이미지 + 오른쪽 [카테고리 … 날짜] → 제목 → 최대 두 줄 부제 → 태그.
+// 글 한 줄 — 왼쪽 큰 이미지 + 오른쪽 [카테고리 … 날짜] → 제목 → 내용 요약 → 태그.
 // 대표 글과 목록이 같은 모양을 쓴다. 좁은 화면에선 이미지가 위로 올라간다.
 // 글쓴이는 한 명이라 목록에선 프로필을 빼고, 눈이 제목·부제로 가게 나머지는 옅게 둔다.
 import { categoryLabel, type Lang } from '../i18n/ui';
@@ -16,7 +16,7 @@ interface Props {
 const { lang, post, headingLevel = 'h3', eager = false } = Astro.props;
 const { title, subtitle, description, pubDate, category, tags, cover, coverAlt } = post.data;
 const { coverFit, coverBackground } = post.data;
-// 부제가 없으면 요약을 대신 쓴다. 어느 쪽이든 최대 두 줄까지 표시한다
+// 부제가 없으면 요약을 대신 쓴다. 한국어 설명은 전체, 영어는 최대 두 줄까지 표시한다.
 const lead = subtitle ?? description;
 // 태그는 앞에서 세 개만 — 대표 태그를 앞에 적는다
 const shownTags = tags.slice(0, 3);
@@ -47,7 +47,7 @@ const monogram = (title.trim()[0] ?? '·').toUpperCase();
       <time datetime={isoDate}>{isoDate}</time>
     </div>
     <Heading class="title"><a href={href}>{title}</a></Heading>
-    <p class="lead"><a href={href} tabindex="-1">{lead}</a></p>
+    <p class:list={['lead', { 'lead--full': lang === 'ko' }]}><a href={href} tabindex="-1">{lead}</a></p>
     {
       shownTags.length > 0 && (
         <ul class="tags">
@@ -151,13 +151,18 @@ const monogram = (title.trim()[0] ?? '·').toUpperCase();
     font-weight: 500;
     line-height: 1.55;
     color: var(--text-muted);
-    /* 최대 두 줄까지 표시하고 넘치는 내용은 말줄임표로 처리한다 */
+    /* 영어는 최대 두 줄. 한국어는 아래 lead--full에서 전체 표시한다. */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
   .lead a { color: inherit; }
+  .lead--full {
+    display: block;
+    -webkit-line-clamp: unset;
+    overflow: visible;
+  }
   .tags {
     display: flex;
     flex-wrap: wrap;

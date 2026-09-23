@@ -1,7 +1,7 @@
 ---
 title: '[메신저 부하 테스트 1편] 재사용 가능한 부하 테스트 환경 구축 — Make 기반 IaC, Observability, Auth Seeding'
 description: '메신저의 send API가 몇 TPS까지 버티는지, 정확히 어디서 무너지는지 확인했습니다. 프로덕션을 복제한 7-노드 환경을 Makefile 한 줄로 언제든 다시 세울 수 있게 만들었습니다.'
-subtitle: "프로덕션을 복제한 7-노드 환경을 Makefile 한 줄로"
+subtitle: "메신저 API의 처리 한계와 병목을 확인하기 위해 운영 구성을 복제한 7노드 부하 테스트 환경을 만들었습니다. 인프라 생성부터 관측 도구와 인증 데이터 준비까지 반복 실행할 수 있도록 구성했습니다."
 pubDate: 2026-05-04
 tags: ['load-testing', 'k6', 'observability', 'grafana', 'prometheus', 'postgresql', 'terraform', 'websockets', 'devops']
 category: scaling
