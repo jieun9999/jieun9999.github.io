@@ -20,6 +20,8 @@ coverAlt: "A Cloudflare 523 page shown while the origin was unreachable during a
 coverCaption: "The moment the origin disappeared mid-deploy. Cloudflare is Working — only Host is in Error."
 ---
 
+## Introduction
+
 > [!NOTE]
 > Eight deploys went out in 25 minutes, and the service went down on every one of them. The culprit was a single `docker compose up -d --force-recreate` with no service names.
 
@@ -429,7 +431,9 @@ A step printing uptime was already there, and its comment was even correct — _
 
 ---
 
-## 5\. Results
+<a id="5-results"></a>
+
+## Conclusion
 
 So that an upstream cache couldn't paper over a gap at the origin, verification went **straight at the origin's 443, bypassing Cloudflare**, every 0.5 seconds. **Zero failures.** A probe that quietly dies also reports zero, so we cross-checked against the access log for the same window: **437 requests**. The most conclusive signal is the container itself.
 

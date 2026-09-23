@@ -19,6 +19,8 @@ coverAlt: "Architecture diagram: only caddy is exposed, while api, db and redis 
 coverCaption: "Caddy is the only door in from the internet. Only the boxes marked ● hold DB credentials — admin does not."
 ---
 
+## Introduction
+
 A designer asked to run the UI locally and edit it while watching the screen. Common enough request, but not simple on the platform I work on.
 
 The api lives on an internal network only. Caddy doesn't proxy it, so there is no URL to call it from outside, and db and redis don't publish ports at all. Meanwhile admin (Next.js) is a BFF, so its server components call the api at render time. **Boot admin alone on a laptop and every one of those fetches fails, so the page comes back as a 500.** Even someone touching nothing but frontend code needs a live api connection.
@@ -299,7 +301,9 @@ This is the part where **opening a port makes things safer.** That's backwards f
 
 ---
 
-## 4\. Don't make people remember the procedure
+<a id="4-dont-make-people-remember-the-procedure"></a>
+
+## Conclusion
 
 Even with all that, a sequence remains. Check the tunnel is alive, check nothing already holds port 3000, then start the dev server. Leave that to memory and it eventually gets skipped.
 

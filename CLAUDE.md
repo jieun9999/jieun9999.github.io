@@ -2,6 +2,7 @@
 
 기술 블로그. Astro + GitHub Pages, 커스텀 도메인 **jieun.dev**, 한/영 i18n(`/en/`·`/ko/`).
 새 글 작성 절차·frontmatter는 `POST_TEMPLATE.md` 참고. 이 문서는 **SEO/교차발행 규칙**을 다룬다.
+본문 집필·구조 개편·시리즈 분할·품질 리뷰는 [집필 기준](docs/writing/GUIDE.md)을 따른다. [참고 글 목록](docs/writing/README.md)에서 작업에 맞는 분석 카드 1~2편을 선택한다. 단순 오탈자·링크 수정에는 전체 집필 절차를 적용하지 않는다.
 화면 디자인(토큰·공통 틀·페이지별 구조와 규칙)은 **`design/`** 에 페이지마다 한 파일로 있다 — `design/README.md` 부터.
 화면을 고치면 해당 `design/*.md` 도 같은 커밋에서 고친다.
 
@@ -25,6 +26,8 @@ Hashnode 에 맡기는 2채널 구조였다. Hashnode 가 GraphQL API 를 Pro �
 - repo Secret `HASHNODE_PAT` 은 이제 쓰이지 않는다(지워도 무방).
 
 ## 새 글 쓸 때 규칙 (중요)
+
+본문은 **들어가며 → 주제별 본론 → 마무리하며**로 통일한다. 한국어 첫·마지막 H2는 `들어가며`·`마무리하며`, 영어는 `Introduction`·`Conclusion`이다. 본론은 내용에 맞는 구체적인 소제목을 쓴다.
 
 1. **파일명 = URL slug.** EN↔KO 짝은 **같은 파일명**으로 연결(`en/<slug>.md` ↔ `ko/<slug>.md`).
 2. **canonical 은 건드리지 않는다.** 기본값 self 가 정답이다. `canonicalURL` 필드는

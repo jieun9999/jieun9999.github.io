@@ -14,6 +14,8 @@ seriesOrder: 1
 seriesTitle: "Sharing One Machine Among Four People"
 ---
 
+## Introduction
+
 We started development on individual 16GB RAM MacBooks, but the limit showed up quickly once the codebase, development tools, and coding agents were running together. As builds got heavier, memory ran short. With multiple projects and coding agents open at the same time, the fans spun up and other work slowed down too.
 
 Instead of continuing to upgrade each MacBook, we rented one inexpensive Linux server. We decided to keep the code there, and to run coding, compilation, and coding agents there as well. Today, four people share one 96GB, 18-core Linux machine.
@@ -181,7 +183,9 @@ This is not something we need to do immediately. At the current team and service
 
 ---
 
-## Scorecard
+<a id="scorecard"></a>
+
+## Conclusion
 
 | Segment | Judgment |
 | --- | --- |

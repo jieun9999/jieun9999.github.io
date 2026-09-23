@@ -12,6 +12,8 @@ seriesOrder: 2
 seriesTitle: 'Load-Testing a Messenger'
 ---
 
+## Introduction
+
 > [!NOTE]
 > 42.8% HTTP error rate, 9 minutes into a load test. The culprit was a single `updateMany` line carelessly written during AI-assisted coding.
 
@@ -230,7 +232,9 @@ Phased rollout for backward compatibility:
 
 By the end of Phase 2, **the deadlock vector is already gone**. Why? Once the read path is based on `lastReadAt`, a wrong `unreadCount` value is no longer visible to users. After that, we can clean up the write path on our own schedule, with no production pressure.
 
-## 8\. Lessons — AI Coding and Concurrency
+<a id="8-lessons--ai-coding-and-concurrency"></a>
+
+## Conclusion
 
 This incident wasn't a one-line bug. It was **a thinking-pattern trap**.
 

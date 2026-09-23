@@ -12,6 +12,8 @@ coverAlt: "Cover image comparing search and full-text parsing cost for 15 topic 
 coverCaption: "309 KRW is the counterfactual estimate that adds omitted calls back at the same unit prices. 150 KRW is the actual search and parsing cost recorded in the Chuncheon server logs. This is not a separate before-and-after experiment."
 ---
 
+## Introduction
+
 > [!NOTE]
 > I rechecked the logs for **15 topic candidates** on the Chuncheon production server. If I add back the calls skipped by caching and retry limits, this batch's search and full-text parsing cost drops from about 309 KRW to **150 KRW**, a **51.5% reduction**. Per topic candidate, that is about 20.6 KRW down to 10.0 KRW.
 
@@ -177,7 +179,9 @@ This cap does not reduce a single call the way search caching does. It prevents 
 
 ---
 
-## 5\. I Recalculated It from Server Logs
+<a id="5-i-recalculated-it-from-server-logs"></a>
+
+## Conclusion
 
 Finally, I reconciled the numbers against actual server logs. The target was the `m-wdot-worker-1` container on Chuncheon B. From the container logs, I fixed the sample to topic 40817 through 40831: 15 completed topics processed between 18:48:01 and 18:49:59 KST on September 16, 2026.
 

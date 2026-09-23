@@ -12,6 +12,8 @@ seriesOrder: 1
 seriesTitle: 'Load-Testing a Messenger'
 ---
 
+## Introduction
+
 > I wanted to know exactly how many TPS our messenger's send API could survive — and _where_ it would actually break. So I mirrored production into a 7-node load-test environment, and instead of treating it as a one-shot setup, I designed it to be **reproducible on demand**.
 
 This post is a record of that process — what we wanted to measure, what had to be prepared first, and how the environment itself was wrapped so anyone can re-run the whole thing.
@@ -399,7 +401,9 @@ Why write these down ahead of time? Simple: **if "should we keep going?" gets an
 
 * * *
 
-## Reading a real run on Grafana — the 75→100 TPS knee
+<a id="reading-a-real-run-on-grafana--the-75100-tps-knee"></a>
+
+## Conclusion
 
 About 7–8 minutes into `chat-knee-sweep.js`, just as the sweep stage stepped from **75 TPS to 100 TPS**, we caught this dashboard snapshot. What makes the moment interesting is that **infra resources are barely touched, yet HTTP error rate spikes to 42.8%** — a clear signal that the knee isn't a resource ceiling, it's something inside the app's processing path.
 
