@@ -1,6 +1,6 @@
 ---
 title: '[메신저 부하 테스트 1편] 재사용 가능한 부하 테스트 환경 구축 — Make 기반 IaC, Observability, Auth Seeding'
-description: '메신저의 send API는 몇 TPS까지 버티고, 정확히 어디서 무너지는가. 프로덕션을 복제한 7-노드 환경을 Makefile 한 줄로 언제든 다시 세울 수 있게 만들었습니다.'
+description: '메신저의 send API가 몇 TPS까지 버티는지, 정확히 어디서 무너지는지 확인했습니다. 프로덕션을 복제한 7-노드 환경을 Makefile 한 줄로 언제든 다시 세울 수 있게 만들었습니다.'
 subtitle: "프로덕션을 복제한 7-노드 환경을 Makefile 한 줄로"
 pubDate: 2026-05-04
 tags: ['load-testing', 'k6', 'observability', 'grafana', 'prometheus', 'postgresql', 'terraform', 'websockets', 'devops']
@@ -14,7 +14,7 @@ seriesTitle: '메신저 부하 테스트 실전기'
 
 ## 들어가며
 
-> 우리 메신저의 send API가 정확히 몇 TPS까지 버틸 수 있는지, 그리고 실제로 _어디서_ 무너지는지 알고 싶었습니다. 그래서 프로덕션을 7-노드 부하 테스트 환경으로 복제했고, 이를 일회성 셋업으로 취급하는 대신 **필요할 때마다 재현 가능하도록** 설계했습니다.
+> 제가 담당하던 메신저의 send API가 정확히 몇 TPS까지 버틸 수 있는지, 그리고 실제로 _어디서_ 무너지는지 알고 싶었습니다. 그래서 프로덕션을 7-노드 부하 테스트 환경으로 복제했고, 이를 일회성 셋업으로 취급하는 대신 **필요할 때마다 재현 가능하도록** 설계했습니다.
 
 이 글은 그 과정에 대한 기록입니다 — 무엇을 측정하고 싶었는지, 무엇을 먼저 준비해야 했는지, 그리고 누구나 전체 과정을 다시 실행할 수 있도록 환경 자체를 어떻게 감쌌는지에 대한 이야기입니다.
 
@@ -24,17 +24,17 @@ seriesTitle: '메신저 부하 테스트 실전기'
 
 사람들은 "우리 서비스는 100 MPS를 처리합니다"라고 즐겨 말합니다. 그 숫자 하나만으로 아래 질문에 답해 보세요.
 
--   그 100 MPS는 어떤 **WebSocket 동시 접속** 상황에서 측정된 것인가요?
+-   그 100 MPS는 어떤 **WebSocket 동시 접속** 상황에서 측정된 것입니까?
     
--   어떤 **메시지 타입**인가요? (일반 텍스트? 멘션? 첨부파일?)
+-   어떤 **메시지 타입**입니까? (일반 텍스트? 멘션? 첨부파일?)
     
--   어떤 종류의 **채널**로 보낸 것인가요? (5명 채널? 50명 채널? 수천 명?)
+-   어떤 종류의 **채널**로 보낸 것입니까? (5명 채널? 50명 채널? 수천 명?)
     
--   그 부하는 **얼마나 오래** 유지되었나요?
+-   그 부하는 **얼마나 오래** 유지되었습니까?
     
--   실행 중 **CPU, DB 커넥션, Redis, Centrifugo**의 상태는 어땠나요?
+-   실행 중 **CPU, DB 커넥션, Redis, Centrifugo**의 상태는 어땠습니까?
     
--   **4xx / 5xx 비율**과 **REST→WS p95/p99 전달 지연**은 어땠나요?
+-   **4xx / 5xx 비율**과 **REST→WS p95/p99 전달 지연**은 어땠습니까?
     
 
 이런 변수들을 모두 걷어낸 단일 숫자는 무의미합니다. 그래서 이 프로젝트의 목표는 "더 큰 숫자를 만들어내는 것"이 아니라 **"위의 모든 질문에 답할 수 있는 측정 환경을 만드는 것"**이었습니다.
@@ -43,7 +43,7 @@ seriesTitle: '메신저 부하 테스트 실전기'
 
 > **수천 명이 있는 단일 채널에 부하를 몰지 말 것. 부하를 수백 개의 작은 채널(5명/50명 혼합)에 분산시킬 것.**
 
-우리 메시지 API는 `msg:{userId}:{channelId}` 단위 rate limit(10초당 10요청, 즉 pair당 약 1 TPS)을 적용합니다. **단일 채널에 부하를 몰면 실제 백엔드 부하가 나타나기 훨씬 전인 100 TPS 부근에서 429를 맞습니다.** 프로덕션과 유사한 조건에서 1k TPS를 소화하려면 최소 1,000개, 이상적으로는 2,000개 이상의 서로 다른 sender/channel pair가 필요합니다. 데이터셋 자체를 프로덕션 트래픽 형태에 맞춰 설계해야 합니다.
+메시지 API는 `msg:{userId}:{channelId}` 단위 rate limit(10초당 10요청, 즉 pair당 약 1 TPS)을 적용합니다. **단일 채널에 부하를 몰면 실제 백엔드 부하가 나타나기 훨씬 전인 100 TPS 부근에서 429를 맞습니다.** 프로덕션과 유사한 조건에서 1k TPS를 소화하려면 최소 1,000개, 이상적으로는 2,000개 이상의 서로 다른 sender/channel pair가 필요합니다. 데이터셋 자체를 프로덕션 트래픽 형태에 맞춰 설계해야 합니다.
 
 * * *
 
@@ -85,7 +85,7 @@ Next.js App writes → PostgreSQL
 
 ## 재사용 가능한 인프라 — 단일 진입점으로서의 Makefile + Terraform
 
-부하 테스트 환경의 가장 큰 함정은 "한 번 셋업하고 다시는 손대지 않는 것"입니다. 1k TPS 스모크 테스트가 DB를 무너뜨리고, 일주일 뒤에 knee sweep을 돌리러 돌아왔을 때 PG 비밀번호나 cloud-init이 마지막으로 어디서 멈췄는지를 누군가 기억해내야 한다면, 오후 하나가 통째로 날아갑니다.
+부하 테스트 환경의 가장 큰 함정은 "한 번 셋업하고 다시는 손대지 않는 것"입니다. 1k TPS 스모크 테스트가 DB를 불안정하게 만들고, 일주일 뒤에 knee sweep을 돌리러 돌아왔을 때 PG 비밀번호나 cloud-init이 마지막으로 어디서 멈췄는지를 누군가 기억해내야 한다면, 오후 하나를 그대로 쓰게 됩니다.
 
 그래서 모든 것을 **하나의 Makefile 주도 흐름**으로 감쌌습니다. Terraform이 7대 호스트 전체를 단일 state로 관리하고, 그 위에서 Make가 `up → wait → cutover → smoke → down`을 순서대로 실행합니다.
 
@@ -103,7 +103,7 @@ make down       # destroy all 7
 
 **(1) Terraform output →** `scripts/HOSTS.env` **자동 갱신.** IP는 절대 하드코딩되지 않습니다 — README에도, 스크립트에도 마찬가지입니다. `make up` 이후 `HAPROXY_IP`, `APP_IP`, `CENTRIFUGO_1_IP` 같은 env 변수가 자동으로 채워지고, 모든 하위 스크립트는 `source scripts/HOSTS.env`로 시작합니다. **코드 한 줄 건드리지 않고도 IP가 바뀔 수 있습니다.**
 
-**(2)** `secrets-check` **게이트.** App과 Centrifugo가 **서로 다른 HMAC secret**을 갖게 되면, JWT 검증이 도처에서 조용히 실패합니다. 이걸 수동으로 추적하는 데는 한 시간이 날아갑니다. 그래서 `cutover` 전에 `compose/.env.app`과 `compose/.env.centrifugo` 사이의 `CENTRIFUGO_HMAC_SECRET_KEY`가 일치하는지 자동으로 검증합니다.
+**(2)** `secrets-check` **게이트.** App과 Centrifugo가 **서로 다른 HMAC secret**을 갖게 되면, JWT 검증이 여러 지점에서 조용히 실패합니다. 이를 수동으로 추적하는 데는 한 시간이 걸릴 수 있습니다. 그래서 `cutover` 전에 `compose/.env.app`과 `compose/.env.centrifugo` 사이의 `CENTRIFUGO_HMAC_SECRET_KEY`가 일치하는지 자동으로 검증합니다.
 
 ```make
 secrets-check:
@@ -215,7 +215,7 @@ docker compose -f monitoring/docker-compose.monitor.yml up -d
 -   각 receiver가 어떤 Centrifugo 채널을 subscribe할 수 있는가
     
 
-이 모든 것이 아홉 개의 `data/generated/*.jsonl` 파일로 직렬화됩니다. **이 파일들이 테스트의 SSOT입니다.** Postgres, Redis, k6는 모두 같은 시점의 같은 스냅샷을 바라보고 있어야 합니다 — 이들 사이에 drift가 생기면 즉시 401/403이 폭주합니다.
+이 모든 것이 아홉 개의 `data/generated/*.jsonl` 파일로 직렬화됩니다. **이 파일들이 테스트의 SSOT입니다.** Postgres, Redis, k6는 모두 같은 시점의 같은 스냅샷을 바라보고 있어야 합니다 — 이들 사이에 drift가 생기면 즉시 401/403이 크게 늘어납니다.
 
 ### 생성 파이프라인
 
@@ -397,7 +397,7 @@ Postgres deadlocks repeating
 client CPU pinned at 80–90% AND achieved TPS falling behind target
 ```
 
-왜 이것들을 미리 적어두는가? 간단합니다. **"계속 진행해도 될까?"를 실행 도중 직감으로 답하기 시작하면, 그 결과 리포트는 신뢰를 잃습니다.**
+왜 이것들을 미리 적어두어야 할까요? 간단합니다. **"계속 진행해도 될까?"를 실행 도중 직감으로 답하기 시작하면, 그 결과 리포트는 신뢰를 잃습니다.**
 
 * * *
 
@@ -407,7 +407,7 @@ client CPU pinned at 80–90% AND achieved TPS falling behind target
 
 대시보드는 앞서 세팅한 세 레이어 순서로 읽습니다: `(A) k6 / Sender → (B) Delivery / Receiver → (C) Server / Resource`.
 
-_(계속 —_ "다음 글에서 앱 서버 로그를 파고들어 42.8% HTTP 에러율\*의 원인을 풀어보겠습니다.)\*
+_(계속 —_ "다음 글에서 앱 서버 로그를 파고들어 42.8% HTTP 에러율\*의 원인을 풀어보겠습니다.")\*
 
 ![](/images/469c2171-2a30-4c0a-8dd0-373aa02d4bec.webp) ![](/images/35960873-fdfd-46bc-b73c-31bce2c7f2e3.webp) ![](/images/c83745e8-8bc4-4fc5-b94e-00045ed3078e.webp) ![](/images/08dddcc4-0e94-4e9c-9a7c-13c7f4710088.webp)
 
@@ -415,4 +415,4 @@ _(계속 —_ "다음 글에서 앱 서버 로그를 파고들어 42.8% HTTP 에
 
 ## 마무리하며
 
-_읽어주셔서 감사합니다. 비슷한 측정 작업을 진행하고 있다면, 이 글에서 가져갈 만한 가장 가치 있는 두 가지 패턴은 아마_ _**"IaC + 배포 + 스모크 + seeding + teardown을 하나의 Make 주도 흐름으로 감싼다"**_ _와_ _**"auth 상태를 파일로 직렬화하고 그것을 SSOT로 취급한다"**_ _일 것입니다. 이 두 가지가 환경이 재사용 가능한 것이 되는지, 아니면 그냥 일회성으로 끝나는지를 결정합니다._
+_읽어주셔서 감사합니다. 비슷한 측정 작업을 진행하고 있다면, 이 글에서 가져갈 만한 가장 가치 있는 두 가지 패턴은 아마_ _**"IaC + 배포 + 스모크 + seeding + teardown을 하나의 Make 주도 흐름으로 감쌉니다"**_ _와_ _**"auth 상태를 파일로 직렬화하고 그것을 SSOT로 취급합니다"**_ _일 것입니다. 이 두 가지가 환경이 재사용 가능한 것이 되는지, 아니면 그냥 일회성으로 끝나는지를 결정합니다._
