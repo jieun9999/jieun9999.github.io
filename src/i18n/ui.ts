@@ -29,6 +29,7 @@ export const ui = {
     allArticles: 'All Articles',
     loadMore: 'Load More',
     nextArticle: 'Next Article',
+    previousArticle: 'Previous Article',
     newerArticle: 'Newer Article',
     pages: 'Pages',
     // 검색
@@ -61,6 +62,7 @@ export const ui = {
     allArticles: '전체 글',
     loadMore: '더 보기',
     nextArticle: '다음 글',
+    previousArticle: '이전 글',
     newerArticle: '최신 글',
     pages: '페이지',
     search: '검색',

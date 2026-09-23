@@ -106,11 +106,11 @@ const chapterPos = (c: Chapter, i: number) =>
 // 제목은 단어마다 떠오른다(GSAP, 아래 스크립트) — 단어를 span 으로 나눠 둔다.
 const titleWords = title.split(/\s+/).filter(Boolean);
 
-// "다음 글" = 이어서 읽을 더 오래된 글. 가장 오래된 글이면 더 최신 글을 대신 건다.
-const upNext = prev
-  ? { label: t.nextArticle, link: prev }
-  : next
-    ? { label: t.newerArticle, link: next }
+// 다음 글은 더 최신 글을 우선한다. 최신 글에서는 이전 글로 연결한다.
+const upNext = next
+  ? { label: t.nextArticle, link: next }
+  : prev
+    ? { label: t.previousArticle, link: prev }
     : null;
 ---
 

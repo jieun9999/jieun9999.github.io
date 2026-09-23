@@ -121,7 +121,7 @@ frontmatter `series` 가 있을 때만. 위 32px.
 
 본문 아래 56px. 라벨 `.eyebrow` + 카드 하나.
 
-- **"다음 글" = 이어서 읽을 더 오래된 글.** 가장 오래된 글이면 대신 더 최신 글을 "최신 글 / Newer Article" 로 건다.
+- **"다음 글" = 발행일 기준 더 최신 글.** 더 최신 글이 없으면 오래된 글을 "이전 글 / Previous Article"로 연결한다.
 - 카드: `--bg-2` 면 + `--border` + `--radius-lg`, 안쪽 14px, hover `--surface`. 왼쪽 커버 118px(비율 1.5, `--radius-sm`, 커버 없으면 생략) + 제목 18px/800.
 
 ### 댓글 — `.post-comments` (`src/components/Comments.astro`)
@@ -245,7 +245,7 @@ giscus 기본 생김새(GitHub 파랑 링크 · GitHub 초록 버튼 · 시스�
 ## 한/영 차이
 
 - 번역이 있으면 헤더 언어 버튼이 **그 번역 글**로, 없으면 다른 언어 홈으로 간다. `hreflang` 은 실제 있는 번역만 건다.
-- 라벨: "On this page / 목차", "Series / 시리즈", "Next Article / 다음 글", "Newer Article / 최신 글", "min read / 분 분량", "Updated / 수정", "Comments / 댓글".
+- 라벨: "On this page / 목차", "Series / 시리즈", "Next Article / 다음 글", "Previous Article / 이전 글", "min read / 분 분량", "Updated / 수정", "Comments / 댓글".
 - 날짜 형식은 언어별.
 
 ## 규칙
