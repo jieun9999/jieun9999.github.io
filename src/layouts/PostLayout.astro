@@ -571,7 +571,7 @@ const upNext = prev
     transition: width 0.1s linear;
   }
 
-  @media (max-width: 1199px) {
+  @media (max-width: 1071px) {
     .post-wrap {
       flex-direction: column;
       align-items: stretch;
@@ -675,7 +675,7 @@ const upNext = prev
   //    문단은 움직이지 않는다 — 읽는 흐름을 끊지 않게.
   if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
     gsap.registerPlugin(ScrollTrigger);
-    const sideBySide = matchMedia('(min-width: 1200px)').matches;
+    const sideBySide = matchMedia('(min-width: 1072px)').matches;
     // display:none 인 것(데스크톱의 접는 목차 등)은 차례에서 뺀다
     const all = (sel: string) => gsap.utils.toArray<HTMLElement>(sel).filter((el) => el.getClientRects().length > 0);
 

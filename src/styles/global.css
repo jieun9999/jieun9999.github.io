@@ -53,7 +53,7 @@
   --header-h: 80px;          /* 헤더 높이 — 홈 히어로가 이만큼 헤더 뒤로 올라간다 */
 }
 /* 데스크톱은 헤더가 위에 붙지 않으니 줄을 넉넉히 — 메뉴가 천장에 붙어 보이지 않게 */
-@media (min-width: 1200px) {
+@media (min-width: 1072px) {
   :root { --header-h: 100px; }
 }
 @media (max-width: 809px) {
