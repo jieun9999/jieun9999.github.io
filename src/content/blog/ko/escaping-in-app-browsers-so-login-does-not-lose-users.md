@@ -15,6 +15,8 @@ tags:
   ]
 category: systems
 cover: /covers/escaping-in-app-browsers-so-login-does-not-lose-users.webp
+coverFit: contain
+coverBackground: dark
 coverAlt: "카카오 로그인 화면 두 장 비교. 왼쪽 Threads 인앱 브라우저에는 아이디·비밀번호 폼만 있고, 오른쪽 Safari 에는 '카카오톡으로 로그인' 버튼이 맨 위에 있습니다"
 coverCaption: "같은 URL, 같은 로그인 페이지입니다. 다른 건 어느 브라우저로 들어왔느냐뿐입니다."
 ---

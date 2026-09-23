@@ -25,6 +25,9 @@ const blog = defineCollection({
     // 커버 이미지(선택). 예: "/covers/hello-astro.jpg". 없으면 자동 타일 생성.
     cover: z.string().optional(),
     coverAlt: z.string().optional(),
+    // 목록 전용: 도식·스크린샷은 contain으로 전체 표시. 상세 커버에는 적용하지 않는다.
+    coverFit: z.enum(['cover', 'contain']).default('cover'),
+    coverBackground: z.enum(['light', 'dark']).optional(),
     // 커버 바로 아래 작은 캡션(선택). 있을 때만 표시.
     coverCaption: z.string().optional(),
     // 시리즈(선택): 같은 series id 를 가진 글들이 묶임

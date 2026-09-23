@@ -14,9 +14,11 @@ tags:
     "devops",
   ]
 category: systems
-cover: /covers/isolated-dev-access-for-an-outside-collaborator.webp
-coverAlt: "caddy 만 외부에 열려 있고 api·db·redis 는 내부망에만 있는 서버 구성도"
-coverCaption: "인터넷에서 들어오는 문은 caddy 하나뿐입니다. ● 이 붙은 곳만 DB 자격증명을 갖습니다 — admin 에는 없습니다."
+cover: /covers/isolated-dev-access-tunnel-cover.png
+coverFit: contain
+coverBackground: light
+coverAlt: "셸은 막고, 터널만 엽니다 — 디자이너의 로컬 BFF에서 SSH 터널로 서버 내부 API에 연결하고 셸 실행과 DB 직접 접근은 차단하는 구조"
+coverCaption: "로컬 BFF에 필요한 API 연결만 허용하고, 터널 목적지는 서버의 127.0.0.1:8987로 제한했습니다."
 ---
 
 ## 들어가며

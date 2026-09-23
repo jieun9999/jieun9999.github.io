@@ -150,7 +150,7 @@
 | 히어로 | **GSAP** — 점이 번지고, 사진(구슬)이 튀어오르고, 이름 → 제목 단어(0.07s 간격) → 링크 아이콘이 떠오름 | `Hero.astro`, [`shell.md`](./shell.md#히어로--srccomponentsheroastro) |
 | 소개 카드 | **GSAP** — 히어로와 같은 말투. 점 · 카드 → 그림 튀어오름 → 인사 단어 → 소개 → 아이콘 | `about.astro`, [`about.md`](./about.md#들어올-때-움직임) |
 | 글 상세 | **GSAP** — 첫 화면은 메타 → 제목 단어 → 요약 · 커버 · 시리즈 → 본문 타임라인, 그 아래 소제목 · 코드 · 표 · 인용 · 그림은 스크롤로 떠오름(ScrollTrigger). 문단은 안 움직인다 | `PostLayout.astro`, [`post.md`](./post.md#움직임--gsap) |
-| 목록 이미지 | hover 시 살짝 확대 | `scale(1.03)`, `0.4s` |
+| 목록 이미지 | 기본 cover만 hover 시 살짝 확대, contain은 확대하지 않음 | `scale(1.03)`, `0.4s` |
 | 히어로 점 | 천천히 떠다님, 화면 밖이면 멈춤 | `Particles.astro` 스크립트 (히어로·소개 카드 뒤) |
 
 `prefers-reduced-motion: reduce` 면 **전역에서** 애니메이션·전환을 끈다(`global.css` 끝). GSAP 모션도 돌지 않는다(아래). 파티클은 한 번만 그린다.

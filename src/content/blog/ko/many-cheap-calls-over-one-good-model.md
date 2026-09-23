@@ -15,6 +15,8 @@ tags:
   ]
 category: systems
 cover: /covers/many-cheap-calls-over-one-good-model.webp
+coverFit: contain
+coverBackground: dark
 coverAlt: "한 번에 8,000자를 요구한 결과와 1,200자씩 여덟 번 나눠 요구한 결과를 나란히 놓은 도식 — 왼쪽은 2,000자에서 수렴해 최장 3,182자, 오른쪽은 조각 여덟 개를 조립해 8,995자"
 coverCaption: "같은 모델입니다. 왼쪽은 한 번에 8,000자를 요구한 결과, 오른쪽은 1,200자씩 여덟 번 요구해 조립한 결과입니다."
 ---

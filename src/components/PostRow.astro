@@ -15,6 +15,7 @@ interface Props {
 }
 const { lang, post, headingLevel = 'h3', eager = false } = Astro.props;
 const { title, subtitle, description, pubDate, category, tags, cover, coverAlt } = post.data;
+const { coverFit, coverBackground } = post.data;
 // 부제가 없으면 요약을 대신 쓴다. 어느 쪽이든 최대 두 줄까지 표시한다
 const lead = subtitle ?? description;
 // 태그는 앞에서 세 개만 — 대표 태그를 앞에 적는다
@@ -26,7 +27,7 @@ const monogram = (title.trim()[0] ?? '·').toUpperCase();
 ---
 
 <div class="row">
-  <a class="img" href={href} tabindex="-1" aria-hidden="true">
+  <a class:list={['img', { 'img--contain': coverFit === 'contain' }]} data-background={coverBackground} href={href} tabindex="-1" aria-hidden="true">
     {
       cover ? (
         <img
@@ -72,7 +73,8 @@ const monogram = (title.trim()[0] ?? '·').toUpperCase();
     flex: 0 0 45%;
     min-width: 0;
     position: relative;
-    aspect-ratio: 16 / 9; /* 커버 대부분이 16:9 — 이 비율이면 잘리지 않는다 */
+    aspect-ratio: 16 / 9;
+    align-self: flex-start;
     border-radius: var(--radius);
     overflow: hidden;
     background: var(--surface);
@@ -93,7 +95,10 @@ const monogram = (title.trim()[0] ?? '·').toUpperCase();
     object-fit: cover;
     transition: transform 0.4s ease;
   }
-  .img:hover img { transform: scale(1.03); }
+  .img--contain img { object-fit: contain; }
+  .img[data-background='light'] { background: var(--cover-bg-light); }
+  .img[data-background='dark'] { background: var(--cover-bg-dark); }
+  .img:not(.img--contain):hover img { transform: scale(1.03); }
   .mono {
     display: flex;
     align-items: center;
