@@ -77,13 +77,12 @@ export async function getStaticPaths() {
         next,
         series,
         ogImage,
-        postCount: list.length,
       },
     };
   });
 }
 
-const { post, alternates, hreflang, canonicalURL, hasTranslation, prev, next, series, ogImage, postCount } =
+const { post, alternates, hreflang, canonicalURL, hasTranslation, prev, next, series, ogImage } =
   Astro.props;
 const lang = langFromId(post.id);
 const { Content, headings } = await render(post);
@@ -108,7 +107,6 @@ const mins = readingMinutes(post.body ?? '');
   hreflang={hreflang}
   canonicalURL={canonicalURL}
   hasTranslation={hasTranslation}
-  postCount={postCount}
   prev={prev}
   next={next}
   series={series}

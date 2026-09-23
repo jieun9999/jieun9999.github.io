@@ -1,7 +1,6 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import PostMeta from '../components/PostMeta.astro';
-import ProfileWidget from '../components/ProfileWidget.astro';
 import BackToTop from '../components/BackToTop.astro';
 import Comments from '../components/Comments.astro';
 import { ui, categoryLabel, type Lang } from '../i18n/ui';
@@ -33,8 +32,6 @@ interface Props {
   hreflang: Partial<Record<Lang, string>>;
   canonicalURL?: string;
   hasTranslation: boolean;
-  /** 사이드바 프로필에 띄울 이 언어의 글 수 */
-  postCount: number;
   prev?: NavLink;
   next?: NavLink;
   series?: Series;
@@ -58,7 +55,6 @@ const {
   hreflang,
   canonicalURL,
   hasTranslation,
-  postCount,
   prev = null,
   next = null,
   series = null,
@@ -264,7 +260,6 @@ const upNext = prev
           </nav>
         )
       }
-      <ProfileWidget lang={lang} count={postCount} />
     </aside>
   </div>
 
@@ -273,9 +268,10 @@ const upNext = prev
 
 <style>
   .post-wrap {
+    --width-page: 1200px;
     display: flex;
     align-items: flex-start;
-    gap: 48px;
+    gap: 32px;
     padding-block: 64px;
   }
   .post-main {
@@ -292,10 +288,10 @@ const upNext = prev
     flex: none;
     position: sticky;
     top: 30px;
-    width: 240px;
+    width: 200px;
     max-height: calc(100vh - 60px);
     overflow-y: auto;
-    /* 펼친 챕터에 h3 가 많으면 프로필이 조금 밀린다 — 스크롤은 되되 막대는 숨긴다 */
+    /* 목차가 화면보다 길면 스크롤하되 막대는 숨긴다 */
     scrollbar-width: none;
     display: flex;
     flex-direction: column;
@@ -571,6 +567,25 @@ const upNext = prev
     transition: width 0.1s linear;
   }
 
+  /* 넓은 화면에서는 본문 자체를 가운데 두고 오른쪽 여백에 목차를 둔다. */
+  @media (min-width: 1280px) {
+    .post-wrap {
+      display: grid;
+      grid-template-columns: minmax(180px, 1fr) minmax(0, 935px) minmax(180px, 1fr);
+      column-gap: 24px;
+      max-width: none;
+    }
+    .post-main { grid-column: 2; }
+    .vline { display: none; }
+    .sidebar {
+      grid-column: 3;
+      width: 100%;
+      max-width: 224px;
+      padding-left: 16px;
+      border-left: 1px solid var(--border);
+    }
+  }
+
   @media (max-width: 1071px) {
     .post-wrap {
       flex-direction: column;
@@ -579,14 +594,7 @@ const upNext = prev
       padding-block: 36px;
     }
     .vline { display: none; }
-    .sidebar {
-      position: static;
-      width: 100%;
-      max-width: 360px;
-      max-height: none;
-      overflow: visible;
-    }
-    .sidebar .toc { display: none; }
+    .sidebar { display: none; }
     .toc-inline {
       display: block;
       margin-top: 32px;
@@ -693,7 +701,7 @@ const upNext = prev
         );
       if (sideBySide) {
         tl.from(
-          all('.sidebar .toc-head, .sidebar .chapter, .sidebar .profile-widget'),
+          all('.sidebar .toc-head, .sidebar .chapter'),
           { opacity: 0, y: 16, stagger: 0.04 },
           '<'
         );
@@ -703,8 +711,7 @@ const upNext = prev
     // 2) 처음에 화면 아래 있던 것만 숨긴다 — 이미 보이는 걸 숨겼다 띄우면 깜빡인다.
     const blocks = gsap.utils
       .toArray<HTMLElement>(
-        '.prose > :is(h2, h3, figure, .expressive-code, blockquote, .markdown-alert, table), .post-tags, .up-next' +
-          (sideBySide ? '' : ', .sidebar > *')
+        '.prose > :is(h2, h3, figure, .expressive-code, blockquote, .markdown-alert, table), .post-tags, .up-next'
       )
       .filter((el) => el.getBoundingClientRect().top > innerHeight);
     // 빠르게 내리거나 목차로 건너뛰면 한꺼번에 여러 개가 들어온다 — 이미 지나친 건 바로 보이고,
