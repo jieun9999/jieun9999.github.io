@@ -281,7 +281,9 @@ const menu = [
       panel.hidden = !open;
       toggle.setAttribute('aria-expanded', String(open));
       toggle.setAttribute('aria-label', (open ? toggle.dataset.labelClose : toggle.dataset.labelOpen) ?? '');
-      document.body.style.overflow = open ? 'hidden' : '';
+      // 잠금은 body 가 아니라 html 에 건다 — global.css 의 html{overflow-x:clip} 탓에
+      // body 의 overflow 가 더 이상 뷰포트로 전해지지 않아, 메뉴를 연 채로도 뒤가 그대로 스크롤됐다.
+      document.documentElement.style.overflow = open ? 'hidden' : '';
     };
     toggle.addEventListener('click', () => setOpen(panel.hidden));
     panel.addEventListener('click', (e) => {

@@ -98,6 +98,11 @@ Lightbox   본문 이미지 클릭 확대 (평소엔 숨김)
 - **모바일(≤809)**: 메뉴와 언어 버튼이 사라지고 **메뉴가 있던 왼쪽에** 햄버거(☰)가 생긴다. 오른쪽엔 검색 · 테마만 남는다.
   - 햄버거를 누르면 헤더 아래가 전부 메뉴 패널로 덮인다. 링크가 세로로 서고, 선 아래 "View in English" / "한국어로 보기" 글자 링크.
   - 열리면 본문 스크롤이 잠긴다. Esc 로 닫히고, 링크를 누르거나 창이 810px 이상으로 넓어지면 닫힌다.
+  - 🔴 **스크롤 잠금은 `<html>` 에 건다 — `<body>` 에 걸면 먹지 않는다.** `global.css` 가
+    `html { overflow-x: clip }` 을 두고 있어서, 루트의 overflow 가 `visible` 이 아니게 된다.
+    그러면 브라우저가 `<body>` 의 overflow 를 뷰포트로 넘겨주지 않는다(CSS Overflow §"viewport propagation").
+    `body.style.overflow = 'hidden'` 은 조용히 무시되고 뒤 배경이 그대로 스크롤된다 — 빌드도 콘솔도 멀쩡하다.
+    같은 이유로 **라이트박스(`BaseLayout.astro`)도 `<html>` 에 건다.** 새로 덮개를 만들 때도 마찬가지다.
 
 ## 검색창 — `src/components/SearchDialog.astro`
 
