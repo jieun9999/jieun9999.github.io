@@ -12,6 +12,8 @@ const slugs = [
   'many-cheap-calls-over-one-good-model',
   'escaping-in-app-browsers-so-login-does-not-lose-users',
 ];
+const lang = process.env.TEST_LANG ?? 'ko';
+assert.ok(['ko', 'en'].includes(lang), 'Supported test language');
 const base = process.env.TEST_BASE_URL ?? 'http://127.0.0.1:4322';
 const artifacts = await mkdtemp(path.join(tmpdir(), 'cover-fit-'));
 const chrome = spawn(process.env.CHROME_PATH ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', [
@@ -57,16 +59,16 @@ try {
   };
   for (const width of [1280, 900, 390]) {
     await call('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false }, sessionId);
-    await call('Page.navigate', { url: `${base}/ko/` }, sessionId);
+    await call('Page.navigate', { url: `${base}/${lang}/` }, sessionId);
     for (let attempt = 0; attempt < 100; attempt++) {
-      if (await evaluate(`location.pathname === '/ko/' && document.readyState === 'complete' && !!document.querySelector('[data-load-more]')`)) break;
+      if (await evaluate(`location.pathname === '/${lang}/' && document.readyState === 'complete' && !!document.querySelector('[data-load-more]')`)) break;
       await new Promise(resolve => setTimeout(resolve, 50));
     }
     await evaluate(`for (let i = 0; i < 5; i++) document.querySelector('[data-load-more]')?.click();`);
     for (const dark of [false, true]) {
       await evaluate(`document.documentElement.classList.toggle('dark', ${dark})`);
       for (const slug of slugs) {
-        const selector = `a.img[href="/ko/blog/${slug}/"]`;
+        const selector = `a.img[href="/${lang}/blog/${slug}/"]`;
         await evaluate(`document.querySelector(${JSON.stringify(selector)}).scrollIntoView({block:'center'})`);
         const state = await evaluate(`(async () => {
           const box = document.querySelector(${JSON.stringify(selector)});
@@ -86,15 +88,15 @@ try {
           await writeFile(path.join(artifacts, `${slug}.png`), Buffer.from(shot.data, 'base64'));
         }
       }
-      assert.equal(await evaluate(`getComputedStyle(document.querySelector('a.img[href="/ko/blog/redefining-ai-blog-product-after-beta-feedback/"] img')).objectFit`), 'cover', 'Other covers unchanged');
+      assert.equal(await evaluate(`getComputedStyle(document.querySelector('a.img[href="/${lang}/blog/redefining-ai-blog-product-after-beta-feedback/"] img')).objectFit`), 'cover', 'Other covers unchanged');
       assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'), true, 'No horizontal overflow');
-      assert.equal(await evaluate(`Array.from(document.querySelectorAll('.lead')).every(el => {
+      if (lang === 'ko') assert.equal(await evaluate(`Array.from(document.querySelectorAll('.lead')).every(el => {
         const sentences = Array.from(new Intl.Segmenter('ko', { granularity: 'sentence' }).segment(el.textContent.trim()));
         return el.scrollHeight <= el.clientHeight + 1 && sentences.length === 2 && sentences.every(s => /니다\\.$/.test(s.segment.trim()));
       })`), true, 'Korean summaries must show two complete polite sentences');
     }
   }
-  console.log(`PASS: four covers, three widths, two themes, hover; screenshots: ${artifacts}`);
+  console.log(`PASS (${lang}): four covers, three widths, two themes, hover; screenshots: ${artifacts}`);
 } finally {
   ws?.close();
   chrome.kill();
