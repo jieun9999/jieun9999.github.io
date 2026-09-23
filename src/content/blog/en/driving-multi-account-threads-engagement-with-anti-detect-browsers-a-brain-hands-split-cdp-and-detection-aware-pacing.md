@@ -1,6 +1,7 @@
 ---
 title: '[Threads Marketing Agent, Part 3] Multi-Account Engagement Automation with an Anti-Detect Browser — Brain/Hands Split, CDP Driving, Detection-Aware Pacing'
 description: 'Part 3 of an engineering log on building a Threads marketing agent: automating engagement (likes/comments). Isolating sub-accounts with an AdsPower anti-detect browser, connecting a VPS (brain) and a Mac mini (hands) over a queue, driving the browser via CDP, and pacing it with a detection-aware random schedule.'
+subtitle: "VPS as the brain, Mac mini as the hands"
 pubDate: 2026-07-14
 tags: ['threads', 'automation', 'anti-detect', 'playwright', 'cdp', 'sqlite', 'system-design']
 category: systems

@@ -1,9 +1,9 @@
 ---
-// 글 한 줄 — 왼쪽 큰 이미지 + 오른쪽 제목·메타·요약·카테고리.
+// 글 한 줄 — 왼쪽 큰 이미지 + 오른쪽 [카테고리 … 날짜] → 제목 → 한 줄 부제 → 태그.
 // 대표 글과 목록이 같은 모양을 쓴다. 좁은 화면에선 이미지가 위로 올라간다.
+// 글쓴이는 한 명이라 목록에선 프로필을 빼고, 눈이 제목·부제로 가게 나머지는 옅게 둔다.
 import { categoryLabel, type Lang } from '../i18n/ui';
-import { postUrl, categoryUrl, type Post } from '../lib/posts';
-import PostMeta from './PostMeta.astro';
+import { postUrl, categoryUrl, tagUrl, type Post } from '../lib/posts';
 
 interface Props {
   lang: Lang;
@@ -14,7 +14,12 @@ interface Props {
   eager?: boolean;
 }
 const { lang, post, headingLevel = 'h3', eager = false } = Astro.props;
-const { title, description, pubDate, category, cover, coverAlt } = post.data;
+const { title, subtitle, description, pubDate, category, tags, cover, coverAlt } = post.data;
+// 부제가 없으면 요약을 대신 쓴다. 어느 쪽이든 한 줄에서 자른다
+const lead = subtitle ?? description;
+// 태그는 앞에서 세 개만 — 대표 태그를 앞에 적는다
+const shownTags = tags.slice(0, 3);
+const isoDate = pubDate.toISOString().slice(0, 10);
 const href = postUrl(lang, post);
 const Heading = headingLevel;
 const monogram = (title.trim()[0] ?? '·').toUpperCase();
@@ -36,36 +41,50 @@ const monogram = (title.trim()[0] ?? '·').toUpperCase();
     }
   </a>
   <div class="content">
+    <div class="top">
+      <a class="cat" href={categoryUrl(lang, category)}>{categoryLabel(category)}</a>
+      <time datetime={isoDate}>{isoDate}</time>
+    </div>
     <Heading class="title"><a href={href}>{title}</a></Heading>
-    <PostMeta lang={lang} date={pubDate} />
-    <p class="excerpt"><a href={href} tabindex="-1">{description}</a></p>
-    <div><a class="chip" href={categoryUrl(lang, category)}>{categoryLabel(category)}</a></div>
+    <p class="lead"><a href={href} tabindex="-1">{lead}</a></p>
+    {
+      shownTags.length > 0 && (
+        <ul class="tags">
+          {shownTags.map((t) => (
+            <li>
+              <a class="tag" href={tagUrl(lang, t)}>#{t}</a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
   </div>
 </div>
 
 <style>
-  /* 제목이 이미지 윗선에서 시작한다 — 가운데 정렬이면 글이 길 때 제목이 이미지보다 올라간다 */
+  /* 글 칸을 이미지 높이만큼 늘린다 — 윗줄은 이미지 윗선, 태그는 이미지 아랫선에 붙어 줄마다 같은 자리에 온다 */
   .row {
     display: flex;
-    align-items: flex-start;
+    align-items: stretch;
     gap: 40px;
   }
   .img {
-    flex: 1 1 0;
+    flex: 0 0 45%;
     min-width: 0;
     position: relative;
-    aspect-ratio: 1.72;
+    aspect-ratio: 16 / 9; /* 커버 대부분이 16:9 — 이 비율이면 잘리지 않는다 */
     border-radius: var(--radius);
     overflow: hidden;
     background: var(--surface);
   }
-  /* 선을 이미지 위에 얹어야 사진 가장자리에서도 보인다 */
+  /* 선을 이미지 위에 얹어야 흰 바탕 다이어그램도 가장자리가 보인다 */
   .img::after {
     content: '';
     position: absolute;
     inset: 0;
-    border: 1px solid var(--hairline);
+    border: 1px solid var(--border);
     border-radius: inherit;
+    pointer-events: none;
   }
   .img img {
     display: block;
@@ -90,31 +109,68 @@ const monogram = (title.trim()[0] ?? '·').toUpperCase();
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    padding-block: 4px;
   }
+  /* 카테고리 왼쪽, 날짜 오른쪽 — 둘 다 옅게 */
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  .cat {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+    transition: color 0.15s;
+  }
+  .cat:hover { color: var(--text); }
+  .top time { color: var(--text-faint); font-variant-numeric: tabular-nums; }
   .title {
-    margin: 0;
-    font-size: 24px;
+    margin: 16px 0 0;
+    font-size: 22px;
     font-weight: 800;
     line-height: 1.4;
     overflow-wrap: anywhere;
   }
   .title a { color: var(--text); transition: color 0.2s; }
   .title a:hover { color: var(--accent); }
-  .excerpt {
+  .lead {
+    margin-top: 8px;
     font-size: 16px;
-    line-height: 1.5;
+    font-weight: 500;
+    line-height: 1.55;
     color: var(--text-muted);
+    /* 한 줄에서 자른다 — 길면 눈에 안 들어온다 */
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
-  .excerpt a { color: inherit; }
+  .lead a { color: inherit; }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: auto 0 0;
+    padding: 20px 0 0;
+    list-style: none;
+  }
 
   @media (max-width: 1199px) {
     .row { flex-direction: column; align-items: stretch; gap: 24px; }
     .img { flex: none; width: 100%; }
+    .content { padding-block: 0; }
   }
   @media (max-width: 809px) {
-    .row { gap: 12px; }
-    .content { gap: 8px; }
-    .title { font-size: 20px; }
+    .row { gap: 14px; }
+    .title { margin-top: 10px; font-size: 20px; }
+    .lead { margin-top: 6px; font-size: 15px; }
+    .tags { padding-top: 14px; }
   }
 </style>

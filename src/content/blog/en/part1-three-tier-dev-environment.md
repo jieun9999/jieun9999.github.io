@@ -1,6 +1,7 @@
 ---
 title: "Part 1 — Why We Chose a 96GB VPS Instead of Four 16GB MacBooks"
 description: "The code lives on the server, the server compiles it, and the MacBook only runs the browser. Once four people started sharing one machine, we had to re-check where this structure is sound and where it is a compromise. Seeing one dev server grow from 1.2GB to 3.7GB in four hours made it clear what belongs on the server."
+subtitle: "A dev server that grew from 1.2GB to 3.7GB in 4 hours"
 pubDate: 2026-09-15
 tags:
   ["ssh", "port-forwarding", "nextjs", "remote-development", "e2e", "devops"]

@@ -1,6 +1,7 @@
 ---
 title: "Eight Cheap Calls Beat One Good One — Why I Removed the Model That Wrote Better"
 description: "I ran both engines on the same topics for ten days. Codex won on a close read of the output, and Codex is the one I deleted. No prompt could push either model past a length ceiling; what broke it was splitting the call, not swapping the model. Once the shape became many short calls, per-call latency decided everything. Grok's quality gap got closed with 4,000 characters of source and a code-level diff of every number."
+subtitle: "Why fast repeated Grok calls beat the better writer"
 pubDate: 2026-08-17
 tags:
   [

@@ -1,6 +1,7 @@
 ---
 title: '[Threads Marketing Agent, Part 1] Designing a Crawler That Beats Three Tiers of Anti-Bot — From TLS Fingerprints to CDP Detection'
 description: 'Part 1 of an engineering log on building a Threads marketing agent: the bottleneck was never LLM generation — it was crawling. Tiering the strategy by which signal the anti-bot actually inspects.'
+subtitle: "The real bottleneck was crawling, not the LLM"
 pubDate: 2026-06-29
 tags: ['webscraping', 'crawling', 'cloudflare', 'tls', 'system-design', 'anti-bot', 'threads']
 category: systems

@@ -1,6 +1,7 @@
 ---
 title: "AI 블로그 서비스 두 달 회고 — 만들 수 있을까에서 누가 쓸까로"
 description: "AI 블로그 서비스 베타 전후를 돌아봤다. 검색 색인, 글 구조, 자동완성 글감, 비용·UX·배포를 만들며 '될까?'를 확인했고, 베타 이후에는 채널, 재방문, 고객 질문, 운영 자동화, 피봇을 보며 '누가 쓰나?'로 질문이 바뀌었다."
+subtitle: "'될까?'에서 '누가 쓸까?'로 질문이 바뀐 두 달"
 pubDate: 2026-09-18
 tags: ["poc", "product-development", "pivot", "llm", "seo", "observability"]
 category: systems

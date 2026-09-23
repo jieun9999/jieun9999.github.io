@@ -1,6 +1,7 @@
 ---
 title: "Taking Caddy Out of the Deploy Path — the Structural Problem Was Touching a SPOF Automatically"
 description: "Every deploy took the whole stack down for 60–100 seconds. Blue-green removed most of it, but five seconds stayed at the reverse proxy — and the real cost of those five seconds was not five seconds. It was the variance: five seconds, or indefinitely. So we took it out of the deploy path entirely."
+subtitle: "Removing 60–100s outages, then the last 5 seconds"
 pubDate: 2026-07-20
 updatedDate: 2026-07-22
 tags:

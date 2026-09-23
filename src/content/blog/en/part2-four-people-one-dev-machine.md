@@ -1,6 +1,7 @@
 ---
 title: "Part 2 — Four People Sharing One VPS — Role-Based Access, Homes, and Ports"
 description: "Developers Jieun and Sungsuk, designer Juhee, and marketer Jina started sharing the 96GB, 18-core server we rented after hitting the limits of 16GB MacBooks. We separated permissions, project homes, and ports by role, and isolated production access behind a shared tunnel service."
+subtitle: "Two developers, a designer, and a marketer on one server"
 pubDate: 2026-09-16
 tags:
   ["linux", "cron", "systemd", "git-worktree", "ssh", "devops", "automation"]

@@ -1,6 +1,7 @@
 ---
 title: "The In-App Browser Eats Your Social Login Button — and Hard Logins Lose Users Instantly"
 description: "Open the same page from inside Threads and the 'Log in with Kakao Talk' button is gone, leaving only an ID and password form. Nothing shows up in the error logs, so I detected the in-app browser, escaped to the real one, and made the failure path invisible."
+subtitle: "Detect, escape, fall back — for drop-offs no log catches"
 pubDate: 2026-09-08
 tags:
   [

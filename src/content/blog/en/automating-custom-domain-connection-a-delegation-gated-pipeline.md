@@ -1,6 +1,7 @@
 ---
 title: "Connecting a Custom Domain with One Click — a Pipeline Built Around 'You Can't Speed Up DNS Propagation'"
 description: "I built a feature to buy a domain and attach it to a blog. Bought four with the same code; all four failed differently. One cause: we ignored a wait we can't shorten (DNS propagation) and tried to do everything synchronously. Once we accepted that wait as a given, the pipeline settled into one synchronous stage plus two worker stages."
+subtitle: "Four purchases, four failures, one 3-stage pipeline"
 pubDate: 2026-07-23
 tags:
   [
