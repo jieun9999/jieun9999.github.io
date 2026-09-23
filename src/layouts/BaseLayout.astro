@@ -80,13 +80,14 @@ const hreflang = Astro.props.hreflang ?? alternates;
           lbImg.alt = alt || '';
           lb.classList.add('open');
           lb.setAttribute('aria-hidden', 'false');
-          document.body.style.overflow = 'hidden';
+          // 메뉴와 같은 이유로 html 에 건다 — html{overflow-x:clip} 이 body 쪽 잠금을 무력화한다
+          document.documentElement.style.overflow = 'hidden';
         };
         const close = () => {
           lb.classList.remove('open');
           lb.setAttribute('aria-hidden', 'true');
           lbImg.removeAttribute('src');
-          document.body.style.overflow = '';
+          document.documentElement.style.overflow = '';
         };
         document.addEventListener('click', (e) => {
           const img = e.target.closest('.prose img, .post-cover');

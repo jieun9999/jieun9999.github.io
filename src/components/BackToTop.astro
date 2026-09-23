@@ -36,6 +36,13 @@ const { lang } = Astro.props;
   }
   .to-top.show { opacity: 1; transform: none; pointer-events: auto; }
   .to-top:hover { color: var(--accent); }
+  /* 모바일 메뉴가 화면을 덮는 동안엔 내려둔다 — 패널(헤더 z-index 50) 보다 위(55)라 그냥 두면
+     메뉴만 있어야 할 화면 구석에 화살표가 떠서 눈을 끈다. 햄버거의 aria-expanded 를 보고 안다. */
+  :global(body:has([data-menu-toggle][aria-expanded='true'])) .to-top {
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+  }
 </style>
 
 <script>
