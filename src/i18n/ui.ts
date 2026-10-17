@@ -128,11 +128,12 @@ export const social = {
   email: 'kindjjee@gmail.com',
 };
 
-// 일러스트 아바타. 실사 사진은 /avatar.jpg 로 남겨둠 (되돌리려면 이 값만 바꾸면 됨)
-export const avatarSrc = '/avatar-illustration.jpg';
-// 같은 그림의 고해상도판 — 소개 카드처럼 크게 보일 때 쓴다. 원본(336px)을 Real-ESRGAN
-// anime 모델로 4배 키운 뒤 1024px 로 줄였다. avatarSrc 를 바꾸면 이것도 같이 바꾼다.
-export const avatarLargeSrc = '/avatar-illustration-1024.jpg';
+// 실사 프로필 사진. 작은 원형(20·32·100px)에서도 얼굴이 보이도록 원본(1254px)에서 얼굴 중심으로
+// 720px 를 잘라 400px 로 줄였다. 예전 일러스트는 /avatar-illustration.jpg 로 남겨둠
+// (되돌리려면 이 두 값만 바꾸면 됨 — 공유 카드는 여전히 일러스트를 쓴다, scripts/gen-og.mjs)
+export const avatarSrc = '/avatar-photo.jpg';
+// 같은 사진의 큰 판(상반신 전체, 1024px) — 소개 카드처럼 크게 보일 때 쓴다. avatarSrc 를 바꾸면 이것도 같이 바꾼다.
+export const avatarLargeSrc = '/avatar-photo-1024.jpg';
 
 // 카테고리 (영어 고정 — 한/영 공통). id 는 content.config.ts 의 category enum 과 같다.
 export const categories = [

@@ -64,7 +64,7 @@
 | 제목 | 800, 줄간격 1.24, 자간 -0.015em, **어절 단위 줄바꿈**. 62px 에서 시작해 남은 세로에 들어갈 때까지 줄인다 (자르지 않는다) |
 | 아래 줄 | 위 `--border` 선, 아바타 38px + "**Jieun** · Deserve what you want." 22px, 오른쪽 발행 **연.월**(`2026.05`) 700 |
 | 글꼴 | Nunito + Pretendard — 사이트와 같은 조합 (woff2 를 임시 폴더로 복사해 쓴다) |
-| 아바타 | `public/avatar-illustration.jpg` (홈과 같은 그림) |
+| 아바타 | `public/avatar-illustration.jpg` (일러스트 — 사이트 프로필은 실사 사진 `avatar-photo.jpg` 로 바뀌었지만 카드는 그대로 둠) |
 
 ## 테마 · 한/영 차이
 
