@@ -173,7 +173,7 @@ plain 이면 (태그 목록·태그별 글) — 사진·구슬 없음
 
 ### ProfileHero — `src/components/ProfileHero.astro`
 
-홈·카테고리가 쓰는 히어로. `Hero snug` + 프로필 그림(`avatarSrc`, 누르면 홈) + **큰 이름**(name 슬롯) + 모토 "Deserve what you want." + 회색 링크 아이콘(`SocialLinks muted`).
+홈·카테고리가 쓰는 히어로. `Hero snug` + 프로필 사진(`avatarSrc`, 누르면 홈) + **큰 이름**(name 슬롯) + 모토 "Deserve what you want." + 회색 링크 아이콘(`SocialLinks muted`).
 
 - 이름은 헤더와 같은 워드마크(`BrandWordmark`)를 48px(모바일 40)로, 홈 링크로 감싼다. 뒤에 점은 찍지 않는다.
 - 홈에선 이름이 **보이는 `<h1>`** 이다(`nameHeading`). 카테고리는 카테고리 이름이 숨긴 `<h1>` 이라 이름은 `<p>`.
