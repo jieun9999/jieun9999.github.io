@@ -178,7 +178,7 @@ The generated question, search expression, and finalized query are saved togethe
 
 General search returns both general documents and platform documents. The general-document path selects up to three documents after filtering. The platform path first checks the current results and the shared candidate pool. Only platforms with no document available for assignment and no completed supplementary search need another search.
 
-![General-search results split into general documents and platform candidates. The shared pool and conditional supplementary search feed document assignment, followed by deduplication, full-text retrieval, and outline creation.](/images/search-intent/source-acquisition-flow-en-v1.png "diagram")
+![General-search results split into general documents and platform candidates. The shared pool and conditional supplementary search feed document assignment, followed by deduplication, full-text retrieval, and outline creation.](/images/search-intent/source-acquisition-flow-en-v2.png "diagram")
 
 Documents selected through both paths are combined, then available full text is retrieved for outline creation. Documents whose full text cannot be retrieved, or whose retrieval is skipped, retain their search snippets. **Assigning a document is not the same as obtaining its full text.** The diagram summarizes this sequence and omits retries and detailed filters.
 

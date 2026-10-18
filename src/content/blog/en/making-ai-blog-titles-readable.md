@@ -100,14 +100,7 @@ The title model does not read the entire finished article. Source texts are used
 
 The following is an illustrative example of the processing flow. It shows how a draft covering several points narrows its focus after the outline is available.
 
-| Step | Responsibility and processing | Example data |
-| --- | --- | --- |
-| **01 · Input** | Code passes the input | **Keyword:** Yongsan redevelopment apartments |
-| ↓ **02 · Topic title** | Grok generates an initial title | **Draft:** Cash settlement risks, association membership eligibility, contract clauses, and precautions to know before buying a Yongsan redevelopment apartment |
-| ↓ **03 · Evidence and outline** | Collect source texts → Write and verify the outline | **Outline:** ① Conditions under which an apartment purchase can lead to cash settlement rather than a replacement unit ② Conditions for transferring association membership ③ Checks before signing a contract<br />Each item has a description and supporting sources. |
-| ↓ **04 · Final title** | Grok reads the input and outline, chooses a format, and returns a title and input-coverage assessment | **Core question reflected in the outline:** Could I buy the apartment but still not qualify for a replacement unit?<br />**Title:** Could buying a Yongsan redevelopment apartment leave me facing cash settlement?<br />**Input coverage:** `answered: true`<br />**Reason:** The outline covers conditions leading to cash settlement and checks to make before buying. |
-| ↓ **05 · Code validation** | Check response structure, required assessment, and title rules | **Result:** `status: ready`<br />The finalized title goes into `proposed_title`. |
-| ↓ **06 · Storage and subsequent generation** | Save the finalized title → Preserve it through article generation and rewriting | **Title on the topic card and article:** Could buying a Yongsan redevelopment apartment leave me facing cash settlement? |
+![Illustrative six-step title pipeline: code passes the keyword, Grok drafts a title, sources support a verified outline, Grok writes the final title, and code validates, saves, and preserves it.](/images/title-generation/title-timeline-en-v1.png "diagram")
 
 Association eligibility and contract clauses remain in the outline as material to explain. The title foregrounds the question connecting them: “Could I buy the property and still end up with cash settlement?” Grok decides what belongs in the title, while code keeps the validated title in subsequent generation steps.
 
