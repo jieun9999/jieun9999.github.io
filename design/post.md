@@ -270,7 +270,9 @@ giscus 기본 생김새(GitHub 파랑 링크 · GitHub 초록 버튼 · 시스�
 
 ## 표·도식 자료 영역
 
-표 배경과 도식 패널은 `--visual-bg`, 머리행은 `--visual-head`, 선은 `--visual-border`를 사용한다. 밝은 테마는 옅은 청회색, 어두운 테마는 낮은 채도의 짙은 청회색이다. 표의 행별 줄무늬는 사용하지 않는다.
+표의 배경은 셀(th·td)에만 적용하고 스크롤용 table 블록은 투명하게 둔다. 셀 바깥의 빈 공간을 색칠하지 않는다.
+
+표는 `--table-bg`, `--table-head`, `--table-border`의 무채색 회색을 사용한다(밝은 테마 #fafafa/#e8e8e8/#d4d4d4, 어두운 테마 #181818/#303030/#454545). 도식 패널은 `--visual-bg`, 선은 `--visual-border`를 사용한다. 밝은 테마는 옅은 청회색, 어두운 테마는 낮은 채도의 짙은 청회색이다. 표의 행별 줄무늬는 사용하지 않는다.
 
 도식은 `![설명](/images/example.svg "diagram")`으로 명시한다. `astro.config.mjs`가 이 마커를 소비해 `.post-diagram` figure 안에 `.diagram-panel`을 만든다. 패널은 16–24px 여백과 8px 반경을 가지며 캡션은 밖에 남는다. 일반 이미지와 커버는 해당하지 않는다. 이미지 색을 CSS 필터로 바꾸지 않는다.
 
