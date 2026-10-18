@@ -86,6 +86,8 @@
 frontmatter `cover` 가 있을 때만. 폭 100%, `--radius` + `--hairline`, 위 40px. 누르면 확대([`shell.md`](./shell.md#이미지-확대--baselayoutastro--globalcss-lightbox)).
 `coverCaption` 이 있으면 아래 14px `--text-subtle` 가운데 정렬.
 
+새 기술 글 커버는 남색 배경·슬레이트/파란색 평면 도식·작은 문구·넓은 여백의 16:9 보고서 형식으로 통일한다. 긴 글 제목을 크게 반복하지 않고 핵심 관계를 보여준다. 한·영은 같은 구도로 각각 생성하며 `coverFit: contain`, `coverBackground: dark`를 사용한다. 레퍼런스와 상세 생성·검수 규칙은 `CLAUDE.md`의 “커버 이미지의 공통 톤앤매너”를 따른다. 이 규칙은 본문 도식이나 OG 카드와 별개다.
+
 ### 시리즈 상자 — 선택
 
 frontmatter `series` 가 있을 때만. 위 32px.

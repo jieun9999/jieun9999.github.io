@@ -7,9 +7,11 @@ updatedDate: 2026-09-24
 tags:
   ["ssh", "port-forwarding", "nextjs", "remote-development", "e2e", "devops", "bff"]
 category: systems
-cover: /covers/part1-three-tier-dev-environment-en.webp
-coverAlt: "Diagram of a MacBook connecting by SSH to a development server, with the current :3100 app using a :8787 tunnel to production API and DB, and a future :39xx local API, DB, Redis, and Playwright stack inside the development server"
-coverCaption: "The current preview path uses the production API, while e2e will later run on a separate local stack."
+cover: /covers/part1-three-tier-dev-environment-en-v2.png
+coverFit: contain
+coverBackground: dark
+coverAlt: "Navy diagram connecting a 16GB MacBook through SSH to a 96GB development VPS and through a shared tunnel to production API and DB"
+coverCaption: "The browser runs on the MacBook; code, builds, and agents run on the VPS."
 series: shared-dev-machine
 seriesOrder: 1
 seriesTitle: "Sharing One Machine Among Four People"
