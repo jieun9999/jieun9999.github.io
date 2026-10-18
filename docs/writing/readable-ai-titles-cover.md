@@ -60,3 +60,14 @@ Create a replacement blog cover using the attached image ONLY as the exact visua
 ```text
 Edit the provided blog cover, preserving its exact navy and blue report design, layout, dimensions, typography sizes, whitespace and all other text. Correct ONLY the central slate bar's Korean text to exactly: '입력 + 검증된 목차'. The critical word is 검증된 (syllables 검 / 증 / 된), NOT 검종된 or 검중된. Render 증 with the proper ㅈ + ㅡ + ㅇ glyph, crisp clean Korean typography. Preserve small restrained text size; do not enlarge headings. All other labels unchanged: 읽히는 제목으로; 내용에 맞춰 형식 선택; 질문형; 정보형; 후기형; 의미 판단은 Grok · 보존 규칙은 코드; jieun.dev.
 ```
+
+
+## v6: 중앙 문구 재생성·확대 확인
+
+- image_gen으로 v5를 참조하여 중앙 문구를 다시 생성했습니다.
+- `입력 + 검증된 목차`를 3배 확대해 확인했습니다.
+- 결과: `public/covers/readable-ai-titles-v6.png`
+
+```text
+Regenerate this blog cover with the same restrained navy report style and same layout. IMPORTANT: previous image has a Korean typo in central bar: it looks like 검종된. Replace that entire central text with crisp correct typeset Korean '입력 + 검증된 목차'. The middle syllable MUST be 증 U+C99D (ㅈ above a flat horizontal ㅡ, with ㅇ below). There is NO vertical stroke on that horizontal vowel. Do NOT copy glyph pixels from source: redraw the whole central label in a clean Korean sans serif font. Verify exact characters 입 력 + 검 증 된 목 차. Preserve all other wording exactly: TITLE GENERATION / GROK; 읽히는 제목으로; 내용에 맞춰 형식 선택; 질문형; 정보형; 후기형; 의미 판단은 Grok · 보존 규칙은 코드; jieun.dev. Preserve subtle small text proportions, navy background, slate bar, blue three rectangles, thin branching lines. No oversized typography. Output sharp high resolution.
+```
