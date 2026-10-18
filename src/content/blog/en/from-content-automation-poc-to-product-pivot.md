@@ -126,7 +126,7 @@ These were numbers from a `site:` search at the time. Search-result counts are n
 
 This was Wiblog's operating judgment, not a claim that Google cannot index subdomains. [Google's official FAQ](https://developers.google.com/search/help/crawling-index-faq) states that it has no preference between subfolders and subdomains for indexing and ranking. Connecting a custom domain does not guarantee indexing or high rankings.
 
-![The decision that connected indexing observations to domain purchase and connection. Search → payment → registration → connection became one flow.](/images/poc-pivot/domain-purchase-flow.png)
+![The decision that connected indexing observations to domain purchase and connection. Search → payment → registration → connection became one flow.](/images/poc-pivot/domain-purchase-flow.png "diagram")
 
 WordPress and Inblog, which I looked at then, both emphasized buying and connecting a domain from the beginning. If users had to buy a domain elsewhere, configure DNS, and check the connection alone, the flow stopped even if article generation was good. We put domain search, payment, registration, and connection checks inside the product. The path went from `workb.xyz` to `witim.blog` and then to a custom-domain publishing strategy; at the time of the retrospective, 36 of 201 blogs used their own domain. That count describes adoption at the time, not a completed migration of every blog.
 

@@ -5,10 +5,10 @@ subtitle: "Letting Grok judge meaning while code preserves and validates titles"
 pubDate: 2026-10-18
 tags: ["llm", "prompt-engineering", "content-automation"]
 category: systems
-cover: /covers/readable-ai-titles-v6.png
+cover: /covers/readable-ai-titles-en-v1.png
 coverFit: contain
 coverBackground: dark
-coverAlt: "A navy diagram showing input and a verified outline leading to question, informational, or experience-based titles. Korean labels distinguish Grok's meaning judgment from preservation rules enforced in code."
+coverAlt: "A navy diagram showing input and a verified outline leading to question, informational, or experience-based titles. English labels distinguish Grok's meaning judgment from preservation rules enforced in code."
 series: wiblog-quality
 seriesOrder: 1
 seriesTitle: "Improving Wiblog Titles and Search"
