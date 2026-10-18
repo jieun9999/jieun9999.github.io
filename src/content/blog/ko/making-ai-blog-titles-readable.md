@@ -5,7 +5,7 @@ subtitle: "직접 검수하던 글감의 제목이 장황해 생성 지시와 �
 pubDate: 2026-10-18
 tags: ["llm", "prompt-engineering", "content-automation"]
 category: systems
-cover: /covers/readable-ai-titles-v4.png
+cover: /covers/readable-ai-titles-v5.png
 coverFit: contain
 coverBackground: dark
 coverAlt: "입력과 검증된 목차에서 질문형·정보형·후기형을 선택하는 흐름을 남색 배경과 파란색 도형으로 표현한 커버"

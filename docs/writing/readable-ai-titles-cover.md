@@ -47,3 +47,16 @@ Create a minimalist, sophisticated Korean tech blog thumbnail, landscape 16:9. S
 ```text
 Create a replacement blog cover using the attached image ONLY as the exact visual style reference. Match its flat dark-navy engineering report aesthetic: solid #101722 background, slate gray geometric bars, restrained periwinkle/blue accents, fine separator rules, flush-left typography, wide margins. New subject is AI title generation. Landscape 16:9. NOT a cute illustration or centered document icon. No 3D, no glow, no shadows, no textures. Text must be modest, NOT giant: heading only 4.5% of canvas height, all other Korean labels 2.5–3% height. Top-left small tracked eyebrow "TITLE GENERATION / GROK". Below at left one modest white headline "읽히는 제목으로". Middle of image: a quiet full-width slate horizontal band with centered text "입력 + 검증된 목차". Below it a tiny explanatory label "내용에 맞춰 형식 선택" and very thin connector lines branching from the band into three equally sized wide low rectangular blue-toned blocks along one row, with labels "질문형", "정보형", "후기형". This is a process schematic, not a statistical chart. Keep 50% of layout as breathing room. No giant article title, no example real-estate titles, no percentages, no numeric data or price symbols. Bottom fine horizontal rule like reference and small footer left "의미 판단은 Grok · 보존 규칙은 코드" and bottom-right "jieun.dev". Muted sophisticated palette very close to reference, uniform clean Korean sans-serif, exact Korean text. The graphic should feel like another cover in the reference's same engineering report series, with smaller typography.
 ```
+
+
+## v5: 한글 오타 수정
+
+- 도구: image_gen, v4 이미지를 참조한 편집
+- 결과: public/covers/readable-ai-titles-v5.png
+- 변경: 중앙 문구를 `입력 + 검증된 목차`로 재생성. 기존 색·배치·글자 크기 유지.
+
+### 편집 프롬프트
+
+```text
+Edit the provided blog cover, preserving its exact navy and blue report design, layout, dimensions, typography sizes, whitespace and all other text. Correct ONLY the central slate bar's Korean text to exactly: '입력 + 검증된 목차'. The critical word is 검증된 (syllables 검 / 증 / 된), NOT 검종된 or 검중된. Render 증 with the proper ㅈ + ㅡ + ㅇ glyph, crisp clean Korean typography. Preserve small restrained text size; do not enlarge headings. All other labels unchanged: 읽히는 제목으로; 내용에 맞춰 형식 선택; 질문형; 정보형; 후기형; 의미 판단은 Grok · 보존 규칙은 코드; jieun.dev.
+```
