@@ -317,9 +317,9 @@ const upNext = next
   }
   .lede {
     margin-top: 16px;
-    font-size: 22px;
+    font-size: 18px;
     font-weight: 400;
-    line-height: 1.6;
+    line-height: 1.72;
     color: var(--text-muted);
   }
   .translation-note {
@@ -478,7 +478,7 @@ const upNext = next
   }
   .chapter.active .chapter-link {
     color: var(--accent);
-    font-weight: 800;
+    font-weight: 600;
     border-left-color: var(--accent);
   }
   .chapter.active .num { color: var(--accent); }
@@ -505,14 +505,14 @@ const upNext = next
     display: flex;
     gap: 6px;
     font-size: 13px;
-    font-weight: 600;
-    line-height: 1.5;
+    font-weight: 400;
+    line-height: 1.65;
     color: var(--text-muted);
   }
   .sub-link::before { content: '·'; flex: none; color: var(--text-faint); }
   .sub-link:hover,
   .sub-link.current { color: var(--text); }
-  .sub-link.current { font-weight: 800; }
+  .sub-link.current { font-weight: 500; }
 
   /* 좁은 화면용 접이식 목차 — 넓은 화면에선 사이드바가 대신한다.
      사이드바와 같은 챕터 묶음(번호 · 주제어 · 부제 · h3)을 쓰되, 글 위에 있어 읽는 위치를
@@ -608,7 +608,7 @@ const upNext = next
   @media (max-width: 809px) {
     .post-wrap { padding-block: 24px; }
     .post-header h1 { font-size: 28px; }
-    .lede { font-size: 18px; }
+    .lede { font-size: 17px; }
     .post-cover-fig { margin-top: 28px; }
     .prose { margin-top: 32px; font-size: 17px; }
     .next-img { width: 88px; }

@@ -1,5 +1,5 @@
 ---
-title: "[Wiblog Part 2] Redefining the Product Direction After Beta Feedback"
+title: "Redefining the Product Direction After Beta Feedback"
 description: "How beta users' questions and behavior changed Wiblog's customer hypothesis, onboarding, B2C/B2B direction, and value proposition."
 pubDate: 2026-09-23
 updatedDate: 2026-09-23
@@ -10,7 +10,7 @@ coverAlt: "A whiteboard discussion comparing B2C and B2B directions for Wiblog"
 coverCaption: "September 2026, comparing B2C and B2B business directions."
 series: wiblog-development
 seriesOrder: 2
-seriesTitle: "Building Wiblog"
+seriesTitle: "Wiblog Product Development and Pivot"
 ---
 
 ## Introduction

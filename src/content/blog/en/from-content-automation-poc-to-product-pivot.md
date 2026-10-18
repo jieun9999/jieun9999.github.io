@@ -1,5 +1,5 @@
 ---
-title: "[Wiblog Part 1] From Topic Idea to Generated, Published, Search-Visible Content"
+title: "From Topic Idea to Generated, Published, Search-Visible Content"
 description: "How Wiblog took a user's topic idea, collected sources, generated a post, published it, and observed whether Google and AI crawlers could discover it."
 subtitle: "From topic ideas to publishing and search visibility"
 pubDate: 2026-09-18
@@ -11,7 +11,7 @@ coverAlt: "The Wiblog personal console showing the flow from keyword selection t
 coverCaption: "The personal console flow from choosing a keyword to publishing."
 series: wiblog-development
 seriesOrder: 1
-seriesTitle: "Building Wiblog"
+seriesTitle: "Wiblog Product Development and Pivot"
 ---
 
 <a id="1-before-the-beta--can-a-post-make-it-into-search-results"></a>
