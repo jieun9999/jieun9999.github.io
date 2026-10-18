@@ -18,7 +18,10 @@
   /* 글자 (진한 순) */
   --text: #18181b;           /* 제목 */
   --text-2: #27272a;
-  --article-text: #616161;         /* 본문 */
+  --article-text: #616161;
+  --visual-bg: #f7f9fb;
+  --visual-head: #eef2f6;
+  --visual-border: #dfe5eb;         /* 본문 */
   --text-muted: #3f3f46;     /* 요약·메타·라벨 */
   --text-subtle: #71717a;
   --text-faint: #a1a1aa;
@@ -75,6 +78,9 @@ html.dark {
   --text: #f4f4f5;
   --text-2: #e4e4e7;
   --article-text: #b5b5bd;
+  --visual-bg: #111820;
+  --visual-head: #1b2632;
+  --visual-border: #303d4a;
   --text-muted: #d4d4d8;
   --text-subtle: #a1a1aa;
   --text-faint: #71717a;
@@ -291,17 +297,18 @@ a.tag:hover { background: var(--surface-2); color: var(--text); }
   width: 100%;
   overflow-x: auto;
   border-collapse: collapse;
+  background: var(--visual-bg);
   font-size: 15px;
   line-height: 1.55;
   margin: 28px 0;
 }
 .prose th, .prose td {
-  border: 1px solid var(--border);
+  border: 1px solid var(--visual-border);
   padding: 9px 12px;
   text-align: left;
 }
-.prose th { background: var(--surface); font-weight: 800; color: var(--text); }
-.prose tbody tr:nth-child(even) td { background: var(--bg-2); }
+.prose th { background: var(--visual-head); font-weight: 600; color: var(--text); }
+.prose td { background: var(--visual-bg); }
 
 /* ===========================================================================
    콜아웃 (GitHub alerts: NOTE / TIP / IMPORTANT / WARNING / CAUTION)
@@ -363,6 +370,14 @@ html.dark .markdown-alert-caution { --al: #f5525f; }
    이미지: figure/caption + 클릭 확대(라이트박스)
    =========================================================================== */
 .prose .post-figure { margin: 32px 0; }
+/* Only explicitly marked diagrams receive a panel; captions stay outside it. */
+.prose .diagram-panel {
+  padding: clamp(16px, 2vw, 24px);
+  background: var(--visual-bg);
+  border: 1px solid var(--visual-border);
+  border-radius: 8px;
+}
+.prose .diagram-panel img { border: 0; border-radius: 0; }
 .prose .post-figure img {
   display: block;
   margin-inline: auto;

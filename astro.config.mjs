@@ -65,11 +65,19 @@ function rehypeImages() {
           const img = kids[0];
           img.properties = { ...img.properties, loading: 'lazy', decoding: 'async' };
           const alt = img.properties?.alt;
+          // Explicit author opt-in; never infer diagrams from filenames or alt text.
+          const isDiagram = img.properties?.title === 'diagram';
+          if (isDiagram) delete img.properties.title;
           const fig = {
             type: 'element',
             tagName: 'figure',
-            properties: { className: ['post-figure'] },
-            children: [img],
+            properties: { className: isDiagram ? ['post-figure', 'post-diagram'] : ['post-figure'] },
+            children: isDiagram ? [{
+              type: 'element',
+              tagName: 'div',
+              properties: { className: ['diagram-panel'] },
+              children: [img],
+            }] : [img],
           };
           if (alt && String(alt).trim()) {
             fig.children.push({
