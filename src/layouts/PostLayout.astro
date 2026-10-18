@@ -268,13 +268,16 @@ const upNext = next
 
 <style>
   .post-wrap {
-    --width-page: 1200px;
+    --width-page: 1055px;
     display: flex;
     align-items: flex-start;
     gap: 32px;
     padding-block: 64px;
   }
   .post-main {
+    width: 100%;
+    max-width: 790px;
+    margin-inline: auto;
     flex: 1 1 0;
     min-width: 0;
   }
@@ -309,18 +312,18 @@ const upNext = next
   }
   .post-header h1 {
     margin-top: 20px;
-    font-size: 36px;
-    font-weight: 800;
+    font-size: 42px;
+    font-weight: 700;
     line-height: 1.2;
     color: var(--text);
     overflow-wrap: anywhere;
   }
   .lede {
     margin-top: 16px;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 400;
-    line-height: 1.72;
-    color: var(--text-muted);
+    line-height: 1.75;
+    color: var(--article-text);
   }
   .translation-note {
     margin-top: 16px;
@@ -571,7 +574,7 @@ const upNext = next
   @media (min-width: 1280px) {
     .post-wrap {
       display: grid;
-      grid-template-columns: minmax(180px, 1fr) minmax(0, 935px) minmax(180px, 1fr);
+      grid-template-columns: minmax(180px, 1fr) minmax(0, 790px) minmax(180px, 1fr);
       column-gap: 24px;
       max-width: none;
     }
@@ -607,10 +610,10 @@ const upNext = next
   }
   @media (max-width: 809px) {
     .post-wrap { padding-block: 24px; }
-    .post-header h1 { font-size: 28px; }
-    .lede { font-size: 17px; }
+    .post-header h1 { font-size: 32px; }
+    .lede { font-size: 16px; }
     .post-cover-fig { margin-top: 28px; }
-    .prose { margin-top: 32px; font-size: 17px; }
+    .prose { margin-top: 32px; }
     .next-img { width: 88px; }
     .next-title { font-size: 16px; }
   }

@@ -17,7 +17,8 @@
 
   /* 글자 (진한 순) */
   --text: #18181b;           /* 제목 */
-  --text-2: #27272a;         /* 본문 */
+  --text-2: #27272a;
+  --article-text: #616161;         /* 본문 */
   --text-muted: #3f3f46;     /* 요약·메타·라벨 */
   --text-subtle: #71717a;
   --text-faint: #a1a1aa;
@@ -73,6 +74,7 @@ html.dark {
 
   --text: #f4f4f5;
   --text-2: #e4e4e7;
+  --article-text: #b5b5bd;
   --text-muted: #d4d4d8;
   --text-subtle: #a1a1aa;
   --text-faint: #71717a;
@@ -197,37 +199,39 @@ a.chip:hover { background: var(--surface-2); color: var(--text); }
 a.tag:hover { background: var(--surface-2); color: var(--text); }
 
 /* ===========================================================================
-   본문(prose) — 18px / 1.7, 문단 간격 16px
+   본문(prose) — 제목은 크고 선명하게, 본문은 16px / 1.75로 구분
    =========================================================================== */
 .prose {
-  font-size: 18px;
-  line-height: 1.7;
-  color: var(--text-2);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.75;
+  color: var(--article-text);
+  word-break: keep-all;
   overflow-wrap: break-word;
 }
 .prose > *:first-child { margin-top: 0; }
 .prose p { margin: 16px 0; }
 .prose h2 {
   margin: 40px 0 14px;
-  font-size: 26px;
+  font-size: 32px;
   font-weight: 700;
   line-height: 1.35;
   color: var(--text);
 }
 .prose h3 {
   margin: 28px 0 8px;
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 26px;
+  font-weight: 700;
   line-height: 1.4;
   color: var(--text);
 }
 .prose h4 {
   margin: 24px 0 8px;
-  font-size: 18px;
+  font-size: 21px;
   font-weight: 600;
   color: var(--text);
 }
-.prose strong { font-weight: 700; color: var(--text); }
+.prose strong { font-weight: 600; color: inherit; }
 /* 소제목과 첫 문단을 붙이고, 연속된 제목 사이의 여백을 줄인다. */
 .prose h2 + h3 { margin-top: 20px; }
 .prose :is(h2, h3, h4) + p { margin-top: 8px; }
@@ -431,4 +435,11 @@ html.dark .markdown-alert-caution { --al: #f5525f; }
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
   }
+}
+
+/* 작은 화면에서도 제목과 본문의 위계를 유지한다. */
+@media (max-width: 809px) {
+  .prose h2 { font-size: 26px; }
+  .prose h3 { font-size: 22px; }
+  .prose h4 { font-size: 19px; }
 }
