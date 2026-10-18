@@ -7,9 +7,11 @@ updatedDate: 2026-09-24
 tags:
   ["linux", "cron", "systemd", "git-worktree", "ssh", "devops", "automation", "least-privilege"]
 category: systems
-cover: /covers/part2-four-people-one-dev-machine-en.webp
-coverAlt: "Diagram of separate accounts, home directories, and ports inside a shared VPS, with a common service-owned :8787 tunnel to the production API on :8987"
-coverCaption: "People get separate workspaces; shared resources belong to service accounts."
+cover: /covers/part2-four-people-one-dev-machine-en-v2.png
+coverFit: contain
+coverBackground: dark
+coverAlt: "Navy diagram of four separate workspaces in a shared VPS connected through a shared tunnel to the production API"
+coverCaption: "Accounts, homes, and ports separate workspaces; a service account owns production access."
 series: shared-dev-machine
 seriesOrder: 2
 seriesTitle: "Sharing One Machine Among Four People"

@@ -7,9 +7,11 @@ updatedDate: 2026-09-24
 tags:
   ["ssh", "port-forwarding", "nextjs", "bff", "remote-development", "e2e", "devops"]
 category: systems
-cover: /covers/part1-three-tier-dev-environment.webp
-coverAlt: "맥북이 SSH로 개발 서버에 접속하고, 현재 :3100에서 :8787 터널을 거쳐 운영 API·DB로 가는 실선 경로와 추후 서버 내부의 Playwright·:39xx·로컬 API·DB·Redis로 분리할 점선 경로"
-coverCaption: "현재 화면 확인 경로는 운영 API를 보지만, e2e는 추후 별도 로컬 스택으로 분리합니다."
+cover: /covers/part1-three-tier-dev-environment-ko-v2.png
+coverFit: contain
+coverBackground: dark
+coverAlt: "맥북 16GB에서 SSH로 개발 VPS 96GB에 접속하고 공용 터널로 운영 API·DB에 연결하는 남색 도식"
+coverCaption: "화면은 맥북에서 보고, 코드·빌드·에이전트는 VPS에서 실행합니다."
 series: shared-dev-machine
 seriesOrder: 1
 seriesTitle: "한 대를 네 명이 나눠 쓰기"

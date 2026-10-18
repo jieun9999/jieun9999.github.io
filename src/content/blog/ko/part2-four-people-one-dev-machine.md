@@ -7,9 +7,11 @@ updatedDate: 2026-09-24
 tags:
   ["linux", "cron", "systemd", "git-worktree", "ssh", "least-privilege", "devops", "automation"]
 category: systems
-cover: /covers/part2-four-people-one-dev-machine.webp
-coverAlt: "공유 VPS 안에서 개발자 두 명·디자이너·마케터의 계정·홈·포트를 분리하고, wdot-tunnel 서비스가 :8787 공용 터널에서 운영 API :8987로 연결하는 구조도"
-coverCaption: "사람의 작업공간은 나누고, 공유 자원은 서비스 계정으로 분리했습니다."
+cover: /covers/part2-four-people-one-dev-machine-ko-v2.png
+coverFit: contain
+coverBackground: dark
+coverAlt: "공유 VPS 안의 개발자 두 명·디자이너·마케터 작업공간과 운영 API로 연결되는 공용 터널을 보여주는 남색 도식"
+coverCaption: "계정·홈·포트로 작업공간을 나누고, 운영 연결은 서비스 계정이 담당합니다."
 series: shared-dev-machine
 seriesOrder: 2
 seriesTitle: "한 대를 네 명이 나눠 쓰기"
