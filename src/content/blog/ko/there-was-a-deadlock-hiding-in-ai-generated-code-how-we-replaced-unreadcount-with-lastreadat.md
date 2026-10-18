@@ -3,6 +3,7 @@ title: '[메신저 부하 테스트 2편] AI가 생성한 코드에 deadlock이 
 description: '부하 테스트 시작 9분 만에 HTTP 오류율 42.8%, 목표 TPS의 12%. 범인은 AI 보조 코딩 중 무심코 작성한 단 한 줄의 updateMany였습니다.'
 subtitle: "메신저 부하 테스트에서 오류율이 42.8%까지 높아진 원인을 추적하니 읽지 않은 메시지 수를 갱신하는 쿼리에 교착 상태가 있었습니다. 반복 갱신이 필요했던 unreadCount 대신 마지막으로 읽은 시점인 lastReadAt을 사용하는 구조로 전환했습니다."
 pubDate: 2026-05-11
+updatedDate: 2026-10-18
 tags: ['postgresql', 'prisma', 'databases', 'concurrency', 'node-js', 'debugging']
 category: reliability
 cover: /covers/there-was-a-deadlock-hiding-in-ai-generated-code-how-we-replaced-unreadcount-with-lastreadat.webp
@@ -75,7 +76,7 @@ Tx-B: UPDATE ChannelMember WHERE channelId=X AND userId != B
         → locks rows A, C, D, ... one at a time, in scan order
 ```
 
-`updateMany`는 하나의 SQL 문이지만, `ORDER BY`가 **없으면** Postgres는 실행 계획에 따라 락을 잡는 순서를 정합니다. 캐시 상태, 병렬 워커 분배, 테이블 통계가 모두 이 순서에 영향을 주며, 이는 곧 **같은 SQL의 두 동시 실행 사이에서도 순서가 달라질 수 있다**는 뜻입니다.
+`updateMany`는 하나의 SQL 문이지만 여러 행을 갱신하며 각 행에 락을 획득합니다. 같은 채널을 대상으로 하더라도 송신자에 따라 갱신 대상은 달라집니다. 이 코드에는 여러 행의 락 획득 순서를 명시적으로 통일하는 장치가 없었습니다.
 
 ### PG 로그에서 나온 직접적인 증거
 
@@ -89,7 +90,7 @@ deadlock마다 `CONTEXT` 라인이 매번 달랐습니다.
 | 05:29:09 | `while locking tuple (214,56)` |
 | 05:29:10 | `while locking tuple (1364,5)` |
 
-`(page, slot)`이 매번 다릅니다 → **락 순서가 비결정적(non-deterministic)**입니다. 가설이 확인됐습니다.
+`(page, slot)`은 충돌한 행의 물리적 위치입니다. 이 값이 다르다는 사실만으로 각 트랜잭션의 전체 락 획득 순서를 입증할 수는 없습니다. 관련 이슈에서 추가로 추출한 `STATEMENT`에는 서로 기다리는 두 프로세스가 모두 `ChannelMember.unreadCount`를 일괄 증가시키는 `UPDATE`를 실행하고 있었습니다. 순환 대기 로그와 실행 SQL을 함께 보고 문제의 카운터 갱신 경로를 확인했습니다.
 
 <a id="4-솔직한-고백--부끄러운-ai-코딩-실수였습니다"></a>
 
@@ -137,106 +138,109 @@ await prisma.channelMember.updateMany({
 
 -   `channelId` 해시로 Message INSERT를 파티셔닝
 
-P0만으로도 deadlock은 사라집니다. 하지만 **메시지 1개 = N번의 행 쓰기**라는 구조는 그대로 남습니다. 100K CCU에 도달하면 형태만 다를 뿐 다시 터질 문제입니다.
+P0는 재시도로 실패를 완화하거나 락 획득 순서를 맞추는 접근입니다. 하지만 **메시지 1개 = 멤버 수에 비례하는 행 쓰기**라는 구조는 그대로 남습니다. 그래서 카운터를 일괄 갱신하는 작업 자체를 없애는 방향을 검토했습니다.
 
 P1(Redis)은 더 빠르지만 Redis ↔ Postgres 동기화 복잡도를 끌어들입니다. unreadCount가 Postgres와 일시적으로 어긋나고, Redis 플러시가 실패하면 카운트가 영구적으로 틀어질 수 있습니다.
 
 그래서 우리는 **다른 방향**을 선택했습니다.
 
-## 6\. 우리가 고른 것 — `lastReadAt` 컬럼
+<a id="6-우리가-고른-것--lastreadat-컬럼"></a>
 
-핵심 아이디어는 이렇습니다.
+## 6\. 우리가 고른 것 — 읽은 시점 기준으로 미읽음 수 계산하기
 
-> **"메시지마다 카운터를 쓰지 않고, 읽을 때 카운트를 계산합니다."**
+핵심은 **사용자마다 어디까지 읽었는지를 저장하고, 그 이후의 메시지 수를 조회할 때 계산하는 것**입니다. 메시지가 올 때마다 다른 멤버들의 `unreadCount`를 증가시키는 방식에서, `ChannelMember.lastReadAt`과 `Message.createdAt`을 비교하는 방식으로 전환했습니다.
 
-`ChannelMember.unreadCount` 컬럼을 없앱니다. 대신 **단 하나의** `ChannelMember.lastReadAt` **타임스탬프**로 교체합니다.
+여기서 DB 컬럼과 API 응답을 구분해야 합니다. 폐기 대상은 DB에 저장해 두고 계속 증감하던 `ChannelMember.unreadCount`입니다. 클라이언트가 받는 API 응답의 `unreadCount` 필드는 유지하고, 그 값을 조회 시 계산한 미읽음 수로 채웠습니다.
 
-### 이전 — 쓰기 중심
+### 읽은 메시지의 시점을 기록합니다
 
-```plaintext
-[Send 1 message]
-  ├─ INSERT Message                              (write 1)
-  ├─ UPDATE ChannelMember unreadCount++ for N    (write N) ← deadlock vector
-  └─ UPDATE ChannelMember unreadCount=0 (sender) (write 1)
+`lastReadAt`은 일자 단위의 값이 아니라 타임스탬프입니다. 특정 메시지까지 읽었다는 요청이 오면 해당 메시지가 그 채널에 속하는지 확인하고, 그 메시지의 `createdAt`을 읽음 기준으로 삼습니다. 전체 읽음 요청에서는 채널의 최신 메시지를 찾아 기준 시점과 `lastReadMessageId`를 함께 갱신하도록 보완했습니다.
 
-→ 1 message = (N+2) writes
-```
+`lastReadMessageId`는 화면의 읽음 구분선 위치에도 쓰입니다. 따라서 숫자만 0으로 만드는 것과 읽음 위치를 이동하는 것은 함께 처리해야 했습니다. 늦게 도착한 요청이 읽음 시점을 과거로 되돌리지 않도록, 갱신에는 `GREATEST`를 사용하고 미래 시각을 제한하는 방어도 뒀습니다.
 
-### 이후 — 필요할 때 읽기
+다음은 미읽음 계산의 핵심 조건만 나타낸 개념식입니다.
 
 ```plaintext
-[Send 1 message]
-  └─ INSERT Message                              (write 1)
-                                                          ← done.
-
-[Fetch channel list]
-  └─ SELECT count(*) FROM Message
-       WHERE channelId = $1 AND createdAt > lastReadAt   (read, hits index)
-
-[Enter channel / mark as read]
-  └─ UPDATE ChannelMember SET lastReadAt = NOW()
-       WHERE userId = \(1 AND channelId = \)2              (write 1, own row only)
+미읽음 수 = 해당 채널에서
+            삭제되지 않았고,
+            Message.createdAt > ChannelMember.lastReadAt이며,
+            사용자별 미읽음 집계 정책에 해당하는 메시지 수
 ```
 
-### 왜 이 방식이 deadlock을 없애는가
+실제 조회에는 삭제 여부와 답글·멘션 정책도 반영됩니다. 답글 집계 정책은 후속 작업에서 조정됐지만, 읽음 시점을 기준으로 계산하고 다른 멤버들의 카운터를 일괄 갱신하지 않는 원칙은 유지됐습니다.
 
-`updateMany WHERE userId != sender`가 **사라집니다.** 메시지를 보내도 더 이상 다른 사용자의 행을 건드리지 않습니다. 락 경합 유발 지점이 코드에서 완전히 제거됩니다.
-
-`lastReadAt` 업데이트는 오직 **자기 자신의 행**만 건드립니다. 사용자 A는 언제나 A의 `ChannelMember` 행만, 사용자 B는 B의 행만 업데이트합니다. **두 트랜잭션이 같은 행을 두고 경쟁하는 시나리오 자체가 존재하지 않습니다** — 재시도 로직이 아니라 구조적으로 제거된 것입니다.
-
-### 왜 이것이 성능 저하가 아닌가
-
-언뜻 보면 "매번 `count(*)`를 돌린다"는 것이 더 느리게 들립니다. 하지만 그렇지 않습니다. 이유는 다음과 같습니다.
-
-1.  **읽기는 캐시 친화적입니다.** `(channelId, createdAt)` 복합 인덱스가 있으면 이 카운트는 인덱스 range scan이 됩니다.
-    
-2.  **읽기 빈도 << 쓰기 빈도.** 사용자는 앱을 열거나 채널에 들어갈 때 채널 목록을 봅니다. 반면 메시지는 초당 수십에서 수백 번씩 전송됩니다. **N번의 쓰기를 1번의 읽기로 바꾸는 것만으로도 엄청난 이득입니다.**
-    
-3.  **읽기는 read replica에서 처리할 수 있습니다.** 쓰기 락은 그럴 수 없습니다.
-    
-
-### 시퀀스 다이어그램 (개념도)
+### 이전 — 메시지마다 다른 멤버의 카운터 갱신
 
 ```plaintext
-[Before — count at write time]
-User A ─── POST /messages ───▶ Web
-                                 ├─ INSERT Message
-                                 ├─ UPDATE ChannelMember(N rows) ← 💥 deadlock
-                                 └─ 200 OK
+[메시지 전송]
+  ├─ Message 저장
+  ├─ 다른 멤버들의 unreadCount 증가  ← 여러 행에 쓰기·락 발생
+  └─ 보낸 사람의 읽음 상태 갱신
 
-[After — count at read time]
-User A ─── POST /messages ───▶ Web
-                                 ├─ INSERT Message
-                                 └─ 200 OK                       ← done
-
-User B ─── GET /channels  ───▶ Web
-                                 ├─ SELECT channels ...
-                                 ├─ SELECT count(*) FROM Message
-                                 │    WHERE createdAt > lastReadAt
-                                 └─ [{ id, name, unread: 3 }, ...]
-
-User B ─── POST /channels/X/read ▶ Web
-                                 └─ UPDATE ChannelMember
-                                      SET lastReadAt = NOW()
-                                      WHERE userId = B           ← own row only
+[메시지 삭제]
+  └─ 다른 멤버들의 unreadCount 감소
 ```
+
+### 이후 — 읽음 위치 저장과 미읽음 조회 분리
+
+```plaintext
+[메시지 전송]
+  ├─ Message 저장
+  ├─ 보낸 사람의 읽음 위치 갱신
+  └─ 다른 멤버들의 unreadCount 증가 없음
+
+[채널 목록 조회]
+  └─ lastReadAt 이후의 집계 대상 메시지를 COUNT
+       → API 응답의 unreadCount로 반환
+
+[메시지 읽음 처리]
+  └─ 해당 사용자의 lastReadAt과 lastReadMessageId 갱신
+
+[메시지 삭제]
+  └─ 삭제 상태 반영 → 다음 COUNT에서 제외
+       (멤버별 unreadCount 감소 없음)
+```
+
+위 도식은 미읽음 처리와 관련된 작업만 나타냅니다. 메시지 전송의 모든 DB 작업이 `INSERT` 한 번으로 줄었다는 뜻은 아닙니다. 보낸 사람의 읽음 위치 갱신과 답글 수 갱신 등은 별도로 남습니다.
+
+### 어떤 데드락 경로를 제거했는가
+
+메시지 전송·삭제 시 여러 멤버의 `unreadCount`를 증감하던 `updateMany`를 제거했습니다. 이 변경으로 이번 장애에서 확인한 **여러 멤버 행을 함께 잠그는 카운터 갱신 경로**가 사라졌습니다.
+
+읽음 처리는 해당 사용자의 멤버십 행을 갱신합니다. 다만 같은 사용자가 여러 기기에서 동시에 읽음 요청을 보낼 수 있으므로, 모든 락 경합이 없어지는 것은 아닙니다. 이번 수정의 범위는 미읽음 카운터의 일괄 쓰기에서 발생한 데드락 원인을 제거하는 것입니다.
+
+### 쓰기 비용을 줄인 대신 조회 비용을 확인합니다
+
+기존에는 메시지 하나가 들어올 때마다 멤버 수에 비례하는 카운터 쓰기가 발생했습니다. 전환 후에는 채널 목록 조회 시 미읽음 수를 계산하는 비용을 부담합니다.
+
+Phase 1 구현은 채널마다 쿼리를 하나씩 보내지 않고, 사용자가 속한 채널들의 미읽음 수를 배치 쿼리로 계산했습니다. `(channelId, isDeleted, createdAt)` 인덱스를 활용하도록 구성했습니다. 다만 인덱스가 있다고 `COUNT` 비용이 없어지는 것은 아니므로, 조회 지연과 동시 부하도 함께 확인해야 합니다.
 
 <a id="7-마이그레이션-전략--한-번에-다-뒤엎지-마라"></a>
 
-## 7\. 마이그레이션 전략 — 한 번에 다 뒤엎지 않습니다
+<a id="7-마이그레이션-전략--한-번에-다-뒤엎지-않습니다"></a>
 
-하위 호환성을 위한 단계적 롤아웃입니다.
+## 7\. 마이그레이션 — 조회 전환, 일괄 쓰기 제거, 컬럼 정리
 
-1.  **Phase 1**: `lastReadAt` 컬럼을 추가합니다. **기존** `unreadCount` **쓰기 경로는 손대지 않고 그대로 둡니다.**
-    
-2.  **Phase 2**: **읽기 API만** 새 방식(`count(*) WHERE createdAt > lastReadAt`)으로 전환합니다.
-    
-3.  **Phase 3**: 부하 테스트를 다시 돌립니다. 75 TPS를 깔끔하게 통과하는지 확인합니다.
-    
-4.  **Phase 4**: `unreadCount` 쓰기 코드를 삭제하고 컬럼을 드롭합니다.
-    
+최종 방향은 `unreadCount` 쓰기를 유지하는 것이 아니라 **읽음 시점 기준 계산으로 전환하고 기존 카운터를 제거하는 것**이었습니다. 실제 작업은 조회 전환과 쓰기 제거를 나눠 진행했습니다.
 
-Phase 2가 끝나는 시점이면 **이미 deadlock 유발 지점은 사라진 상태**입니다. 왜일까요? 읽기 경로가 `lastReadAt` 기반으로 바뀌는 순간, 잘못된 `unreadCount` 값은 더 이상 사용자에게 보이지 않기 때문입니다. 그 이후에는 프로덕션 압박 없이 저희 일정에 맞춰 쓰기 경로를 정리하면 됩니다.
+| 단계 | 변경 내용 | 기존 카운터 쓰기와 데드락의 관계 |
+| --- | --- | --- |
+| Phase 1 — 조회 전환 | `lastReadAt` 추가·기존 읽음 위치 보정, API의 `unreadCount`를 계산값으로 전환 | 비교 검증을 위해 기존 쓰기를 잠시 유지했습니다. 이 단계만으로 데드락 원인은 없어지지 않습니다. |
+| Phase 2 — 일괄 쓰기 제거 | 메시지 전송 시 증가 함수와 호출, 삭제 시 감소 쿼리 제거 | 문제가 된 여러 멤버 행의 카운터 증감 경로를 제거했습니다. |
+| Phase 3 — 잔여 참조·컬럼 정리 | 대시보드 집계 등 남은 참조를 계산 방식으로 바꾸고 DB 컬럼 제거 | 원인 쿼리를 제거한 뒤 수행하는 스키마 정리입니다. API 응답 필드는 유지합니다. |
+
+Phase 1은 2026년 5월 8일 머지된 PR #836에 해당합니다. 당시에는 조회 결과를 새 방식으로 바꾸면서 기존 카운터와의 차이를 확인하기 위해 쓰기를 잠시 남겨뒀습니다. 이 과도기를 최종 설계와 혼동하면 안 됩니다.
+
+Phase 2는 2026년 5월 20일 머지된 PR #974에 해당합니다. `updateUnreadCounts()` 함수와 메시지 전송 시 호출을 없애고, 메시지 삭제 시 `unreadCount`를 감소시키던 `updateMany`도 제거했습니다. **이번 데드락의 원인 경로가 사라지는 시점은 조회 결과를 바꾼 때가 아니라, 이 일괄 쓰기를 제거한 때입니다.**
+
+컬럼 삭제는 별도 단계였습니다. Phase 2 이후에도 대시보드 집계와 읽음 처리 등에 기존 컬럼 참조가 남아 있었기 때문에, 이를 정리한 뒤 컬럼을 제거하도록 나눴습니다. 이슈의 마지막 기록에는 운영 DB 반영과 main 배포 완료가 남아 있습니다.
+
+### 확인한 결과와 검증 목표를 구분합니다
+
+PR #974에는 staging 부하 테스트에서 PostgreSQL 로그의 `40P01` 카운트가 0임을 확인했다는 기록이 있습니다. 반면 **75 TPS 회복과 HTTP 오류율 1% 미만**은 검증 목표로 기재돼 있고, 해당 PR에서 완료된 측정값은 확인하지 못했습니다. 따라서 이 글에서는 두 수치를 달성한 성과로 쓰지 않습니다.
+
+> [!NOTE]
+> 2026년 10월 18일 수정: 관련 이슈와 머지된 PR을 대조해 읽음 시점 기반 계산과 실제 전환 단계를 정리했습니다. 초판의 “읽기 API만 전환하면 데드락 유발 지점이 사라진다”는 설명을 바로잡고, 초판 발행일 이후의 쓰기 제거 작업을 반영했습니다.
 
 ## 마무리하며
 
