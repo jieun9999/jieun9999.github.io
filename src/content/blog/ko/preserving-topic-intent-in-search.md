@@ -5,10 +5,10 @@ subtitle: "서로 다른 글감이 비슷한 자료를 가져오는 문제를 �
 pubDate: 2026-10-18
 tags: ["llm", "prompt-engineering", "content-automation"]
 category: systems
-cover: /covers/wiblog-search-intent-ko-v2.png
+cover: /covers/wiblog-search-intent-ko-v3.png
 coverFit: contain
 coverBackground: dark
-coverAlt: "같은 야외웨딩 제목에서 추가 단어가 올에서 텐트 비용으로 바뀌는 검색어 전후 비교"
+coverAlt: "같은 야외웨딩 제목에서 씨앗키워드에 올을 더하던 기존 검색어와 텐트 비용을 더하는 개선 검색어를 좌우로 비교한 커버"
 series: wiblog-quality
 seriesOrder: 2
 seriesTitle: "위블로그 제목과 검색 개선기"
