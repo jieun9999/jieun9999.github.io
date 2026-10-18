@@ -14,7 +14,7 @@ tags:
     "cost",
   ]
 category: systems
-cover: /covers/many-cheap-calls-blue-cover.png
+cover: /covers/many-cheap-calls-blue-cover-v2.png
 coverFit: contain
 coverBackground: dark
 coverAlt: "남색 배경의 단일·분할 생성 비교 도식 — 같은 모델에 한 번에 8,000자를 요청한 최장 결과는 3,182자, 1,200자씩 8개 섹션으로 나누어 조립한 결과는 8,995자"
