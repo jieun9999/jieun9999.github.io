@@ -5,10 +5,10 @@ subtitle: "직접 검수하던 글감의 제목이 장황해 생성 지시와 �
 pubDate: 2026-10-18
 tags: ["llm", "prompt-engineering", "content-automation"]
 category: systems
-cover: /covers/readable-ai-titles-v3.png
+cover: /covers/readable-ai-titles-v4.png
 coverFit: contain
 coverBackground: dark
-coverAlt: "촘촘한 문서가 간결한 제목 카드로 바뀌는 그래픽과 읽히는 제목으로 문구"
+coverAlt: "입력과 검증된 목차에서 질문형·정보형·후기형을 선택하는 흐름을 남색 배경과 파란색 도형으로 표현한 커버"
 series: wiblog-quality
 seriesOrder: 1
 seriesTitle: "위블로그 제목과 검색 개선기"

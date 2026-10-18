@@ -23,14 +23,27 @@ Use case: infographic-diagram. Create a new Korean technical blog cover, 16:9 la
 Redesign this Korean tech blog cover. Keep dark navy background, white/slate and periwinkle blue flat editorial style. Wide 16:9. Remove old article headline and ALL Songdo examples. The actual comparison text must dominate 85% of image. Small understated top eyebrow ONLY "안내문에서 질문으로" (about 3% canvas height). ONE example stacked vertically, full width, not side by side: upper block small label "BEFORE", large readable gray-white Korean text exactly "용산 재개발 아파트 매수 시 현금청산 위험과 계약 특약 확인법" across 2 lines. Highlight the tail "계약 특약 확인법" in muted gray to convey length, but maintain readability. Small downward arrow in narrow gap. Lower block small label "AFTER", significantly larger bold bright light-blue Korean exact text "용산 재개발 아파트 사면 현금청산 위험 있나요?" across 2 lines, emphasize question ending. Use font approximately 6% of canvas height for before and 8% for after. Both blocks have generous inner padding and subtle rectangular boundaries. No huge heading, no repeated article title, no decorative imagery. Footer tiny "동일 목차·출처 · Grok 추가 재현 · 2026.10.18", right "jieun.dev". No invented statistics, no manual-edit label. Ensure all Korean is exact and easy to read as thumbnail.
 ```
 
-## 간결한 최종 커버
+## 세 번째 커버
 
-- 최종 파일: `public/covers/readable-ai-titles-v3.png`
+- 세 번째 파일: `public/covers/readable-ai-titles-v3.png`
 - 도구: 내장 image_gen
 - 예시 비교와 게시물 제목을 제거하고, 문서·짧은 제목 카드 그래픽과 ‘읽히는 제목으로’ 한 줄만 남깁니다.
+
+### 세 번째 생성 프롬프트
+
+```text
+Create a minimalist, sophisticated Korean tech blog thumbnail, landscape 16:9. Solid deep navy background #101722, abundant empty space (at least 65 percent), restrained flat vector-like editorial illustration. Center a small understated composition: on left a pale slate document sheet with many fine closely spaced abstract horizontal lines; on right a compact clean periwinkle-blue title card with just one crisp white abstract line. The document and title card slightly overlap to suggest simplification; no arrows, no labels, no panels, no before-after text. Illustration occupies only about 30 percent of the canvas width, sits centered above a modest caption. The ONLY actual readable text anywhere is exactly "읽히는 제목으로" in clean Korean sans-serif, medium-small, airy, centered below illustration. Do not write the full article title, no examples, no English, no date, no brand, no numbers, no icons of AI robots, no gradients, no glow, no 3D. Quiet, uncluttered, premium and legible at thumbnail scale. Preserve generous margins.
+```
+
+## 최종 커버 — 기존 비용 글과 같은 보고서 스타일
+
+- 최종 파일: `public/covers/readable-ai-titles-v4.png`
+- 도구: 내장 image_gen. `public/covers/ai-blog-pipeline-cost.webp`를 스타일 참고 이미지로 전달했습니다.
+- 남색 배경, 슬레이트·파란색 도형, 얇은 구분선과 좌측 정렬을 유지하며 글자 크기를 줄였습니다.
+- 입력·검증된 목차에서 세 제목 형식을 선택하는 흐름만 표현합니다. 비용 글의 수치와 통계 그래프는 가져오지 않습니다.
 
 ### 최종 생성 프롬프트
 
 ```text
-Create a minimalist, sophisticated Korean tech blog thumbnail, landscape 16:9. Solid deep navy background #101722, abundant empty space (at least 65 percent), restrained flat vector-like editorial illustration. Center a small understated composition: on left a pale slate document sheet with many fine closely spaced abstract horizontal lines; on right a compact clean periwinkle-blue title card with just one crisp white abstract line. The document and title card slightly overlap to suggest simplification; no arrows, no labels, no panels, no before-after text. Illustration occupies only about 30 percent of the canvas width, sits centered above a modest caption. The ONLY actual readable text anywhere is exactly "읽히는 제목으로" in clean Korean sans-serif, medium-small, airy, centered below illustration. Do not write the full article title, no examples, no English, no date, no brand, no numbers, no icons of AI robots, no gradients, no glow, no 3D. Quiet, uncluttered, premium and legible at thumbnail scale. Preserve generous margins.
+Create a replacement blog cover using the attached image ONLY as the exact visual style reference. Match its flat dark-navy engineering report aesthetic: solid #101722 background, slate gray geometric bars, restrained periwinkle/blue accents, fine separator rules, flush-left typography, wide margins. New subject is AI title generation. Landscape 16:9. NOT a cute illustration or centered document icon. No 3D, no glow, no shadows, no textures. Text must be modest, NOT giant: heading only 4.5% of canvas height, all other Korean labels 2.5–3% height. Top-left small tracked eyebrow "TITLE GENERATION / GROK". Below at left one modest white headline "읽히는 제목으로". Middle of image: a quiet full-width slate horizontal band with centered text "입력 + 검증된 목차". Below it a tiny explanatory label "내용에 맞춰 형식 선택" and very thin connector lines branching from the band into three equally sized wide low rectangular blue-toned blocks along one row, with labels "질문형", "정보형", "후기형". This is a process schematic, not a statistical chart. Keep 50% of layout as breathing room. No giant article title, no example real-estate titles, no percentages, no numeric data or price symbols. Bottom fine horizontal rule like reference and small footer left "의미 판단은 Grok · 보존 규칙은 코드" and bottom-right "jieun.dev". Muted sophisticated palette very close to reference, uniform clean Korean sans-serif, exact Korean text. The graphic should feel like another cover in the reference's same engineering report series, with smaller typography.
 ```
