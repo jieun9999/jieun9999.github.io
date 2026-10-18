@@ -100,7 +100,7 @@ The title model does not read the entire finished article. Source texts are used
 
 The following is an illustrative example of the processing flow. It shows how a draft covering several points narrows its focus after the outline is available.
 
-![Illustrative six-step title pipeline: code passes the keyword, Grok drafts a title, sources support a verified outline, Grok writes the final title, and code validates, saves, and preserves it.](/images/title-generation/title-timeline-en-v1.png "diagram")
+![Illustrative six-step title pipeline: code passes the keyword, Grok drafts a title, sources support a verified outline, Grok writes the final title, and code validates, saves, and preserves it.](/images/title-generation/title-timeline-en-v2.png "diagram")
 
 Association eligibility and contract clauses remain in the outline as material to explain. The title foregrounds the question connecting them: “Could I buy the property and still end up with cash settlement?” Grok decides what belongs in the title, while code keeps the validated title in subsequent generation steps.
 
