@@ -5,11 +5,11 @@ subtitle: "직접 검수하던 글감의 제목이 길고 딱딱해 생성 지�
 pubDate: 2026-10-18
 tags: ["llm", "prompt-engineering", "content-automation"]
 category: systems
-cover: /covers/readable-ai-titles.png
+cover: /covers/readable-ai-titles-v2.png
 coverFit: contain
 coverBackground: dark
-coverAlt: "송도 아파트 글감 두 개의 기존 제목과 Grok 재생성 제목을 비교한 이미지"
-coverCaption: "기존 목차·출처를 고정한 Grok v11 재생성 결과 중 두 사례입니다. 사람이 제목을 수정한 결과나 클릭률 비교가 아닙니다."
+coverAlt: "용산 재개발 글감의 장황한 기존 제목과 직접적인 질문형으로 바뀐 Grok 재생성 제목 비교"
+coverCaption: "용산 글감의 기존 목차·출처로 2026년 10월 18일 Grok 제목 생성을 추가 재현한 결과입니다. 본문의 9월 29일 21개 비교와 별개이며, 생성 응답을 수작업으로 수정하지 않았습니다."
 series: wiblog-quality
 seriesOrder: 1
 seriesTitle: "위블로그 제목과 검색 개선기"
