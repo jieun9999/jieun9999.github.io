@@ -10,6 +10,16 @@
 
 ## 생성 프롬프트
 
+### v2 선명도와 검색어 표기 수정
+
+사용자 요청으로 구도·흐름은 유지하며 선과 글자를 선명하게 재생성하고, 상단을 `씨앗키워드 + 추가단어 = 저장된 검색어`로 변경했습니다. 출력은 `public/images/search-intent/source-acquisition-flow-ko-v2.png`입니다. 높은 해상도를 요청했지만 실제 출력 크기는 기존과 같으므로 픽셀 해상도 증가로 설명하지 않습니다.
+
+Re-render this exact Korean technical flowchart at ultra crisp high resolution, target 3072 x 3840 portrait. Preserve ALL Korean wording, layout, box positions, arrows, line breaks, color roles and proportions exactly. This is a quality-only refinement, not a redesign. Replace the slightly textured/fuzzy rendering with perfectly flat light neutral background, razor-sharp clean sans-serif Korean typography, precise straight vector-like lines, smooth clean edges, uniform thin borders. No grain, no paper texture, no shadow, no blur, no gradient. Keep teal and slate connectors. Do not add/remove/change any text or arrows. Output at maximum feasible resolution for sharp zoomed reading.
+
+Edit this exact diagram. In the very top box titled '일반 검색', replace ONLY the subtitle with this exact Korean text: '씨앗키워드 + 추가단어 = 저장된 검색어'. Preserve every other word, arrow, box and layout. Re-render at 3072x3840 pixels or highest possible resolution, with crisp flat clean typography and smooth precise vector-like lines. No fuzzy edges or texture. Do not alter other content.
+
+### v1 최초 생성
+
 Create a precise Korean technical blog flowchart, portrait 4:5, high resolution. Light neutral gray #fafafa background, dark charcoal text, white cards, thin gray borders and arrow connectors, one muted teal accent for the general-search path and one muted slate accent for the platform path. No navy cover style, no decorative icons, no giant heading. Readable short Korean labels with generous spacing. Exact correct typography. Diagram title small: "검색 결과가 글의 출처가 되기까지".
 Layout top to bottom with two lanes in middle. All arrows unambiguous, no crossing:
 TOP centered card "일반 검색" second line "저장된 검색어 · 씨앗 + 검색 표현".
