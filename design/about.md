@@ -98,9 +98,11 @@
 
 | | 한국어 | 영어 |
 | --- | --- | --- |
-| 인사 | 안녕하세요, 정지은입니다 | Hi, I'm Jieun Jeong |
+| 인사 | 안녕하세요 개발자 정지은입니다. | Hello, I'm Jieun Jeong, a developer. |
 | 그림 alt | 정지은 | Jieun Jeong |
-| 소개 | 설계부터 배포·운영까지 서비스를 끝까지 책임지는 백엔드 개발자입니다. 블로그 자동화 SaaS를 처음부터 만들며 … 이 블로그에 기록합니다. | I'm a backend engineer who owns a service end to end … on this blog. |
+| 소개 (3문단) | **백엔드를 중심으로 제품의 설계부터 배포·운영까지 주도하는 Product Engineer입니다.** / 교육사업을 직접 운영하며 … 담당했습니다. / 기술 자체보다 … 지향합니다. | **I'm a Product Engineer who leads products …** / I ran an education business … / Rather than starting from the technology itself … |
+
+- 문단 안 강조는 `**굵게**`(→ `<strong>`, `--text` 800)와 `==형광펜==`(→ `<mark>`) 두 가지를 쓸 수 있다. 지금은 첫 문단만 굵게.
 
 ## 반응형
 
@@ -124,7 +126,7 @@
 
 ## 규칙
 
-- 🔴 **회사명·연차·직함을 쓰지 않는다.** (2026-09 결정)
+- 🔴 **회사명·연차를 쓰지 않는다.** (2026-09 결정. 직함은 2026-10-24 본인 요청으로 "Product Engineer"를 넣었다)
 - 🔴 소개 문장은 **전 회사 지칭 규칙**을 따른다 — 과거형, 전 회사 제품을 "우리 X"로 부르지 않는다 (CLAUDE.md).
 - 🔴 프로필 사진은 **홈 히어로와 같은 사진**이다. `avatarSrc` 를 바꾸면 `avatarLargeSrc` 도 같은 사진의 큰 판으로 바꾼다.
 - 이력서·이메일 **버튼을 두지 않는다.** 연락은 아이콘 줄로 충분하다 (결정 이력 참고).
