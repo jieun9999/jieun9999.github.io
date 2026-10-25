@@ -10,6 +10,9 @@ coverFit: contain
 coverBackground: light
 coverAlt: "The domain search and purchase screen in Wiblog"
 coverCaption: "Domain search results show recommendations alongside registration and renewal prices."
+series: wiblog-custom-domains
+seriesOrder: 1
+seriesTitle: "Introducing custom domains in Wiblog"
 ---
 
 ## Introduction

@@ -11,6 +11,9 @@ coverFit: contain
 coverBackground: light
 coverAlt: "위블로그의 도메인 검색·구매 화면"
 coverCaption: "도메인 검색 결과에서 추천 여부와 등록가·갱신가를 함께 안내합니다."
+series: wiblog-custom-domains
+seriesOrder: 1
+seriesTitle: "위블로그 커스텀 도메인 도입기"
 ---
 
 ## 들어가며

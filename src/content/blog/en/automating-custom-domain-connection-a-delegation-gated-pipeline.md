@@ -18,6 +18,9 @@ category: reliability
 cover: /covers/automating-custom-domain-connection-a-delegation-gated-pipeline.webp
 coverAlt: "A confirmation modal for buying and attaching a custom domain in the blog admin"
 coverCaption: "Behind one buy button: DNS delegation, certificate issuance, and search-engine registration, all automatic."
+series: wiblog-custom-domains
+seriesOrder: 2
+seriesTitle: "Introducing custom domains in Wiblog"
 ---
 
 ## Introduction
