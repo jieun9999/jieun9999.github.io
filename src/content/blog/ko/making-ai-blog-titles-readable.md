@@ -1,14 +1,14 @@
 ---
 title: "안 읽히는 AI 제목을 어떻게 바꿀 수 있을까"
 description: "장황한 AI 글감 제목을 개선하기 위해 Grok이 입력과 검증된 목차에서 필요한 답을 판단하고 제목 형식을 선택하도록 바꾼 과정을 설명합니다."
-subtitle: "직접 검수하던 글감의 제목이 장황해 생성 지시와 재작성 경로를 확인했습니다. 의미 판단은 Grok에, 보존·검증 규칙은 코드에 맡긴 과정과 기존 글감 21개로 추가 재현한 결과를 설명합니다."
+subtitle: "AI가 만든 길고 딱딱한 제목을 더 자연스럽고 이해하기 쉽게 바꾼 과정을 소개합니다."
 pubDate: 2026-10-18
 tags: ["llm", "prompt-engineering", "content-automation"]
 category: systems
-cover: /covers/readable-ai-titles-v6.png
+cover: /covers/readable-ai-titles-v7.png
 coverFit: contain
 coverBackground: dark
-coverAlt: "입력과 검증된 목차에서 질문형·정보형·후기형을 선택하는 흐름을 남색 배경과 파란색 도형으로 표현한 커버"
+coverAlt: "청년 전세자금대출과 아이폰 17 프로를 예로, 조건과 항목을 나열하던 기존 제목을 질문이 보이는 짧은 제목으로 바꾼 전후를 비교한 커버"
 series: wiblog-quality
 seriesOrder: 1
 seriesTitle: "위블로그 제목과 검색 개선기"
