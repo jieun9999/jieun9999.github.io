@@ -10,6 +10,7 @@ coverAlt: '3단계 anti-bot을 뚫는 크롤러 설계 — TLS fingerprint부터
 series: threads-agent
 seriesOrder: 1
 seriesTitle: 'Threads 마케팅 에이전트 만들기'
+draft: true
 ---
 
 ## 들어가며

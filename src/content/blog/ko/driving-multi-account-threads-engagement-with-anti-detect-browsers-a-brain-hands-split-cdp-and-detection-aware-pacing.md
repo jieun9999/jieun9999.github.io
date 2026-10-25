@@ -10,6 +10,7 @@ coverAlt: 'AdsPower 안티디텍트 브라우저의 멀티계정 프로필 목�
 series: threads-agent
 seriesOrder: 3
 seriesTitle: 'Threads 마케팅 에이전트 만들기'
+draft: true
 ---
 
 ## 들어가며
@@ -253,7 +254,7 @@ page = b.contexts[0].pages[0]
 
 > [👈 **Part 1:** "3계층 안티봇을 뚫는 크롤러 설계 — TLS Fingerprint에서 CDP 탐지까지"](/ko/blog/designing-a-crawler-that-beats-three-tiers-of-anti-bot-from-tls-fingerprints-to-cdp-detection/)
 >
-> [👈 **Part 2:** "생성 파이프라인 설계 — 4축 콘텐츠 모델, 큐 기반 스케줄링, 3계층 어트리뷰션"](/ko/blog/designing-a-generation-pipeline-a-4-axis-content-model-queue-based-scheduling-3-layer-attribution/)
+> [👈 **Part 2:** "Threads 글을 자동으로 만들고 예약 발행하고 성과를 측정하기까지"](/ko/blog/designing-a-generation-pipeline-a-4-axis-content-model-queue-based-scheduling-3-layer-attribution/)
 
 * * *
 

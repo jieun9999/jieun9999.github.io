@@ -8,6 +8,7 @@ tags: ['system-design', 'caching', 'performance', 'optimization']
 category: scaling
 cover: /covers/scaling-qps-10x-in-production-3-strategies-that-actually-move-the-needle.webp
 coverAlt: '요청 처리량을 높이는 세 가지 접근 — 캐싱, DB 최적화, 비동기·배칭'
+draft: true
 ---
 ## 들어가며
 

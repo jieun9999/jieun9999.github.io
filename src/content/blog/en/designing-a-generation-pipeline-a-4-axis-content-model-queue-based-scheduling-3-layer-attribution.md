@@ -10,6 +10,7 @@ coverAlt: 'Designing a Generation Pipeline — A 4-Axis Content Model, Queue-Bas
 series: threads-agent
 seriesOrder: 2
 seriesTitle: 'Building a Threads Marketing Agent'
+draft: true
 ---
 
 <a id="tldr"></a>
