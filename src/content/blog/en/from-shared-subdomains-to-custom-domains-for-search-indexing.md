@@ -1,15 +1,16 @@
 ---
-title: "Why I Started Strongly Recommending Custom Domains — Notes from a Blog Indexing PoC"
-description: "Search indexing observations behind the move from workb.xyz to witim.blog and a stronger recommendation for custom domains, including indexing recovery after moving unchanged content from .shop to .blog and the limits of those findings."
-subtitle: "What indexing experiments and domain migrations taught me about the default address a blogging platform provides"
-pubDate: 2026-08-20
+title: "Published but Missing from Search — Why I Started Recommending Custom Domains"
+description: "A comparison of indexing results for default subdomains and custom domains, followed by domain migrations that kept the content unchanged. These observations informed a recommendation for custom domains, while leaving the causes and limits of the results unresolved."
+subtitle: "How indexing observations changed Wiblog's domain recommendations"
+pubDate: 2026-08-10
+updatedDate: 2026-10-25
 tags: ["seo", "google-search-console", "custom-domain", "poc"]
 category: systems
 cover: /covers/from-shared-subdomains-to-custom-domains-for-search-indexing.png
 coverFit: contain
 coverBackground: light
 coverAlt: "The domain search and purchase screen in Wiblog"
-coverCaption: "Domain search results show recommendations alongside registration and renewal prices."
+coverCaption: "The original Korean UI shows domain recommendations alongside registration and renewal prices."
 series: wiblog-custom-domains
 seriesOrder: 1
 seriesTitle: "Introducing custom domains in Wiblog"
@@ -17,136 +18,265 @@ seriesTitle: "Introducing custom domains in Wiblog"
 
 ## Introduction
 
-Wiblog, the service I was developing, collected material from a user's topic and keywords, generated articles using reference sources, and published them to a blog. Users could read their posts at a public URL without setting up a server or deployment environment themselves.
+**Introducing custom domains in Wiblog · Part 1**
 
-But publishing an article did not automatically make it discoverable through search. Pages loaded successfully and had sitemaps, yet search engines sometimes did not fetch the articles, or removed pages they had previously indexed. Validating article generation and validating a blog's discoverability were separate problems.
+Wiblog automatically generates and publishes blog posts from topics and keywords selected by users.
 
-The approach to blog addresses changed from `workb.xyz` to `witim.blog`, and then toward strongly recommending a custom domain for each blog. Throughout that process, I was trying to answer one question: **Is a platform-provided address enough for users who run a blog to reach people through search?**
+Yet many successfully published posts did not appear in Google Search. The pages loaded correctly and their sitemaps had been submitted, but Google Search Console showed that many posts were not indexed.
 
-My conclusion from the proof of concept (PoC) was that **the product should explicitly recommend a custom domain to users seeking search traffic**. That did not mean requiring a domain purchase at signup. It meant clearly explaining the difference between an address for trying the service and an address on which to build a blog's search presence over time.
+To investigate, I compared the platform's default subdomains with custom domains connected by users.
 
-This post documents the evidence behind that decision, based on the indexing investigations, domain migrations, and operational experience I gathered from July through August 19, 2026.
+In a survey on July 21, 2026, 62 of 1,784 posts on default subdomains were indexed. On one blog using a custom domain, 61 of 90 posts were indexed.
 
-## Separating publication, crawling, indexing, and search visibility
+The two groups did not have identical conditions, so the difference could not be attributed to domain type alone. Still, the gap was too large to ignore.
 
-At first, it was easy to treat every absence from search results as an indexing problem. But the next action depended on where the process had stopped.
+After changing the default domain and moving sites whose indexing had stalled, we decided to recommend custom domains to users seeking traffic from search.
 
-| Stage | What I wanted to establish | Evidence used |
-| --- | --- | --- |
-| Publication | Whether the page loaded at its public URL | HTTP responses and rendered HTML |
-| Discovery and crawling | Whether the search engine knew about the URL and had actually fetched it | GSC URL Inspection and Googlebot access logs |
-| Indexing | Whether the fetched page was included in the search index | GSC URL Inspection results |
-| Search visibility | Whether the page appeared in results for a query | GSC search performance data and actual search results |
+## 1. What does it mean for a post to be missing from search?
 
-GSC stands for Google Search Console. I used URL Inspection to check the indexing status Google had recorded for a URL and information such as its last crawl time. Those results need to be distinguished from a live test of a newly deployed page.
+First, I needed to establish why a successfully published post could not be found in search.
 
-Submitting a sitemap is a way to tell a search engine about URLs. It does not mean those URLs will immediately be crawled or indexed, and being indexed does not mean ranking near the top for a particular query. Google also describes crawling, indexing, and serving search results as separate stages in its guide to [how Search works](https://developers.google.com/search/docs/fundamentals/how-search-works).
+Not every missing search result points to the same problem.
 
-This distinction helped me check whether search engines were reaching existing articles before asking whether publishing more would solve the problem.
+| Stage | What to check |
+|---|---|
+| Publication | Does the page load correctly at its URL? |
+| Crawling | Has Google's crawler visited the page? |
+| Indexing | Has Google included the page in its search index? |
+| Search visibility | Does the page appear in results when a user searches? |
 
-## The gap I found on workb.xyz
+Adding a post's URL to a sitemap does not mean Google will immediately fetch it. Nor does fetching a page guarantee that Google will index it.
 
-Initially, each blog received a subdomain in the form `{slug}.workb.xyz`. Users could start immediately without buying a separate domain.
+I therefore needed to distinguish the stage at which the process had stopped.
 
-On July 21, I queried article URLs through the GSC URL Inspection API and compared them with a blog using a custom domain. The investigation into indexing differences by address type produced these results:
+I checked URL Inspection results in Google Search Console (GSC) and Googlebot access records in the server logs.
 
-| Group | Article URLs inspected | Articles indexed | Indexing rate |
-| --- | ---: | ---: | ---: |
-| `*.workb.xyz` subdomains | 1,784 | 62 | About 3.5% |
-| `babynote.blog` custom domain | 90 | 61 | About 67.8% |
+GSC can show whether Google knows a URL, when it last crawled the page, and whether the page is indexed.
 
-The subdomain investigation was incomplete. API quotas meant spreading the checks over several days, so those numbers were interim results. The custom-domain result covered all 90 articles on one site. Both used the same generation pipeline, but this was not a controlled experiment that randomly assigned identical articles to different addresses.
+This revealed that many URLs were not merely excluded from the index: Google did not yet know about them.
 
-Even with that limitation, the difference was substantial. Of the 1,784 subdomain URLs inspected, 1,566 were recorded as unknown to Google. The issue was not limited to content that Google had read and assessed unfavorably: **most of the articles had not yet been fetched**.
+## 2. Subdomains and custom domains had very different indexing results
 
-By contrast, `babynote.blog` had published its first article on July 13. Despite being a new blog, about 68% of its articles were indexed in the July 21 inspection. Simply saying that every new blog had to wait the same amount of time did not explain the two results.
+At the time, Wiblog provided default addresses like this so users could start blogging without buying a domain:
 
-I expanded the comparison to see whether the finding was specific to one site. In a follow-up investigation on July 23, I confirmed indexing within 24 hours on all six custom domains examined. This means **indexing was confirmed on six sites**, not that every article on each site was indexed within a day.
+`myblog.workb.xyz`
 
-At that point, a custom domain started to look less like an optional branding feature and more like a practical choice for operating a blog aimed at search traffic. Still, removing the free trial stage was not an option. Users needed a default address where they could generate articles and evaluate the service, with guidance toward their own domain when they began expecting search results.
+Users could publish posts as soon as they created a blog. But we still needed to check how well search engines were discovering and indexing those blogs.
 
-## The problems continued after moving to witim.blog
+On July 21, I collected GSC URL Inspection results to compare default subdomains and custom domains.
 
-Starting on July 23, I migrated the platform's default domain from `workb.xyz` to `witim.blog`. Blog addresses changed to `{slug}.witim.blog`. This replaced the shared base domain; it did not give each blog an independent domain.
+| Group | Posts inspected | Indexed posts | Indexing rate |
+|---|---:|---:|---:|
+| `*.workb.xyz` | 1,784 | 62 | About 3.5% |
+| `babynote.blog` | 90 | 61 | About 67.8% |
 
-The migration required more than changing the address. Canonical URLs and sitemaps for static pages were generated at build time, so changing DNS and server routing alone would not update them. I first made the new domain available alongside the old one, checked certificates and routing, and then switched the primary address and redirects from the old URLs.
+Of the 1,784 posts inspected on default subdomains, 1,566 were recorded as URLs unknown to Google.
 
-The landing page also had a separate missing-canonical issue. On July 28, while investigating its exclusion from search, I found that the new landing page had no user-declared canonical and that Google had selected the old `workb.xyz` URL as canonical. I corrected it. That issue needed to be kept separate from the later loss of indexing across blog subdomains.
+Some posts had been excluded from the index, but a larger number had not been discovered at all.
 
-On August 1, I observed previously indexed pages under `witim.blog` being excluded. To assess the scope, I compared the **site root URLs** of custom domains and platform subdomains on August 7.
+In contrast, `babynote.blog` was relatively new: it had published its first post on July 13. Just eight days later, 61 of its 90 posts were indexed.
 
-| Group | Site root URLs inspected | Root URLs indexed |
-| --- | ---: | ---: |
+Initially, I considered whether the blogs simply needed more time because they were new. But the two results together were difficult to explain through operating age alone.
+
+I expanded the survey to see whether this was limited to one site. On July 23, I found examples of indexing within 24 hours on all six custom-domain sites inspected.
+
+This does not mean every post on all six sites was indexed within a day. It means that indexed posts were found on each site.
+
+The comparison also had clear limitations.
+
+The 1,784 default-subdomain posts were an interim result collected before the full survey was complete. The 90 custom-domain posts were all the posts on a single site. Site age, topics, content quality, and publishing frequency were not identical either.
+
+Therefore, **this was not an experiment proving that custom domains caused a higher indexing rate.**
+
+Still, blogs created by the same generation system showed markedly different results across addresses. That was reason to investigate further.
+
+## 3. Changing the default address did not solve the problem
+
+At the time, I wondered whether the `.blog` extension would be more suitable for a blogging service.
+
+Starting on July 23, we changed the default domain from `workb.xyz` to `witim.blog`.
+
+An address such as:
+
+`myblog.workb.xyz`
+
+would now use:
+
+`myblog.witim.blog`
+
+The change involved more than DNS and server routing.
+
+Canonical URLs in static pages and sitemap URLs also needed to use the new address. These values were generated at build time, so changing DNS alone could leave the old URLs in the HTML.
+
+On July 28, I found and fixed a missing canonical on the landing page that had led Google to select the old `workb.xyz` address as its canonical URL.
+
+Fixing that issue did not resolve indexing across the blogs.
+
+On August 1, I observed that pages under `witim.blog` that had already been indexed were being excluded again.
+
+On August 7, I compared whether the home URLs of custom-domain and default-subdomain sites were indexed.
+
+| Group | Sites inspected | Indexed home URLs |
+|---|---:|---:|
 | Custom domains | 19 | 17 |
-| Platform subdomains with the highest article counts | 15 | 0 |
+| Default subdomains | 15 | 0 |
 
-The unit of measurement differs from the article-level indexing rates above. This table does not mean that 89% of articles on custom domains were indexed. The two unindexed custom-domain roots also had identifiable issues: a redirect on one and a 404 at the time of the previous crawl on the other.
+This survey inspected each blog's home URL rather than individual posts. Its results therefore cannot be compared directly with the earlier post-level indexing rates.
 
-During this investigation, I checked robots directives, canonical URLs, page responses, and redirects from old addresses. GSC's Manual Actions and Security Issues reports showed no detected problems either. There was therefore no basis for describing this as a manual penalty. I could not establish whether the similar timing of exclusions across multiple sites came from content patterns or signals associated with the domain.
+I also checked `robots.txt`, canonical URLs, page responses, and redirects from old addresses. GSC showed no manual actions or security issues.
 
-Even so, evidence for a product decision was accumulating. **Changing the shared base domain from `.xyz` to `.blog` had not resolved the search problems, while sites using custom domains on the same platform showed different results.**
+However, I could not determine exactly why several subdomains were excluded from the index around the same time.
 
-## Indexing recovered after moving two .shop sites without changing their content
+Other factors, including content similarity, quality, and the search signals accumulated by individual sites, could still have contributed.
 
-There were exceptions among custom domains too: `btc-btc-btc.shop` and `smr-smr-smr-smr.shop`. Both experienced a sharp decline in indexing, and their articles were crawled less than those on other custom domains.
+One conclusion was supported by the observations:
 
-This should not be confused with either site having no indexed pages at all. On August 11, while investigating weak crawling activity, 10 of the Bitcoin site's 76 sitemap URLs were indexed. The problem was that discovery, crawling, and indexing of other articles were not progressing even as some pages remained in the index.
+**Changing the default address from `.xyz` to `.blog` alone did not solve the problem.**
 
-Over 18 days of access records, the Bitcoin site's sitemap received 34 requests, but only six unique article URLs were crawled. The SMR site's sitemap received 28 requests, but only five unique article URLs were crawled. The search engine appeared to be finding the sitemaps but fetching few of the articles they contained.
+## 4. Moving domains whose indexing had stalled
 
-To investigate further, I requested indexing through GSC for nine Bitcoin articles on August 11 and left articles published around the same time unsubmitted as a comparison group. Rather than trusting a Googlebot User-Agent alone, I checked requests against Google's official IP ranges to identify genuine crawler traffic. Across six measurements through August 18, none of the nine submitted articles had been crawled or indexed.
+Custom domains did not always produce good results either.
 
-The next experiment was to move the content to new domains without rewriting it.
+Two sites we operated were having trouble getting their posts crawled:
 
-| Previous domain | New domain | Migration date |
-| --- | --- | --- |
-| `btc-btc-btc.shop` | `coinmanual.blog` | 2026-08-18 |
-| `smr-smr-smr-smr.shop` | `powerinsight.blog` | 2026-08-18 |
+- `btc-btc-btc.shop`
+- `smr-smr-smr-smr.shop`
 
-For the Bitcoin site, I preserved the paths of the 16 URLs I had already been tracking. Instead of rewriting the articles at the new address, I served the same content and updated canonical URLs, sitemaps, and redirects to match the new domain.
+As of August 11, 10 of the 76 URLs in the first site's sitemap were already indexed. The entire site was not absent from the index.
 
-Immediately after the August 18 migration, none of the URLs being investigated on the new domains had been crawled or indexed. **The next day, August 19, I confirmed that indexing was progressing normally on the new domains.** This did not establish a final indexing rate for all articles or whether that state would persist over the long term.
+The problem was that other posts were not being crawled sufficiently afterward.
 
-What I confirmed was **indexing recovery after a domain migration that preserved the content**. Both the `.shop` top-level domain (TLD) and repetitive names such as `btc-btc-btc` changed at the same time, so I could not isolate which factor mattered. Migration signals were also being corrected, and time was passing. The outcome could not be attributed to the TLD alone.
+I examined 18 days of server access records.
 
-Google's [search ranking FAQ](https://developers.google.com/search/help/site-position-in-search-faq) likewise explains that a TLD by itself does not determine search performance. This experience does not establish a general rule that all `.shop` sites are excluded from indexing or that buying a `.blog` domain guarantees inclusion.
+| Site | Sitemap requests | Distinct post URLs crawled |
+|---|---:|---:|
+| Bitcoin site | 34 | 6 |
+| SMR site | 28 | 5 |
 
-## Turning the observations into domain recommendations and migration support
+Google was requesting the sitemaps, but appeared to be visiting relatively few of the actual post pages.
 
-Not having isolated the cause completely did not mean I could keep postponing operational decisions. Based on repeated observations within the same platform, I adjusted both the addresses recommended to users and the migration process.
+On August 11, I requested indexing for nine posts on the Bitcoin site and tracked the changes. Other posts published around the same time were left as a comparison group.
 
-First, I changed the domain recommendation criteria. I removed `.shop` from automatic recommendations and favored `.blog`, `.site`, and `.live`, where indexing had been confirmed in the operational sample at the time. Users could still search manually, and the purchase screen included guidance to avoid repetitive names. This was **a conservative recommendation policy based on observations from that service**, not an official Google ranking of TLDs.
+Rather than relying only on the Googlebot name in the logs, I checked requests against Google's official IP ranges to verify that they came from its crawlers.
 
-I also improved the path for moving from one custom domain to another. The existing code grouped all domains attached to a site into the same server configuration block and served content with a `200` response on each. Adding a new domain therefore left the old address serving the same content as well.
+Across six measurements through August 18, neither crawling nor indexing was confirmed for the nine posts submitted for indexing.
 
-I changed this so that the primary domain served the content while previous domains returned a `301` redirect to it, preserving the path. During the actual migrations, I checked the following together:
+### Keeping the content and moving the domains
 
-1. HTTPS and page responses worked correctly on the new domain.
-2. Static files were rebuilt so canonical URLs and sitemaps used the new address.
-3. Each article at an old URL redirected to the same article at the new URL.
-4. Cached `200` responses for the old URLs were removed from the CDN.
-5. Ownership verification for the new GSC property, sitemap submission, and the change of address were completed.
+On August 18, after reviewing the findings, we changed the domains of both sites.
 
-Google's [site migration guide](https://developers.google.com/search/docs/crawling-indexing/site-move-with-url-changes) also recommends aligning migration signals such as canonical URLs, permanent redirects, and sitemaps. The completion criterion was **whether search engines and users reached the same primary address**, rather than simply whether the domain purchase had finished.
+| Old address | New address |
+|---|---|
+| `btc-btc-btc.shop` | `coinmanual.blog` |
+| `smr-smr-smr-smr.shop` | `powerinsight.blog` |
 
-I describe the automation from purchase through DNS and certificate setup in a separate post on [connecting custom domains](/en/blog/automating-custom-domain-connection-a-delegation-gated-pipeline/). The focus here is why I came to treat that feature as a standard recommendation for blogs seeking search traffic.
+![Original Korean investigation note recorded when deciding to migrate the domains on August 18, 2026](/images/custom-domain-indexing/tld-observation-2026-08-18.png)
 
-## New domains can still find an audience through content
+We did not write new posts or regenerate the existing content. We served the same content from the new domains and updated canonical URLs, sitemaps, and redirects from the old addresses.
 
-Another point worth retaining from these experiments is that a domain's newness alone is not a reason to give up on search. Eight days after its first article was published, `babynote.blog` had 61 of 90 articles indexed. I also confirmed indexing recovery on the two new domains that replaced the `.shop` addresses.
+For the Bitcoin site, the URL paths of the 16 posts we had been tracking also stayed the same.
 
-During operation, I saw articles on new domains appear near the top of search results as well. However, the URL Inspection figures in this post do not prove those rankings. Indexing recovery was the outcome of the domain migration experiment described above; high placement was a separate operational observation. I am not reporting specific positions or how long they lasted.
+Immediately after the migration, crawling and indexing were not confirmed for the inspected URLs on the new domains.
 
-Those experiences led me to conclude that **even a new domain can achieve both indexing and high placement with useful content that matches search intent**. That does not mean content quality alone determines rankings. Alongside changing addresses, it was necessary to produce articles that answered questions readers were actually searching for.
+The next day, August 19, I observed indexing progressing again on the new domains.
 
-In the generation process I worked on, I did not judge quality only by article length or publishing volume. I prioritized direct answers to the question, references that allowed readers to check claims, and a structure that made relevant information easy to find. I did not separately measure how much those criteria explained the ranking of individual articles, but they remained important work after the address changed.
+This was notable because publishing more posts and requesting indexing had previously produced no change.
 
-Evaluating results therefore requires looking beyond indexing: which queries produced impressions, and whether those impressions led to clicks. A custom domain does not replace content. It gives that content an address where it can be evaluated in search and build a history over time.
+However, it should not be interpreted as evidence that `.shop` domains are disadvantaged in search.
+
+Several conditions changed at the same time:
+
+- We changed the extension from `.shop` to `.blog`.
+- We also replaced repetitive domain names such as `btc-btc-btc`.
+- Migrating the old addresses to the new ones also involved updating the URL information supplied to search engines.
+- We could not rule out indexing progressing simply as more time passed.
+
+These conditions prevent us from isolating which factor contributed to the recovery. The observations did not establish whether indexing would persist over the long term or what proportion of all posts would ultimately be indexed.
+
+Google's [official FAQ](https://developers.google.com/search/help/site-position-in-search-faq) also explains that the top-level domain extension itself does not determine search ranking.
+
+What I confirmed was limited to this: **indexing resumed on these two sites after their addresses changed while the content stayed the same.**
+
+## 5. How the findings changed the product
+
+Although I had not fully identified the cause, we still needed to decide which addresses to recommend to users.
+
+Until then, custom domains had mainly been an optional way to give a blog a preferred address.
+
+The findings made domain choice a more important consideration for users running a blog to attract search traffic.
+
+We changed our domain recommendations accordingly.
+
+### Recommending custom domains more actively
+
+Users trying Wiblog could continue using the default subdomain.
+
+Someone exploring the service did not need to be asked to buy a domain immediately.
+
+For users aiming to build search traffic over the long term, however, we recommended a custom domain they owned.
+
+We also kept `.blog`, `.site`, and `.live` in the recommendation list, since indexing had been observed for those extensions in the operating sample. We removed `.shop`, where we had encountered problems, from automatic recommendations.
+
+Users could still search for and purchase a `.shop` domain themselves.
+
+This decision did not follow any official Google rating of domain extensions. It was a conservative adjustment to Wiblog's recommendations based on the cases we had observed.
+
+### Keeping existing post URLs connected after a domain change
+
+We also improved the ability to replace an existing domain with another custom domain.
+
+Previously, multiple domains attached to one blog could serve the same content with `200 OK`. Adding a new domain could therefore leave both the old and new addresses showing identical posts.
+
+We changed this so that one canonical domain served the content, while previous domains returned a `301` redirect to the same path on the new domain.
+
+For a domain migration, we checked:
+
+1. Whether HTTPS and pages worked at the new address
+2. Whether canonical URLs and the sitemap pointed to the new address
+3. Whether old post URLs redirected to the same paths on the new domain
+4. Whether cached responses from the old setup had been purged from the CDN
+5. Whether ownership verification and sitemap submission for the new domain were complete in GSC
+
+Completing a domain purchase is different from completing a blog migration.
+
+The migration was only complete once users and search engines could reach the new canonical address correctly.
+
+## 6. A custom domain does not guarantee search visibility
+
+In this investigation, blogs using custom domains had better indexing results, and we observed cases where indexing resumed after an address change.
+
+This alone does not prove that custom domains increase indexing rates.
+
+The sites differed in operating age, content topics, quality, publishing frequency, and other conditions.
+
+Also, **being indexed does not mean ranking near the top of search results.**
+
+To determine whether search was bringing visitors, we needed to examine not just indexing, but the queries that produced impressions and how many clicks they generated.
+
+I therefore do not consider connecting a custom domain a complete solution to search performance.
+
+What did matter for the product was helping Wiblog users operate a blog at an address they owned over the long term, and continue monitoring its search status.
 
 ## Conclusion
 
-Indexing problems continued after the move from `workb.xyz` to `witim.blog`. By contrast, blogs built on the same platform were indexed on custom domains, and I confirmed recovery after moving two unstable `.shop` sites to `.blog` domains while preserving their content.
+The work began as an investigation into why successfully published posts could not be found in search.
 
-The PoC led me to conclude that the product should strongly recommend custom domains to users seeking search traffic. It needed to distinguish between trying article generation at a trial address and building a search presence at an address of the user's own.
+I compared indexing results for default subdomains and custom domains, then found that changing the default domain did not stop the problem from recurring. We subsequently migrated two custom-domain sites whose indexing had stalled and observed changes in their search indexing.
 
-At the same time, a domain migration does not resolve content quality or search rankings by itself. New domains can create opportunities through useful content, but judging actual results requires checking crawling, indexing, impressions, and clicks separately. The lesson I want to retain is less about declaring one extension better than another and more about **how observed search outcomes informed domain recommendations and operational features**.
+Because the conditions were not fully controlled, I cannot determine how much the domains themselves affected the results.
+
+Nevertheless, recurring differences in operating data led us to recommend custom domains to Wiblog users seeking traffic from search.
+
+**This was less a case of completely solving search indexing than an experience in changing a product's domain recommendations using the data we could verify.**
+
+---
+
+### Next: Automating domain purchase and connection
+
+Recommending custom domains also meant making them reasonably easy to buy and connect.
+
+Immediately after a purchase, DNS changes might not yet be visible, causing certificate issuance or search-engine registration to fail.
+
+[Part 2 — The Domain Was Purchased but Would Not Load](/en/blog/automating-custom-domain-connection-a-delegation-gated-pipeline/) covers the failures encountered while buying several domains and the automation that waits for DNS checks before proceeding.
+
+*This series is organized around two topics—domain selection and connection automation—rather than the chronological order of all development work.*

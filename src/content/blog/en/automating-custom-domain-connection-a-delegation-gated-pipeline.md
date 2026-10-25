@@ -1,8 +1,9 @@
 ---
-title: "Connecting a Custom Domain with One Click — a Pipeline Built Around 'You Can't Speed Up DNS Propagation'"
-description: "I built a feature to buy a domain and attach it to a blog. Bought four with the same code; all four failed differently. One cause: we ignored a wait we can't shorten (DNS propagation) and tried to do everything synchronously. Once we accepted that wait as a given, the pipeline settled into one synchronous stage plus two worker stages."
-subtitle: "Four purchases, four failures, one 3-stage pipeline"
-pubDate: 2026-07-23
+title: "The Domain Was Purchased but Would Not Load — Automating Connections Around DNS Delays"
+description: "Failures while automating domain purchases, DNS setup, HTTPS certificates, and registration with Google led to a connection flow that waits for DNS confirmation before continuing."
+subtitle: "Separating immediate setup from work that waits for DNS, with connection checks and registration retries"
+pubDate: 2026-08-25
+updatedDate: 2026-10-25
 tags:
   [
     "dns",
@@ -17,7 +18,7 @@ tags:
 category: reliability
 cover: /covers/automating-custom-domain-connection-a-delegation-gated-pipeline.webp
 coverAlt: "A confirmation modal for buying and attaching a custom domain in the blog admin"
-coverCaption: "Behind one buy button: DNS delegation, certificate issuance, and search-engine registration, all automatic."
+coverCaption: "Original Korean UI: one purchase button starts DNS delegation, certificate issuance, and registration with Google."
 series: wiblog-custom-domains
 seriesOrder: 2
 seriesTitle: "Introducing custom domains in Wiblog"
@@ -25,140 +26,132 @@ seriesTitle: "Introducing custom domains in Wiblog"
 
 ## Introduction
 
-> [!NOTE]
-> Click "Buy" and the feature purchases a domain and attaches it to a blog. I thought one click was all it took. Behind it was **a wait we can't shorten with code.**
+**Introducing custom domains in Wiblog · Part 2**
 
-The blog platform I work on serves each blog on a subdomain like `myblog.example.com`. I built a feature to let users attach their own custom domain — `myblog.shop` — on top of that. The goal: purchase (via Dynadot), DNS, certificate, and search-engine registration, **all done in one click.**
+In Wiblog, I built a feature that let users buy a domain and connect it to their blog without configuring it themselves. The goal was to automate the purchase, DNS setup, HTTPS certificate issuance, and registration with Google Search Console.
 
-The problem: buying four test domains with the same code, all four failed differently. One showed a parked page for 24 hours. One was up on the server but unreachable for the user. One reported "done" while the site wouldn't open. Some succeeded — but that was luck, not something reproducible.
+But across four test purchases, a different problem appeared each time. One domain showed a parking page for a while. Another remained unreachable even after the server configuration was complete. In one case, the existing blog address redirected to the new address before it was ready, making a previously working blog inaccessible too.
 
-The cause converged to one thing: **we ignored a wait we can't control and tried to do it all at once.** This is the record of accepting that wait as a given and rebuilding the pipeline.
+Tracing these problems revealed a common issue. Buying a domain and changing its nameservers did not mean external DNS resolvers could immediately see the new configuration. The initial implementation started the next steps without waiting for that to happen.
 
----
+I then **separated work that could run immediately from work that had to wait for DNS confirmation**. The first test took 38 minutes and three manual interventions to connect. The final test took 11 minutes with no manual intervention. This compares two cases; it does not mean every domain takes the same amount of time.
 
-## 1\. The problem — why "instant" is impossible
+[Part 1 — Published but Missing from Search](/en/blog/from-shared-subdomains-to-custom-domains-for-search-indexing/) explains why Wiblog began recommending custom domains. This article covers a separate implementation effort. The series follows a reading order; it does not change the actual sequence of the development and tests described below.
 
-Attaching a domain is like moving house. Carrying the boxes isn't the end: you file a change of address, get the keys (the certificate), and tell the post office and search engines your new address so mail arrives.
+## 1. Completing a purchase was not the same as completing a connection
 
-The change of address here is **DNS delegation** — telling the registrar "this domain now points at Cloudflare's nameservers." And that **takes time to propagate across the world's DNS.** Measured:
+Connecting a domain involved more than one API call.
 
-```plaintext
-Domain A   delegation propagation   2 min
-Domain B   delegation propagation   13 min
-```
+1. **Purchase the domain:** Register it through Dynadot.
+2. **Configure DNS:** Add the server address in Cloudflare and change the domain's nameservers.
+3. **Configure HTTPS:** Prepare the Caddy configuration and certificate so the new address can serve the site.
+4. **Register with Google:** Verify domain ownership in Google Search Console (GSC) and submit the sitemap.
 
-Same code, over 6× apart. It's a function of the registrar, the registry, and the internet — **not a number we can shrink in code.**
+Because different services handled these steps, a successful API response from one step did not mean the next was ready to run.
 
-So the real question isn't "how do we connect faster" but **"how do we hide this wait."** The answer is simple:
+The time it took to observe a nameserver change varied between the test domains.
 
-- **Finishes in seconds** → do it while the user waits (synchronous)
-- **Has to wait** → hand it to a worker; the user can leave the page (asynchronous)
+| Test case | Time until the nameserver change was observed |
+|---|---:|
+| Domain A | About 2 minutes |
+| Domain B | About 13 minutes |
 
-That split — **one synchronous stage plus two worker stages** — is the whole design. Now the stages.
+Both used the same connection code. These were observations from those tests, not a guarantee that DNS changes always complete within 2–13 minutes.
 
----
+The initial implementation applied the Caddy configuration and attempted GSC ownership verification immediately after requesting a nameserver change. If external DNS could not yet resolve the new configuration, certificate issuance or ownership verification could fail.
 
-## 2\. Stage 1 — immediate setup (synchronous, seconds)
+The flow needed to **check that the prerequisites were ready before starting the next step**.
 
-The user is watching a spinner here, so we only do **what's irreversible or finishes in seconds.**
+## 2. Immediately after purchase, we only performed setup that did not need to wait
 
-1. **Buy the domain** — re-check the price against what was shown, then charge (Dynadot)
-2. **Write the A record** — "this name → our server" in Cloudflare
-3. **Delegate (set_ns)** — tell the registrar "look at Cloudflare"
-4. **Publish the verification TXT** — just leave the note Google will read later
-5. **Enqueue the caddy/build jobs and return**
+To avoid keeping users waiting after they clicked the purchase button, the initial request handled only work that could run immediately.
 
-Two ordering rules were paid for in incidents.
+- If the actual checkout price differed from the search result, stop the purchase and ask for confirmation again.
+- Purchase the domain through Dynadot.
+- Create an A record in Cloudflare pointing to the server.
+- Ask the registrar to use the Cloudflare nameservers.
+- Create the TXT record for ownership verification.
+- Queue the remaining connection work and show **“Connecting”** in the UI.
 
-**The A record must come before delegation.** Reverse them and, in the gap after delegation propagates but before the A record exists, Cloudflare authoritatively answers "no such name (NXDOMAIN)." If that answer gets cached in the user's ISP resolver, they **can't reach the domain for up to an hour** even after it's live. Lay the answer down first and the gap disappears.
+The important ordering was **creating the A record before changing the nameservers**.
 
-**set_ns doesn't trust the "done" response.** In the first seconds after purchase the registrar hasn't fully provisioned the domain, so the API returns `success` while **actually changing nothing.** So we read the nameservers back, compare against what we expect, and retry on mismatch.
+If the nameserver change became visible before Cloudflare had the A record, a DNS query could return a negative response indicating that the requested address information was absent. If that response was cached, some users could continue to have connection problems even after the record was added.
 
-**GSC only gets the TXT note here — no verification.** At this point delegation hasn't propagated, Google can't see the note, and verification is guaranteed to fail. Why we defer it is Section 4.
+A successful response from the nameserver-change API was not enough either. When a change was requested immediately after purchase, before the registrar had finished preparing the domain, there were cases where the API reported success but the expected nameservers were not actually set. We therefore read the configuration back and retried if it did not match.
 
-Seconds later the screen shows "Connecting," and the rest moves to the worker.
+We did not verify GSC ownership at this stage. Even with the TXT record in place, Google could not read it if external DNS could not yet reach the new nameservers.
 
----
+## 3. We waited for nameserver confirmation before enabling HTTPS
 
-## 3\. Stage 2 — waiting for delegation, then opening the door (worker)
+A separate worker processed the job passed on by the purchase request. It queried the nameserver configuration through public DNS services at 1.1.1.1 and 8.8.8.8.
 
-This is the core. The worker opens the domain **only after it confirms delegation has propagated.**
+- If neither resolver returned Cloudflare nameservers, it retried without applying the Caddy configuration.
+- If either resolver returned Cloudflare nameservers, it applied the Caddy configuration for the new domain together with the redirect from the old address.
+- It then checked the new address's HTTPS response, recorded activation, and cleared caches.
 
-```plaintext
-caddy-reload job
-  │
-  ├─ ① Delegation gate ── ask public DNS (1.1.1.1 / 8.8.8.8): "are this domain's nameservers Cloudflare yet?"
-  │      not yet → fail the job to retry (no config written)
-  │      confirmed → continue
-  │
-  ├─ ② Write Caddy config → certificate auto-issues → HTTPS is up
-  │
-  └─ ③ Cleanup (301 from old address · edge cache purge · HTML cache rule)
-```
+With the earlier implementation, there was a case where Caddy attempted certificate issuance before DNS was ready and the new address remained unavailable until a restart. That describes the failure observed at the time; it does not mean the same permanent failure occurs in every environment.
 
-**Gate ① is the heart of the design.** Caddy tries to issue the certificate the moment it receives the config. Attempt that before delegation has propagated and the issuer misidentifies the domain's parent zone and **caches that mistake.** The cache survives until a restart, so once it happens the domain **never opens.** One domain stayed down until I restarted the process because of exactly this.
+Another problem was **redirecting the old address too early**. Previously, the existing subdomain redirected to the new domain while it was still unavailable, making the previously accessible blog difficult to reach as well.
 
-The gate blocks that outright, with one rule: **don't write config until it's confirmed.** As a side effect, **downtime disappears too.** The config includes an "old address → new address" redirect; previously, while the new domain was dead, the old address redirected to a dead place. With the gate holding, the old address (`myblog.example.com`) keeps serving.
+We changed the order so the old address continued serving until the nameserver change was confirmed. However, the redirect configuration is applied before the HTTPS response check. This does not guarantee that access problems disappear while certificate preparation is delayed.
 
-The retry budget is generous: **once a minute, up to six hours.** However slow propagation is, the next attempt passes as soon as it's done, and a waiting job costs nothing, so a large budget is free.
+At the time, the worker was configured to retry every minute for up to six hours. That was an operational policy for checking automatically during that period, not a guarantee that DNS would update within six hours. Checking two public resolvers also cannot guarantee that every user's DNS cache has been refreshed.
 
----
+## 4. Registration with Google became a separate job
 
-## 4\. Stage 3 — moving search-engine registration to the worker (backfill)
+An available HTTPS connection did not complete registration with Google. To verify domain ownership for GSC, Google had to be able to read the DNS TXT record.
 
-The part that took the most work. Google Search Console (GSC) goes **verify ownership → submit sitemap**, and verification is the tricky one.
+Initially, we retried verification for about 18 seconds immediately after purchase. In the tests, ownership verification did not succeed within that window, so the retries only made users wait longer.
 
-Verification means Google reads a TXT note left in DNS. But to read it, delegation must have propagated. If it hasn't, Google just gets "no such domain" and refuses. **So right after purchase, GSC registration always fails.** All five test domains failed at purchase time.
+We removed those retries and changed the schedule as follows.
 
-We used to retry this for ~18 seconds right after purchase. But propagation takes at least two minutes, so nothing ever finished inside 18 seconds — it was just **18 seconds of the user waiting for nothing.** So we removed it and split the work:
+| When | Work |
+|---|---|
+| Immediately after purchase | Create the ownership-verification TXT record |
+| After nameserver confirmation | Attempt GSC ownership verification and sitemap submission |
+| Every 30 minutes | Retry domains whose earlier attempts failed or were missed |
 
-- **Stage 1 (at purchase):** publish the TXT note only. No verify, no submit.
-- **Worker (after delegation confirmed):** verify → submit, backfilled in two passes.
+Periodic checks were needed because Google API errors or interrupted jobs could still prevent registration after the nameserver change was complete. There had been a case where automatic registration was missed and I had to run a recovery script manually.
 
-Why two passes:
+Instead of repeating the same request rapidly at one point in time, we **attempted it once the connection prerequisites were ready and revisited failed work later**.
 
-| When                | Role                                                                |
-| ------------------- | ------------------------------------------------------------------- |
-| Right after gate    | **Normal path.** Register with GSC after the cert issues            |
-| Every 30 min (cron) | **Safety net.** Periodically pick up domains the normal path missed |
+## 5. The UI showed actual connection status
 
-The safety net matters because the post-gate registration can fail too — the worker was restarting, or Google's API hiccuped. One domain sat unregistered for hours for a reason like this, and I had to run a repair script by hand. A 30-minute cron catches it with no human involved.
+The UI displayed a “Connecting” modal and checked the status approximately every five seconds.
 
-The point isn't "try again" — it's **"try at a different moment."** Retrying at the same moment fails for the same reason every time. Once right after the gate, then periodically after — each pass covers a different failure.
+Rather than only reading a job-completion flag from the database, the server queried DNS and HTTPS to determine whether the address was actually reachable. A queue job's state does not necessarily match what a user can access.
 
----
+We did not present the new domain as a clickable link before its connection was confirmed. This reduced the chance of caching a not-yet-ready DNS response if a browser or other software looked up a link in advance. Until the connection was ready, the UI continued to offer the existing blog address.
 
-## 5\. How the UI tracks progress
+This kept purchase completion distinct from actual service availability.
 
-The screen shows a "Connecting" modal and polls status every five seconds. It **doesn't read a stored state — it re-checks DNS and HTTPS live** each time, because a stored value drifts from reality when the worker dies or propagation wavers.
+## 6. The final purchase test connected without manual intervention
 
-One more thing: **before completion, we don't render the new domain as a link.** Browsers prefetch DNS for links on the page; link the not-yet-delegated new address and that lookup caches "no such name" in the ISP resolver, locking that user out even after it's live. So during connection we show the **still-live old address** as primary and the new one as plain text.
+The initial and final tests produced the following results.
 
----
+| Item | First test | Final test |
+|---|---|---|
+| Time to connect | 38 minutes | 11 minutes |
+| Manual interventions | 3 | 0 |
+| Server restart needed to connect | Yes | No |
+| Existing blog address | Affected by problems with the new address | Preserved until nameserver confirmation |
 
-<a id="6-result--from-three-manual-steps-to-zero"></a>
+One important setting in this process was **configuring the registrar account to use Cloudflare nameservers by default**.
+
+In the first test, the domain initially pointed to the registrar's default parking page. Some DNS caches retained that response and showed the parking page instead of the new site. After changing the initial nameserver setting, the tests avoided this intermediate state.
+
+The better result cannot be attributed to a single change. We changed the record-creation order, nameserver checks, certificate-issuance timing, redirect transition, and periodic recovery together. The first and final tests also used different domains, so I do not attribute the entire time difference to the code changes.
+
+What the final test did establish was that completing the connection no longer required a manual restart or recovery script.
 
 ## Conclusion
 
-First domain vs. last domain:
+Initially, I tried to complete the purchase, HTTPS connection, and registration with Google in one pass. In practice, later steps started before the DNS configuration was externally visible, causing failures.
 
-| Item           | First attempt          | Last attempt |
-| -------------- | ---------------------- | ------------ |
-| Duration       | 38 min                 | 11 min       |
-| Manual steps   | **3**                  | **0**        |
-| Server restart | required               | none         |
-| Old address    | redirected to dead end | stays live   |
+We separated the work done immediately after purchase from the work that waited for external DNS confirmation. The old address stayed in service until the nameserver change was confirmed, and failed registration tasks were retried periodically.
 
-The biggest fix wasn't code. It was **one setting: making Cloudflare the default nameservers on the registrar account.**
-
-That's what caused the first domain's 24-hour parked page. A domain is born on the registrar's default nameservers (parking), then switches to Cloudflare later — and that brief parked state, once cached in an ISP resolver, lingered for **up to 24 hours.** Set the default to Cloudflare from the start and the parked state never exists.
-
-Every code fix so far had been "reduce exposure after a bad state appears." This one line **kept the bad state from ever forming.** Different in kind, and the largest in effect.
-
-Some waits can't be removed, of course. The **up-to-an-hour gap between "registered" and "live in the registry."** Query the domain during that window and "no such name" caches briefly. DNS has no way to force-clear a cache, so this can't be shrunk — the best you can do is **keep anyone from querying it** during that window, which is why the UI never surfaces the new address early.
+The key lesson was not how to eliminate the DNS wait. It was **how to let users keep using their existing blog while waiting, then continue the remaining work automatically**.
 
 ---
 
-Four buys with the same code went four different ways because propagation time differed each time. Trying to remove that wait was the mistake; **accepting it as a given** is what settled the design.
-
-The principle is one line: **do nothing before it's confirmed, do everything automatically once it is, and pick up the misses on a schedule.** The delegation gate owns the first clause, the worker's cleanup the second, the 30-minute cron the third.
+**Previous article:** [Part 1 — Published but Missing from Search: Why I Started Recommending Custom Domains](/en/blog/from-shared-subdomains-to-custom-domains-for-search-indexing/)
