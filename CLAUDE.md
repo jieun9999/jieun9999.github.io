@@ -199,7 +199,10 @@ prettier가 `11~~14초`처럼 물결표를 붙여 정규화해두면 이 grep에
 
 ## 통합한 게시물의 기존 URL
 
-- `/{en,ko}/blog/isolated-dev-access-for-an-outside-collaborator/`는 게시물 목록에서 제거하고 같은 언어의 `part2-four-people-one-dev-machine/#restricted-api-tunnel`로 이동한다.
+- `/{en,ko}/blog/isolated-dev-access-for-an-outside-collaborator/`는 게시물 목록에서 제거하고 같은 언어의 `part1-three-tier-dev-environment/#restricted-api-tunnel`로 이동한다.
 - 이동 페이지는 `src/pages/[lang]/blog/isolated-dev-access-for-an-outside-collaborator.astro`에서 생성한다. GitHub Pages에서는 서버 301 대신 meta refresh와 `location.replace`를 사용한다.
 - 이동 페이지의 canonical은 도착 글이며, `noindex`와 사이트맵 제외를 적용한다. 기존 공유 이미지 파일은 유지한다.
-- BFF 개념은 Part 1, 제한 키와 공유 터널 설계는 Part 2에 통합했다. 삭제 전 GitHub Discussions 조회에서 해당 한·영 URL의 댓글 스레드는 없었다(2026-09-24 확인).
+- BFF 개념과 제한 키·공유 터널 설계는 VPS 통합 글에 함께 담았다. 삭제 전 GitHub Discussions 조회에서 해당 한·영 URL의 댓글 스레드는 없었다(2026-09-24 확인).
+
+- `/{en,ko}/blog/part2-four-people-one-dev-machine/`는 같은 언어의 `part1-three-tier-dev-environment/`로 통합합니다. 원문과 이미지는 보존하고 공개 목록·RSS·사이트맵과 시리즈 탐색에서는 제외합니다.
+- 현재 정적 이동 페이지는 HTTP 301이 아닙니다. HTTP 301 요구를 충족하려면 도메인 앞의 프록시/CDN에서 해당 경로의 영구 이동을 설정해야 합니다.

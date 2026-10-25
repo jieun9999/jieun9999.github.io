@@ -1,207 +1,158 @@
 ---
-title: "Why We Chose a 96GB VPS Instead of Four 16GB MacBooks"
-description: "The code lives on the server, the server compiles it, and the MacBook only runs the browser. Once four people started sharing one machine, we had to re-check where this structure is sound and where it is a compromise. Seeing one dev server grow from 1.2GB to 3.7GB in four hours made it clear what belongs on the server."
-subtitle: "A dev server that grew from 1.2GB to 3.7GB in 4 hours"
+title: "Why We Moved Development from Four 16GB MacBooks to One 96GB Server"
+description: "Two developers, a designer, and a marketer shared a 96GB VPS to ease memory pressure on their MacBooks. We separated accounts, workspaces, and ports, and moved the production API tunnel from a personal laptop to a dedicated service."
+subtitle: "Separate workspaces and permissions, with one shared API tunnel"
 pubDate: 2026-09-15
-updatedDate: 2026-09-24
+updatedDate: 2026-10-25
 tags:
-  ["ssh", "port-forwarding", "nextjs", "remote-development", "e2e", "devops", "bff"]
+  ["ssh", "remote-development", "systemd", "git-worktree", "port-forwarding", "nextjs", "bff", "e2e", "devops"]
 category: systems
 cover: /covers/part1-three-tier-dev-environment-en-v2.png
 coverFit: contain
 coverBackground: dark
 coverAlt: "Navy diagram connecting a 16GB MacBook through SSH to a 96GB development VPS and through a shared tunnel to production API and DB"
 coverCaption: "The browser runs on the MacBook; code, builds, and agents run on the VPS."
-series: shared-dev-machine
-seriesOrder: 1
-seriesTitle: "Sharing One Machine Among Four People"
 ---
 
 ## Introduction
 
-We started development on individual 16GB RAM MacBooks, but the limit showed up quickly once the codebase, development tools, and coding agents were running together. As builds got heavier, memory ran short. With multiple projects and coding agents open at the same time, the fans spun up and other work slowed down too.
+We changed our development environment so that two developers, a designer, and a marketer could share one server. The initial goal was to relieve memory pressure on our MacBooks, but sharing a machine brought other problems.
 
-Instead of continuing to upgrade each MacBook, we rented one inexpensive Linux server. We decided to keep the code there, and to run coding, compilation, and coding agents there as well. Today, four people share one 96GB, 18-core Linux machine.
+Development servers needed to avoid collisions, and users needed to be kept away from other people's files and production server credentials. The SSH tunnel to the production API also depended on one team member's laptop.
 
-As more people joined, we had to look at the structure again. Each person connects from a MacBook over SSH, the dev server runs on that Linux machine, and the data comes from production. That makes three tiers.
+This article covers why we moved development to a server and how we separated workspaces and permissions for four people.
 
-This post lays out where that is good design, where it becomes a compromise, and why e2e tests should not be placed on top of it.
+## 1. Moving development off the MacBooks
 
----
+We initially developed on individual 16GB RAM MacBooks. Running code editors, builds, Next.js development servers, and coding agents together exhausted memory. As builds grew heavier, the fans spun up and other work slowed down.
 
-## 1. The current structure
+We measured how much memory one development server used.
 
-We chose a **Contabo VPS**. The important part was not the highest possible spec. It was getting enough shared memory and CPU cores for less than the cost of upgrading four 16GB MacBooks. Since we connect from Korea, we chose the Tokyo region. The round trip matters not only for SSH, but also for the browser feedback loop during HMR, so keeping the server close to the users keeps the perceived latency low.
+| Time | Memory usage |
+|---|---:|
+| 05:28 | 1,259MB |
+| Around 08:00 | 2,015MB |
+| 09:23 | 2,741MB |
+| 10:00 | 3,759MB |
 
-```plaintext
-MacBook                     browser only; no dev process, no source code
-  │ ssh -N -L 3100:127.0.0.1:3100 server
-  ▼
-Server                      next dev :3100  ← frontend + BFF both here
-  │ API_BASE=http://127.0.0.1:8787          18 cores / 96GB / coding agents
-  │ wdot-api-tunnel (systemd) — ssh -N -L 8787:127.0.0.1:8987
-  ▼
-Production server           api :8987 → production DB      ★ production
-```
+Over roughly four hours, memory usage grew from about 1.2GB to 3.7GB. This alone does not establish a memory leak, but it showed that one long-running development server could consume substantial memory.
 
-<a id="the-macbook-is-not-a-screen-machine"></a>
+Instead of upgrading each MacBook, we chose a Contabo VPS that cost less at the time.
 
-### The screen server also needs an API connection
+- 18 CPU cores and 96GB RAM
+- Tokyo region
+- Code editing, builds, development servers, and coding agents on the VPS
+- MacBooks for SSH access and browser checks
 
-Here, `next dev` is not just serving static screens. Admin serves as a BFF, or Backend For Frontend. Before the browser gets the screen, the [Next.js server component path](https://nextjs.org/docs/app/getting-started/server-and-client-components) calls the API and renders UI from that response. The API and DB live in a separate backend, while admin stands in front of them and shapes the data for the screen.
+Location mattered because we connected from Korea. Browser updates communicate with the development server whenever code changes, so we chose Tokyo to reduce latency.
 
-That split exists because of the credential boundary. Admin does not hold `DATABASE_URL`; DB credentials stay with the API and worker side. If the screen server is compromised, it should not yield direct DB connection details from that layer. Screens that depend on API data still need an API connection while rendering. Server-side execution also does not make every value private: data serialized into client props can reach the browser, so secrets must stay on the server.
+We ran the development server in the background with `nohup` so it could survive an SSH disconnection. Coding agents and the development server also used files on the same machine, eliminating the need for a separate file synchronization step.
 
-So even if we boot only admin on a local or remote development server, screens do not render properly without an API connection. Lists, stats, and cards either become empty shells or fail with a 500. A separate local DB and enough seed data would have removed the need to point at the production API, but that setup did not exist at the time.
+Sharing the server meant we now had to keep each person's work separate.
 
-That is why the current structure is not a two-part split. It is three parts: browser, development processes, and production data. Keeping the browser on the MacBook and moving development processes to the VPS solved the working-environment problem, but the third tier being the production API remained a compromise that needed a separate decision.
+## 2. Sharing a server while separating workspaces
 
----
+A shared server did not require everyone to use the same account or permissions.
 
-## 2. Three reasons the first two tiers work
+Developers needed SSH shells and coding agents, while the designer and marketer needed the screens and working environments relevant to their roles.
 
-### Closed by default
+We gave each person a separate Linux account and home directory. Project files stayed under their own homes, with access to other people's workspaces and production server credentials blocked.
 
-All dev ports bind only to loopback.
+Accounts alone were not enough.
 
-```plaintext
-127.0.0.1:3000
-127.0.0.1:3100
-127.0.0.1:8787   ← API tunnel
-```
+### A port collision could show someone else's work
 
-There are **no dev ports** bound to an external network interface. SSH is the only way in.
+When the default port is occupied, Next.js's `next dev` can try the next port. A port explicitly specified with `-p` can instead cause startup to fail on a collision.
 
-That matters a lot on a shared machine. If someone uses the wrong port or forgets a bind address, the result should be "not open," not "open to everyone."
+For example, if one person's server already occupied port 3000, another server using the default port could start on 3001. If the second person opened `localhost:3000`, they would see the first person's screen instead of their own changes.
 
-### The viewing path and the running path are separate
+We assigned ports by account to prevent this confusion.
 
-The dev server runs under `nohup`, so the server process stays alive even if the SSH connection drops. The tunnel is **only a window**, not the execution path.
+| Account | Admin development server |
+|---|---:|
+| A | 3000 |
+| B | 3100 |
+| C | 3200 |
+| Unassigned fallback | 3900 |
 
-If I close the MacBook lid, the compile state stays on the server. When I reconnect, it is still there. If cafe Wi-Fi drops, the build does not disappear.
+The recorded configuration contains three assigned slots and an unassigned fallback. It does not establish a separate assigned port for a fourth person.
 
-With a screen-sharing style remote desktop, the interactive work depends much more directly on that connection. In this structure, the server-side work keeps running through connection drops. In daily use, that difference feels bigger than it sounds. I stop thinking about the network as much.
+A common startup script managed the port numbers. Before starting a server, it checked who owned the listener and stopped if another user's process occupied the port. Port collisions were checked before startup instead of leaving Next.js to find an available port.
 
-The API tunnel to the third tier applies the same idea one layer down. A systemd service owns that tunnel through a dedicated `nologin` account, not through a person's SSH session. So the tunnel is still up at dawn when no one is connected, and it comes back after a reboot. At first, this depended on **one person's laptop**. Part 2 covers that story.
+Development servers bound to `127.0.0.1` rather than being exposed directly to the internet. Each person reached their screen through SSH port forwarding.
 
-### The heavy work runs on the stronger machine
+Google OAuth callbacks were initially registered for a particular port, which limited login on other account ports. Registering the additional ports resolved that limitation.
 
-I measured the memory of one dev server over time.
+<a id="restricted-api-tunnel"></a>
 
-```plaintext
-05:28   1,259MB
-08:1x   2,015MB
-09:23   2,741MB
-10:00   3,759MB      ← 3x growth over 4 hours
-```
+## 3. Removing the personal laptop from the API connection
 
-**A Next.js dev server grows the longer it stays on.** If that runs on a MacBook, the fans keep spinning and the rest of the machine slows down. The 18-core, 96GB server absorbs that work instead.
+Development servers were separate for each person, but the SSH tunnel to the production API only needed to exist once.
 
-The code, agents, and compiler are also in one place, so there is **no sync delay**. That is the decisive difference from putting a file sync tool between a laptop and a server. When a coding agent changes a file, the dev server sees it right there.
+The Next.js admin application acted as a BFF (Backend For Frontend) and needed production API data to render its screens. We had not prepared a separate development API and database, so the development server called the production API.
 
-There is also only one environment, so "it works on my Mac" is structurally harder to create.
+Initially, one team member opened a reverse SSH tunnel from their MacBook so the shared server could reach that API.
 
----
+If the laptop shut down or disconnected, other team members lost API access too. Reconnecting the tunnel also depended on that person. A core connection for the shared development environment depended on a personal laptop.
 
-## 3. There is a cost
+### Moving the tunnel into a dedicated service
 
-This is not a clean layer separation. There is one leak.
+We moved tunnel management onto the VPS itself. A dedicated Linux account, `wdot-tunnel`, ran a systemd service responsible for the API connection.
 
-The Google OAuth callback is registered as `http://localhost:3100/...`. If the forwarding port on the laptop changes, the page can still load, but login ends with `redirect_uri_mismatch`.
+Before:
 
-```plaintext
-MacBook :3100  ──ssh──  server :3100
-       ▲                    ▲
-       └── these two must match ──┘
-```
+**MacBook → shared VPS → team member's MacBook SSH tunnel → production API**
 
-Once the server-side port is fixed, the MacBook-side port is effectively fixed too. The layers leak into each other.
+After:
 
-The alternative is to make the callback origin dynamic, but OAuth providers require callback URLs to be registered ahead of time, which means maintaining that registration list. We decided that added more complexity than it removed. Instead, the startup script prints this constraint so no one has to remember it from memory.
+**MacBook → shared VPS tunnel service → production API**
 
----
+The dedicated account had no interactive login shell or `sudo` privileges.
 
-## 4. The third tier is a compromise, not a fit
+The production SSH key was restricted using `restrict`, `port-forwarding`, and `permitopen` in `authorized_keys`. The local forwarding destination was limited to the required API endpoint, while `command="/bin/false"` blocked shell and command execution. `permitopen` limits destinations for `-L`; it does not restrict all reverse forwarding.
 
-The preview UI is **directly connected to the production API**. Save, publish, and delete buttons change real production data.
+Requests to `127.0.0.1:8787` on the shared VPS traveled through the SSH tunnel to `127.0.0.1:8987` on the production server. The production API port also listened only on loopback.
 
-That matched the original purpose: letting a designer see screens with real data. We can see the real UI without paying the setup cost of a separate database and seed data.
+We configured systemd to restart the service after it exited and to start it after a server reboot. Keeping the production connection available no longer required a particular person to keep their laptop on or run SSH manually.
 
-### Open the needed use, block direct editing
+This does not mean every recovery scenario was tested. The records establish the restricted key's permissions and the service startup and restart configuration.
 
-Designers and marketers also needed to inspect the real screens and use the API routes required for their own work. But they did not need permission to connect directly to the production DB, query it, or edit data there. So the human-facing path exposes only the allowed API routes, while DB credentials and direct editing authority stay with the development and operations boundary.
+## 4. Using Git worktrees to keep tasks separate
 
-That boundary was intentional from the beginning. Screen preview and content work can happen through the API, but direct DB changes and arbitrary production-data edits require different authority. If something goes wrong, the impact can be kept at the API level, and designers or marketers do not need to receive production privileges they do not need for their work.
+Running multiple coding agents and development tasks on one server also required managing file conflicts. Switching branches in the same directory could let one task's file state affect another.
 
-Still, if the API includes routes that modify production data, using the API can itself be a write operation. High-impact actions such as save, publish, and delete need separate permissions and confirmation steps. Avoiding direct DB access does not remove every write risk.
+We used Git worktrees to give each task its own branch and directory under the user's home.
 
-That boundary is why e2e tests cannot run on the current preview path.
+Finished workspaces were cleaned up automatically, but age alone was not grounds for deletion. Before removing a workspace, we checked for:
 
----
+- Uncommitted changes or unpushed commits
+- An open pull request
+- Confirmation that the pull request had been merged
 
-## 5. e2e cannot sit on top of this
+Squash merges can make ordinary branch ancestry checks insufficient for identifying completed work, so cleanup used GitHub's PR status.
 
-**e2e writes automatically, repeatedly, and without a person watching.** It creates posts, publishes them, and deletes them.
+If a workspace had disappeared but its development server was still running, that process was cleaned up too. A server whose workspace still existed was not stopped automatically just because it appeared idle. We did not want to interrupt someone's work based on an inference.
 
-If we put that on a structure whose last line of defense is human attention, that defense disappears. And when tests fail, they usually run again, so an accident can repeat instead of happening once.
+## 5. The remaining limitation
 
-### e2e is not a fourth tier. It is a separate branch for later.
+The shared VPS eased memory pressure and workspace conflicts, but it did not solve everything.
 
-At first I thought of this as adding one more tier. It was not. It does not attach in series. It **branches**, and the e2e branch is shorter.
+The main limitation is that **development servers still connect to the production API**.
 
-```plaintext
-                         ┌─ next dev :3100 ─▶ 8787 tunnel ─▶ production api ─▶ production DB
-MacBook ─ssh─ server ────┤                                 (preview · now)
-                         │
-                         └─ next dev :39xx ─▶ local api ─▶ local db/redis
-                            ▲ Playwright runs here directly (e2e · future)
-```
+This is convenient for checking admin screens against real data without preparing a separate development dataset. However, saving, publishing, or deleting through those screens can change production data.
 
-The e2e branch has **no MacBook and no production server**.
+Withholding direct database credentials does not remove that risk. If the API exposes write operations, its callers can still affect production data.
 
-- It does not need a MacBook. Playwright runs headlessly inside the server, so no person needs to watch a browser and no SSH tunnel is needed for the test run.
-- It does not need the production server. It never calls the production API. Whether the production tunnel is up or down should not matter.
+We therefore decided not to run automated E2E tests in this environment. These tests can repeatedly create or delete data, making a development environment connected to the production API unsafe for them.
 
-If you count tiers, this is not three tiers. It is two. It starts inside the server, ends inside the server, and never leaves the machine over the network.
-
-### What splits and what stays the same
-
-| Item | Preview (now) | e2e (future) |
-| --- | --- | --- |
-| Code | Same repo | Same repo (one working directory) |
-| Admin port | Per-account assigned port | **Separate number** |
-| `API_BASE` | `127.0.0.1:8787` → production | **Local api container** |
-| DB | Production | **Local db** |
-| MacBook SSH tunnel | Required | **Not required** |
-| Production server | Directly connected | **Not touched** |
-
-Because the port and `API_BASE` differ, the two paths do not touch each other even when they run at the same time. One person can preview production-backed screens while e2e runs against a local DB on the same machine. Even with a 3.7GB dev server and three containers, 96GB leaves plenty of room.
-
-### There are really two things to prepare
-
-`docker-compose.yml` already defines `db`, `redis`, and `api`. **The path is designed, but not laid yet.**
-
-1. Install Docker on the server. It is not installed there now.
-2. Start only those three services and point `API_BASE` at them.
-
-The second item matters most. If the production tunnel and the e2e stack ever share the same `API_BASE`, that is how accidents happen. They need separate ports, and the e2e side must work regardless of whether the production tunnel is running.
-
-The test DB seed and Playwright harness come after that. Once those two pieces are in place, we have a screen that does not touch production, and from there it becomes ordinary test work.
-
-This is not something we need to do immediately. At the current team and service size, keeping coding and screen preview stable matters more than setting up e2e first. e2e should be **set up later as a separate stack** that does not touch production data. For now, the structure is separated in advance, and when tests become necessary, we can add the local API, DB, Redis, and Playwright path.
-
----
-
-<a id="scorecard"></a>
+When we introduce E2E tests, the plan is to run a separate API, database, and Redis instance on the VPS and prevent the tests from reaching production. This remains planned work, not an implemented result.
 
 ## Conclusion
 
-| Segment | Judgment |
-| --- | --- |
-| MacBook → server | ✅ closed, separated path, heavy work on the stronger machine |
-| Server → production | ⚠️ a compromise. Good enough for preview, risky for writes |
-| e2e | ❌ do not put it on the current path. The third tier must be **swapped out** |
+The initial change was to move development tools from MacBooks to a server with more memory. Supporting four people required more than adequate hardware.
 
-If anything needs to change, it is only the third tier, and only when e2e starts. Coding and preview do not need to change.
+We separated accounts, workspaces, and ports so people could distinguish their own development servers. A dedicated service replaced the personal laptop's role in maintaining the production API tunnel.
 
-This structure is not the only answer. If someone works from a place with a slow connection, every HMR round trip over the network may feel annoying. We chose this side for a simple reason: the coding agents run on the server, so **the code and agents need to live in the same place**.
+The setup works for screen development and collaboration, but its dependence on the production API remains a limitation. Automated tests that can modify data will need a separate environment.
+
+More important than sharing one server was **deciding which resources to share and which to separate**.
