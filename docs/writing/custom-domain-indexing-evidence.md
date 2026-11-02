@@ -1,7 +1,7 @@
 # 커스텀 도메인 색인 PoC 집필 근거
 
-- 원문: [커스텀 도메인을 필수로 권장하게 된 이유](archive/2026-10-consolidation/ko/from-shared-subdomains-to-custom-domains-for-search-indexing.md)
-- 2026-10-25 통합: [도메인 연결에서 반복된 실패를 자동화로 해결한 방법](../../src/content/blog/ko/automating-custom-domain-connection-a-delegation-gated-pipeline.md). 아래 발행일과 집필 판단은 원문 기준입니다.
+- 게시물: [커스텀 도메인 도입기 1편](../../src/content/blog/ko/from-shared-subdomains-to-custom-domains-for-search-indexing.md)
+- 2026-11-02 확인: 최신 main에서 도메인 도입기 1·2편으로 정리한 상태를 보존했습니다. 아래 발행일과 집필 판단은 기존 근거 문서 작성 시점 기준입니다.
 - 발행일: 사용자 요청의 8월 20일을 이슈 연도와 맞춰 `2026-08-20`으로 설정했습니다.
 - 자료 확인일: 2026-09-24입니다. 본문의 실험 경과는 2026-08-19까지를 사용했습니다.
 - 조회 범위: `3w-labs/m-wdot-platform`의 closed issue/PR 중 작성자 `Jieun9999`입니다. 본문뿐 아니라 후속 댓글도 확인했습니다.

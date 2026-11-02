@@ -156,7 +156,6 @@ export default defineConfig({
         ![
           'isolated-dev-access-for-an-outside-collaborator',
           'part2-four-people-one-dev-machine',
-          'from-shared-subdomains-to-custom-domains-for-search-indexing',
           'fcm-push-hiding-in-the-message-send-api-moving-it-to-a-dedicated-worker-queue',
         ].some((slug) => new URL(page).pathname.endsWith(`/blog/${slug}/`)),
       // 글 URL 에만 lastmod 를 붙인다. 태그·목록 페이지는 "언제 바뀌었나"를

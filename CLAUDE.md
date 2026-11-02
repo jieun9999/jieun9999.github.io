@@ -205,5 +205,7 @@ prettier가 `11~~14초`처럼 물결표를 붙여 정규화해두면 이 grep에
 - 이동 페이지의 canonical은 도착 글이며, `noindex`와 사이트맵 제외를 적용한다. 기존 공유 이미지 파일은 유지한다.
 - BFF 개념과 제한 키·공유 터널 설계는 VPS 통합 글에 함께 담았다. 삭제 전 GitHub Discussions 조회에서 해당 한·영 URL의 댓글 스레드는 없었다(2026-09-24 확인).
 
-- 2026-10-25: 한·영 각각 `part2-four-people-one-dev-machine` → `part1-three-tier-dev-environment`, `from-shared-subdomains-to-custom-domains-for-search-indexing` → `automating-custom-domain-connection-a-delegation-gated-pipeline`, `fcm-push-hiding-in-the-message-send-api-moving-it-to-a-dedicated-worker-queue` → `there-was-a-deadlock-hiding-in-ai-generated-code-how-we-replaced-unreadcount-with-lastreadat`로 통합했다.
-- 위 세 구 URL도 같은 정적 이동 방식·canonical·noindex·사이트맵 제외를 적용한다. 흡수한 원문은 `docs/writing/archive/2026-10-consolidation/`에 보존하며, 커버·본문 이미지·기존 OG 자산은 삭제하지 않는다.
+- `/{en,ko}/blog/part2-four-people-one-dev-machine/`는 같은 언어의 `part1-three-tier-dev-environment/`로 통합합니다. 원문과 이미지는 보존하고 공개 목록·RSS·사이트맵과 시리즈 탐색에서는 제외합니다.
+- `/{en,ko}/blog/fcm-push-hiding-in-the-message-send-api-moving-it-to-a-dedicated-worker-queue/`는 같은 언어의 `there-was-a-deadlock-hiding-in-ai-generated-code-how-we-replaced-unreadcount-with-lastreadat/#fcm-worker-follow-up`으로 이동합니다. 2026-11-02 해당 후속 절에 FCM 큐·관측·실패 처리 내용을 실제로 통합했습니다.
+- 통합 원문은 `docs/writing/archive/2026-10-consolidation/`에 보존하며 커버·본문 이미지·기존 OG 자산은 삭제하지 않습니다. 도메인 관련 두 글은 최신 main의 `wiblog-custom-domains` 1·2편을 유지하며 이동시키지 않습니다.
+- 현재 정적 이동 페이지는 HTTP 301이 아닙니다. HTTP 301 요구를 충족하려면 도메인 앞의 프록시/CDN에서 해당 경로의 영구 이동을 설정해야 합니다.
