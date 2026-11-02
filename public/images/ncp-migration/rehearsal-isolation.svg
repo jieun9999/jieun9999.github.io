@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="832" viewBox="0 0 420 832" role="img" aria-labelledby="copy-title copy-desc">
+  <title id="copy-title">운영 PostgreSQL 덤프와 복제본 검증 경로</title>
+  <desc id="copy-desc">기존 NKS의 임시 파드에서 운영 PostgreSQL을 읽기 전용으로 덤프하고 운영자 PC에 파일을 보관합니다. 같은 파일을 먼저 네트워크가 차단된 로컬 Docker DB에 복원하고, 새 NKS의 임시 파드에서도 새 계정 PostgreSQL에 복원합니다. 기존 계정과 새 계정 사이에는 VPC Peering을 연결하지 않았습니다. Redis 복사는 이 PostgreSQL 덤프 경로와 별개입니다.</desc>
+  <defs>
+    <marker id="copy-arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1 1 L6 4 L1 7" fill="none" stroke="#737373" stroke-width="1.5" />
+    </marker>
+  </defs>
+  <rect width="420" height="832" fill="#FFFFFF" />
+  <g font-family="'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif">
+    <rect width="420" height="64" fill="#172B4D" />
+    <text x="24" y="42" fill="#FFFFFF" font-size="26" font-weight="700">운영 DB 복제본 검증</text>
+    <text x="24" y="100" fill="#202124" font-size="22">PostgreSQL 덤프·복원 경로</text>
+
+    <g fill="#F5F5F5" stroke="#D4D4D4" stroke-width="1">
+      <rect x="24" y="126" width="372" height="84" rx="4" />
+      <rect x="24" y="252" width="372" height="84" rx="4" />
+      <rect x="94" y="392" width="302" height="86" rx="4" />
+      <rect x="94" y="556" width="302" height="86" rx="4" />
+      <rect x="94" y="690" width="302" height="84" rx="4" />
+    </g>
+    <g fill="#202124" text-anchor="middle">
+      <text x="210" y="160" font-size="24" font-weight="600">기존 NKS 임시 파드</text>
+      <text x="210" y="190" font-size="22">운영 DB 읽기 전용 덤프</text>
+      <text x="210" y="286" font-size="24" font-weight="600">운영자 PC</text>
+      <text x="210" y="316" font-size="22">동일한 덤프 파일 보관</text>
+      <text x="245" y="427" font-size="24" font-weight="600">로컬 Docker DB</text>
+      <text x="245" y="457" font-size="22">복원 · 네트워크 차단</text>
+      <text x="245" y="591" font-size="24" font-weight="600">새 NKS 임시 파드</text>
+      <text x="245" y="621" font-size="22">같은 파일로 복원 실행</text>
+      <text x="245" y="725" font-size="24" font-weight="600">새 계정 PostgreSQL</text>
+      <text x="245" y="755" font-size="22">테이블·행 수 대조</text>
+    </g>
+    <g fill="#202124" font-size="22">
+      <text x="94" y="376">먼저 확인</text>
+      <text x="94" y="540">새 환경 복원</text>
+      <text x="24" y="812">계정 사이 VPC Peering 없음</text>
+    </g>
+    <g fill="none" stroke="#737373" stroke-width="1.5">
+      <path d="M210 214 V244" marker-end="url(#copy-arrow)" />
+      <path d="M54 336 V599" />
+      <path d="M54 435 H86" marker-end="url(#copy-arrow)" />
+      <path d="M54 599 H86" marker-end="url(#copy-arrow)" />
+      <path d="M245 646 V682" marker-end="url(#copy-arrow)" />
+    </g>
+  </g>
+</svg>

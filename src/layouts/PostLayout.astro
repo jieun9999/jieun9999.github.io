@@ -7,8 +7,9 @@ import { ui, categoryLabel, type Lang } from '../i18n/ui';
 import { categoryUrl, tagUrl } from '../lib/posts';
 import type { MarkdownHeading } from 'astro';
 
-type NavLink = { title: string; url: string; cover?: string } | null;
+type NavLink = { title: string; url: string; cover?: string; coverFit?: 'cover' | 'contain' } | null;
 type Series = {
+  id: string;
   title: string;
   parts: { title: string; url: string; order: number; current: boolean }[];
 } | null;
@@ -194,7 +195,7 @@ const upNext = next
         )
       }
 
-      <div class="prose">
+      <div class="prose" data-series={series?.id}>
         <slot />
       </div>
 
@@ -216,7 +217,7 @@ const upNext = next
             <p class="eyebrow">{upNext.label}</p>
             <a class="next-card" href={upNext.link.url}>
               {upNext.link.cover && (
-                <span class="next-img">
+                <span class:list={['next-img', { 'next-img--contain': upNext.link.coverFit === 'contain' }]}>
                   <img src={upNext.link.cover} alt="" loading="lazy" decoding="async" />
                 </span>
               )}
@@ -321,7 +322,7 @@ const upNext = next
   .lede {
     margin-top: 16px;
     font-size: 16px;
-    font-weight: 400;
+    font-weight: 500;
     line-height: 1.75;
     color: var(--article-text);
   }
@@ -414,6 +415,7 @@ const upNext = next
     overflow: hidden;
   }
   .next-img img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .next-img--contain img { object-fit: contain; }
   .next-title {
     font-size: 18px;
     font-weight: 800;

@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="832" viewBox="0 0 420 832" role="img" aria-labelledby="copy-title copy-desc">
+  <title id="copy-title">Production PostgreSQL dump and copy validation path</title>
+  <desc id="copy-desc">A temporary pod in the old NKS cluster takes a read-only dump of production PostgreSQL, and the operator stores the file on a PC. The same dump is first restored to a local Docker database with networking blocked, then restored through a temporary pod in the new NKS cluster to the new-account PostgreSQL database. No VPC peering connects the two accounts. Redis copying is separate from this PostgreSQL dump path.</desc>
+  <defs>
+    <marker id="copy-arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1 1 L6 4 L1 7" fill="none" stroke="#737373" stroke-width="1.5" />
+    </marker>
+  </defs>
+  <rect width="420" height="832" fill="#FFFFFF" />
+  <g font-family="Arial, Helvetica, sans-serif">
+    <rect width="420" height="64" fill="#172B4D" />
+    <text x="24" y="42" fill="#FFFFFF" font-size="26" font-weight="700">Validate a production DB copy</text>
+    <text x="24" y="100" fill="#202124" font-size="22">PostgreSQL dump and restore path</text>
+
+    <g fill="#F5F5F5" stroke="#D4D4D4" stroke-width="1">
+      <rect x="24" y="126" width="372" height="84" rx="4" />
+      <rect x="24" y="252" width="372" height="84" rx="4" />
+      <rect x="94" y="392" width="302" height="86" rx="4" />
+      <rect x="94" y="556" width="302" height="86" rx="4" />
+      <rect x="94" y="690" width="302" height="84" rx="4" />
+    </g>
+    <g fill="#202124" text-anchor="middle">
+      <text x="210" y="160" font-size="24" font-weight="600">Temporary pod · old NKS</text>
+      <text x="210" y="190" font-size="22">Read-only production DB dump</text>
+      <text x="210" y="286" font-size="24" font-weight="600">Operator PC</text>
+      <text x="210" y="316" font-size="22">Store the same dump file</text>
+      <text x="245" y="427" font-size="24" font-weight="600">Local Docker DB</text>
+      <text x="245" y="457" font-size="22">Restore · network blocked</text>
+      <text x="245" y="591" font-size="23" font-weight="600">Temporary pod · new NKS</text>
+      <text x="245" y="621" font-size="22">Restore using the same file</text>
+      <text x="245" y="725" font-size="23" font-weight="600">New-account PostgreSQL</text>
+      <text x="245" y="755" font-size="22">Match tables and row counts</text>
+    </g>
+    <g fill="#202124" font-size="22">
+      <text x="94" y="376">Validate locally first</text>
+      <text x="94" y="540">Restore in the new setup</text>
+      <text x="24" y="812">No VPC peering between accounts</text>
+    </g>
+    <g fill="none" stroke="#737373" stroke-width="1.5">
+      <path d="M210 214 V244" marker-end="url(#copy-arrow)" />
+      <path d="M54 336 V599" />
+      <path d="M54 435 H86" marker-end="url(#copy-arrow)" />
+      <path d="M54 599 H86" marker-end="url(#copy-arrow)" />
+      <path d="M245 646 V682" marker-end="url(#copy-arrow)" />
+    </g>
+  </g>
+</svg>

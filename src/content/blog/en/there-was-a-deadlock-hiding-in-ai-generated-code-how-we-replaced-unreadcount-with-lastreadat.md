@@ -3,6 +3,7 @@ title: '[Messenger Load-Testing, Part 2] There Was a Deadlock Hiding in AI-Gener
 description: '42.8% HTTP error rate, 9 minutes into a load test, at 12% of the target TPS. The culprit was a single updateMany line written during AI-assisted coding.'
 subtitle: "42.8% errors in 9 minutes, caused by one updateMany"
 pubDate: 2026-05-11
+updatedDate: 2026-11-02
 tags: ['postgresql', 'prisma', 'databases', 'concurrency', 'node-js', 'debugging']
 category: reliability
 cover: /covers/there-was-a-deadlock-hiding-in-ai-generated-code-how-we-replaced-unreadcount-with-lastreadat.webp
@@ -217,22 +218,112 @@ User B ─── POST /channels/X/read ▶ Web
                                       WHERE userId = B           ← own row only
 ```
 
-## 7\. Migration Strategy — Don't Flip Everything At Once
+## 7\. Migration — Switching Reads, Removing Bulk Writes, and Cleaning Up the Column
 
-Phased rollout for backward compatibility:
+The final direction was to **calculate unread counts from the read timestamp and remove the old counter**, rather than keep writing `unreadCount`. The actual work separated the read-path switch from write removal.
 
-1.  **Phase 1**: Add the `lastReadAt` column. **Keep the existing** `unreadCount` **write path untouched.**
-    
-2.  **Phase 2**: Switch **only the read API** to the new approach (`count(*) WHERE createdAt > lastReadAt`).
-    
-3.  **Phase 3**: Re-run the load test. Confirm 75 TPS passes cleanly.
-    
-4.  **Phase 4**: Delete the `unreadCount` write code and drop the column.
-    
+| Phase | Change | Relationship to counter writes and the deadlock |
+| --- | --- | --- |
+| Phase 1 — switch reads | Add `lastReadAt`, backfill the read position, and return a calculated `unreadCount` through the API | Keep existing writes temporarily for comparison. This phase alone does not remove the deadlock cause. |
+| Phase 2 — remove bulk writes | Remove the increment function and send-time calls, plus the decrement query on message deletion | Remove the counter-update path that touched multiple member rows. |
+| Phase 3 — clean up references and column | Convert remaining references, including dashboard aggregation, then remove the DB column | Schema cleanup after removing the offending queries. The API response field stays. |
 
-By the end of Phase 2, **the deadlock vector is already gone**. Why? Once the read path is based on `lastReadAt`, a wrong `unreadCount` value is no longer visible to users. After that, we can clean up the write path on our own schedule, with no production pressure.
+Phase 1 corresponds to PR #836, merged on May 8, 2026. Writes remained temporarily so the new calculated values could be compared against the existing counter. This transition was not the final design.
+
+Phase 2 corresponds to PR #974, merged on May 20, 2026. It removed `updateUnreadCounts()` and its message-send call, along with the `updateMany` that decremented `unreadCount` on message deletion. **The deadlock path disappeared when these bulk writes were removed, not when the read results changed.**
+
+Dropping the column was a separate step. Dashboard aggregation and read handling still referenced it after Phase 2, so those references were cleaned up before removal. The final issue record notes that the production DB update and main deployment were complete.
+
+### Separating verified results from validation targets
+
+PR #974 records a PostgreSQL `40P01` count of 0 during the staging load test. However, **recovering 75 TPS and keeping HTTP errors below 1%** were validation targets; the PR did not provide completed measurements of them. This article therefore does not claim those figures as achieved results.
+
+> [!NOTE]
+> Correction from October 18, 2026, aligned with the Korean article: the related issues and merged PRs distinguish the read-path transition from the later removal of bulk writes. Switching only the read API did not remove the deadlock cause. The write-removal work took place after the original publication date.
 
 <a id="8-lessons--ai-coding-and-concurrency"></a>
+
+<a id="fcm-worker-follow-up"></a>
+
+## Follow-up: Moving FCM Delivery to a Worker Queue
+
+While diagnosing the deadlock, I also found another responsibility in the same message-send handler. `POST /messages` and `POST /dm/:userId/messages` launched FCM push work directly in the response path, while empty `.catch(() => {})` blocks hid failures. This section consolidates the previously separate account of that FCM work.
+
+**The actual failure in the preceding load test was the DB deadlock, and the connection pool was not saturated at the time.** Moving push work was a follow-up improvement addressing resource contention as fan-out and concurrency grew, together with an observability gap. It does not change the cause of the measured HTTP errors.
+
+### Work that keeps using the same process and pool after the response
+
+Sending a push involved more than an FCM HTTP call:
+
+```plaintext
+inside sendPushToUser
+ ├─ query pushDevice       (Postgres)
+ ├─ query presence         (Redis)
+ ├─ query userPreference   (Postgres)
+ ├─ FCM HTTP send          (Firebase Admin)
+ └─ clean up invalid tokens (Postgres)
+```
+
+This work shared the same Prisma connection pool in the same API server process as message persistence. `sendPushToUser(...).catch(() => {})` was a floating promise: it was neither awaited nor returned to the caller. It continued using DB and Redis resources after HTTP 201. Not waiting for it did not separate its resources from request processing.
+
+One message can fan out to N recipients and create more push work. Handling FCM latency and partial outages in the request process can therefore contend with message-save queries. The original account used an additional 100ms of Firebase latency as an illustration of that exposure, not as a measured result.
+
+### The API enqueues; the worker owns lookup, delivery, and failures
+
+I moved FCM calls into a dedicated BullMQ worker queue and reduced the API's responsibility:
+
+```plaintext
+// response path: delegate only "who gets what" to the queue, then respond immediately
+await pushQueue.add("send-push", { recipientIds, payload, event });
+// → HTTP 201
+```
+
+The API guarantees **that the push task was enqueued**, not that delivery completed. A separate worker process owns the following work:
+
+| Worker responsibility | Details |
+| --- | --- |
+| Target lookup | pushDevice / presence / userPreference |
+| Batch delivery | FCM multicast, up to 500 tokens per call |
+| Failure handling | retries and exponential backoff for errors such as `server-unavailable` |
+| Token cleanup | deactivate `UNREGISTERED` or invalid tokens |
+| Stability | concurrency limits and failed-job recording (DLQ) |
+| Observability | push-specific metrics and structured logging |
+
+This separated the process responsibilities for message persistence and external I/O. The queue coordinated recipients, payloads, and failure handling, while FCM/APNs remained the final delivery network. A queue alone does not guarantee final delivery or isolation from every failure, so enqueue failures and failures inside the worker still needed separate observation.
+
+### Replacing empty catches with structured logging and Sentry
+
+I replaced empty `catch` blocks scattered across channel and DM notifications with an observability helper. Previously, FCM and realtime-notification failures disappeared without a signal reaching operators. The changes were:
+
+- Record rejected promises and push `success = false` through `secureLogger.error`.
+- Record partial FCM failures (`failureCount > 0`) through `secureLogger.warn`, including cases where only some tokens fail.
+- Return a push failure when Firebase Admin is not configured in production, rather than silently skipping delivery.
+- Attach project, app, screen, and route tags plus request context in Sentry, group matching errors into Issues, and connect thresholds to Telegram alerts and GitHub Issue automation.
+
+```plaintext
+try {
+  await runImportantAction();
+} catch (error) {
+  Sentry.withScope((scope) => {
+    scope.setLevel('error');
+    scope.setTag('screen_name', screenName);
+    scope.setTag('route', route);
+    scope.setContext('request', { method, endpoint, http_status, duration_ms });
+    Sentry.captureException(error);
+  });
+}
+```
+
+Enqueuing in the response path can fail too. I recorded that failure through a separate log and metric rather than swallowing it:
+
+```plaintext
+enqueuePush(...).catch((err) => {
+  secureLogger.error("push enqueue failed", err, { operation: "push.enqueue", messageId, event });
+  metrics.increment("push_enqueue_failed");
+});
+```
+
+The changes established a separate path for push I/O and turned previously hidden failures into searchable, alertable signals. The original record did not include separate measurements of push delivery rates or TPS gains, so I have not added any. Removing the empty catches and moving responsibility to a worker were both necessary.
 
 ## Conclusion
 
@@ -244,6 +335,8 @@ This incident wasn't a one-line bug. It was **a thinking-pattern trap**.
     
 -   The faster AI-generated code lands, the more **human review of concurrency, isolation, and scalability** matters. That's the actual value of a PR review.
     
+
+The FCM follow-up applied the same responsibility boundary by separating external I/O and making failures observable.
 
 One more lesson. **Load testing belongs before production, not after.** Without an isolated load-test environment, this would have detonated under 100K CCU traffic. We'd have been chasing a 5xx storm caused by deadlock cycles in production. The environment itself prevented one incident.
 

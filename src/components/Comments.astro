@@ -10,10 +10,8 @@ interface Props {
 const { lang } = Astro.props;
 const t = ui[lang];
 
-// 댓글창 안쪽 생김새는 public/giscus/{light,dark}.css 가 맡는다. giscus.app 이 이 URL 을
-// 직접 받아가므로 **배포된 절대 URL** 이어야 한다 — 로컬에서 고친 CSS 는 배포 전엔 안 보인다.
-const themeURL = (name: 'light' | 'dark') => new URL(`/giscus/${name}.css`, Astro.site).href;
-const themes = { light: themeURL('light'), dark: themeURL('dark') };
+// giscus.app에서 배포된 CSS를 읽으므로 절대 URL을 사용한다.
+const theme = new URL('/giscus/light.css', Astro.site).href;
 
 const giscus = {
   repo: 'jieun9999/jieun9999.github.io',
@@ -48,25 +46,16 @@ const giscus = {
   .giscus-mount { min-height: 200px; }
 </style>
 
-<script is:inline define:vars={{ giscus, themes }}>
+<script is:inline define:vars={{ giscus, theme }}>
   (() => {
     const mount = document.querySelector('.post-comments .giscus-mount');
     if (!mount) return;
-    const de = document.documentElement;
-    const theme = () => (de.classList.contains('dark') ? themes.dark : themes.light);
 
     const s = document.createElement('script');
     s.src = 'https://giscus.app/client.js';
     s.async = true;
     s.crossOrigin = 'anonymous';
-    for (const [k, v] of Object.entries({ ...giscus, theme: theme() })) s.setAttribute(`data-${k}`, v);
+    for (const [k, v] of Object.entries({ ...giscus, theme })) s.setAttribute(`data-${k}`, v);
     mount.appendChild(s);
-
-    // 헤더 토글·시각에 따른 자동 전환 모두 html.dark 로 나타난다 — 그 변화를 댓글창에 넘긴다
-    new MutationObserver(() => {
-      const frame = document.querySelector('iframe.giscus-frame');
-      if (!frame) return;
-      frame.contentWindow.postMessage({ giscus: { setConfig: { theme: theme() } } }, 'https://giscus.app');
-    }).observe(de, { attributes: true, attributeFilter: ['class'] });
   })();
 </script>

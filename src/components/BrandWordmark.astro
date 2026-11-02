@@ -34,8 +34,7 @@ const VEINS =
 
 <style>
   /* 글자: 가운데 스톱이 사이트 accent — 색조(h160)는 고정하고 명도만 움직인다.
-     J: 다크에선 파비콘의 J 그대로(민트 + 초록 잎맥). 라이트에선 민트가 흰 바탕에 묻히므로
-     파비콘을 뒤집어 에버그린 J 에 민트 잎맥을 긋는다. */
+     J: 흰 바탕에서 잘 보이는 에버그린 J에 민트 잎맥을 긋는다. */
   .wordmark {
     --g0: #519773;
     --g1: #307252;
@@ -50,16 +49,6 @@ const VEINS =
     font-weight: 900;
     line-height: 1.2;
     letter-spacing: -0.01em;
-  }
-  :global(html.dark) .wordmark {
-    --g0: #9ce4bd;
-    --g1: #72be96;
-    --g2: #4b916e;
-    --j0: #e2f6ea;
-    --j1: #bcebd1;
-    --j2: #93d6b1;
-    --vein: #307252;
-    --vein-opacity: 0.45;
   }
   .j0 { stop-color: var(--j0); }
   .j1 { stop-color: var(--j1); }

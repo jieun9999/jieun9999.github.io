@@ -1,0 +1,28 @@
+{
+  "posts": [
+    {
+      "slug": "ncp-account-migration-terraform-nks",
+      "bodyPreserved": true,
+      "localLinks": true,
+      "seo": true,
+      "secretPatterns": false
+    },
+    {
+      "slug": "ncp-account-migration-strategy",
+      "bodyPreserved": true,
+      "localLinks": true,
+      "seo": true,
+      "secretPatterns": false
+    },
+    {
+      "slug": "ncp-migration-safe-rehearsal",
+      "bodyPreserved": true,
+      "localLinks": true,
+      "seo": true,
+      "secretPatterns": false
+    }
+  ],
+  "localLinkAndImageChecks": 150,
+  "manifestMatches": 8,
+  "identicalCovers": 3
+}

@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="674" viewBox="0 0 420 674" role="img" aria-labelledby="routing-title routing-desc">
+  <title id="routing-title">Centrifugo destination found during rehearsal and the corrected route</title>
+  <desc id="routing-desc">During rehearsal, the new web app actually published messages to the old production Centrifugo public endpoint because CENTRIFUGO_API_URL had been copied. The setting was corrected to the Centrifugo address inside the new cluster. Actual production addresses and secret values are omitted.</desc>
+  <defs>
+    <marker id="routing-arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1 1 L6 4 L1 7" fill="none" stroke="#737373" stroke-width="1.5" />
+    </marker>
+  </defs>
+  <rect width="420" height="674" fill="#FFFFFF" />
+  <g font-family="Arial, Helvetica, sans-serif">
+    <rect width="420" height="64" fill="#172B4D" />
+    <text x="24" y="42" fill="#FFFFFF" font-size="26" font-weight="700">Realtime message destination</text>
+
+    <g fill="#172B4D" font-size="24" font-weight="700">
+      <text x="24" y="106">Found during rehearsal</text>
+      <text x="24" y="406">After the fix</text>
+    </g>
+    <g stroke="#D4D4D4" stroke-width="1">
+      <rect x="24" y="124" width="372" height="56" rx="4" fill="#F5F5F5" />
+      <rect x="24" y="240" width="372" height="64" rx="4" fill="#FFF7DB" />
+      <rect x="24" y="424" width="372" height="56" rx="4" fill="#F5F5F5" />
+      <rect x="24" y="540" width="372" height="84" rx="4" fill="#F5F5F5" />
+    </g>
+    <g fill="#202124" font-size="24" font-weight="600" text-anchor="middle">
+      <text x="210" y="161">New web app</text>
+      <text x="210" y="281">Old production Centrifugo</text>
+      <text x="210" y="461">New web app</text>
+      <text x="210" y="604">Centrifugo</text>
+    </g>
+    <g fill="#202124" font-size="22">
+      <text x="95" y="218">Copied API setting</text>
+      <text x="24" y="340">Published to the old public endpoint</text>
+      <text x="95" y="518">Use the internal address</text>
+      <text x="210" y="572" text-anchor="middle">Inside the new cluster</text>
+      <text x="24" y="658">Verify the actual destination</text>
+    </g>
+    <g fill="none" stroke="#737373" stroke-width="1.5" marker-end="url(#routing-arrow)">
+      <path d="M70 184 V232" />
+      <path d="M70 484 V532" />
+    </g>
+    <path d="M24 364 H396" fill="none" stroke="#D4D4D4" stroke-width="1" />
+  </g>
+</svg>

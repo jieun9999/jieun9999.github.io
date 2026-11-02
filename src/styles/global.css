@@ -5,11 +5,13 @@
    얇은 선(--border)과 여백으로 나눈다. 콘텐츠 폭은 1040px 로 모은다(글 상세 본문이 한 줄 40자 안팎이 되는 폭).
    =========================================================================== */
 :root {
+  color-scheme: light;
   /* 이미지 원본에 맞춘 여백: 화면 테마와 무관하게 유지한다. */
   --cover-bg-light: #fff;
   --cover-bg-dark: #0d1512;
   /* 면 */
   --bg: #ffffff;
+  --profile-banner-bg: #e9edf1;
   --bg-2: #fafafa;           /* 히어로 그라데이션 끝, 인용·카드 면 */
   --surface: #f4f4f5;        /* 칩·버튼 면 */
   --surface-2: #e4e4e7;      /* 검색 버튼·hover */
@@ -18,7 +20,7 @@
   /* 글자 (진한 순) */
   --text: #18181b;           /* 제목 */
   --text-2: #27272a;
-  --article-text: #616161;
+  --article-text: var(--text-2);
   --table-bg: #fafafa;
   --table-head: #e8e8e8;
   --table-border: #d4d4d4;
@@ -70,43 +72,6 @@
   :root { --header-h: 60px; }
 }
 
-/* 다크 — 템플릿의 다크 토큰을 그대로 뒤집어 쓴다 */
-html.dark {
-  --bg: #040405;
-  --bg-2: #09090b;
-  --surface: #18181b;
-  --surface-2: #27272a;
-  --card: #09090b;
-
-  --text: #f4f4f5;
-  --text-2: #e4e4e7;
-  --article-text: #b5b5bd;
-  --table-bg: #181818;
-  --table-head: #303030;
-  --table-border: #454545;
-  --visual-bg: #111820;
-  --visual-head: #1b2632;
-  --visual-border: #303d4a;
-  --text-muted: #d4d4d8;
-  --text-subtle: #a1a1aa;
-  --text-faint: #71717a;
-
-  --border: #27272a;
-  --border-strong: #3f3f46;
-  --hairline: rgba(255, 255, 255, 0.08);
-
-  /* 같은 초록을 밝게 — 면도 밝은 초록에 검은 글자로 뒤집는다(무채색 선택 칩과 같은 방식) */
-  --accent: #72be96;         /* oklch(0.74 0.095 160) — 검은 바탕 9.29:1 */
-  --accent-bg: #72be96;
-  --accent-hover: #8fd4ad;
-  --accent-soft: rgba(114, 190, 150, 0.22);
-  --accent-fg: #040405;      /* 밝은 초록 면 위 검은 글자 9.29:1 */
-  --ring: rgba(114, 190, 150, 0.5);
-
-  --code-bg: #18181b;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.5);
-}
 
 /* ===========================================================================
    리셋 / 기본
@@ -215,7 +180,7 @@ a.tag:hover { background: var(--surface-2); color: var(--text); }
    =========================================================================== */
 .prose {
   font-size: 16px;
-  font-weight: 400;
+  font-weight: 500;
   line-height: 1.75;
   color: var(--article-text);
   word-break: keep-all;
@@ -243,7 +208,7 @@ a.tag:hover { background: var(--surface-2); color: var(--text); }
   font-weight: 600;
   color: var(--text);
 }
-.prose strong { font-weight: 600; color: inherit; }
+.prose strong { font-weight: 700; color: inherit; }
 /* 소제목과 첫 문단을 붙이고, 연속된 제목 사이의 여백을 줄인다. */
 .prose h2 + h3 { margin-top: 20px; }
 .prose :is(h2, h3, h4) + p { margin-top: 8px; }
@@ -317,6 +282,21 @@ a.tag:hover { background: var(--surface-2); color: var(--text); }
 .prose th { background: var(--table-head); font-weight: 600; color: var(--text); }
 .prose td { background: var(--table-bg); }
 
+/* NCP series: softly colored columns distinguish comparison items at a glance. */
+.prose[data-series='ncp-account-migration'] {
+  --table-bg: #f4f8fd;
+  --table-head: #dceafa;
+  --table-border: #bed0e3;
+  --table-bg-secondary: #f1f8f5;
+  --table-head-secondary: #d5eae1;
+  --table-bg-tertiary: #f6f3fc;
+  --table-head-tertiary: #e7def5;
+}
+.prose[data-series='ncp-account-migration'] th:nth-child(3n + 2) { background: var(--table-head-secondary); }
+.prose[data-series='ncp-account-migration'] td:nth-child(3n + 2) { background: var(--table-bg-secondary); }
+.prose[data-series='ncp-account-migration'] th:nth-child(3n) { background: var(--table-head-tertiary); }
+.prose[data-series='ncp-account-migration'] td:nth-child(3n) { background: var(--table-bg-tertiary); }
+
 /* ===========================================================================
    콜아웃 (GitHub alerts: NOTE / TIP / IMPORTANT / WARNING / CAUTION)
    인용 프리셋과 같은 모양(면+테두리+라운드)에 색만 입힌다.
@@ -350,11 +330,6 @@ a.tag:hover { background: var(--surface-2); color: var(--text); }
 .markdown-alert-important { --al: #6d24ff; }
 .markdown-alert-warning { --al: #c27c00; }
 .markdown-alert-caution { --al: #d90f20; }
-html.dark .markdown-alert-note { --al: #5ba8f5; }
-html.dark .markdown-alert-tip { --al: #3fc97a; }
-html.dark .markdown-alert-important { --al: #a47dff; }
-html.dark .markdown-alert-warning { --al: #f0b43c; }
-html.dark .markdown-alert-caution { --al: #f5525f; }
 
 /* ===========================================================================
    헤딩 앵커(#) — 호버 시 노출
