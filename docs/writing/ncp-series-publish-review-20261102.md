@@ -110,3 +110,40 @@
 - 도식 네 장의 표시·확대·닫기, 모바일 메뉴, SVG 텍스트 경계, 다른 언어·소개·태그·카테고리의 밝은 화면을 검사했습니다. 모바일 도식과 표, 데스크톱 홈 화면을 직접 열어 읽기와 잘림 여부도 확인했습니다.
 - 화면: [홈](ncp-series-20261102/reading-update/home-1280.png), [모바일 표](ncp-series-20261102/reading-update/part-1-table-390.png), [1편 로드맵](ncp-series-20261102/reading-update/roadmap-390.png), [2편 전환 절차](ncp-series-20261102/reading-update/cutover-gates-390.png), [3편 복제 경로](ncp-series-20261102/reading-update/rehearsal-isolation-390.png), [3편 Centrifugo 수정](ncp-series-20261102/reading-update/centrifugo-routing-390.png)입니다.
 - 최종 `npm run build`: 201개 페이지 생성, 경고·오류 없이 통과했습니다. `git diff --check`도 통과했습니다. 빌드 산출물의 세 글 내부 링크·이미지·앵커 154개와 로컬 HTTP 200을 재확인했습니다. commit/push·실제 배포는 하지 않았습니다.
+
+
+## 한·영 게시 및 배포 요청 반영 — 2026-11-02
+
+사용자가 영어판 세 편 작성, PR 생성, 이번 세션의 변경사항을 main에 병합·배포하도록 요청했습니다. 앞 절들의 ‘로컬 검증만’이라는 제한과 실행 기록은 이전 요청 시점 기준이며, 이번 요청에 따라 게시 절차를 진행합니다.
+
+### 문서화와 영어판
+
+- `CLAUDE.md`, `design/{foundations,home,post,shell,og-card,README}.md`에 흰 화면 고정, 본문 대비·굵기, 컬러 표의 팔레트·적용 범위, SVG 우선·모바일 글자 크기·의미 강조·민감값 제외·언어별 자산과 검수 기준을 정리했습니다. `docs/writing/README.md`에도 사용자가 확인한 개선 사례를 연결했습니다.
+- `src/content/blog/en/`에 한국어와 같은 slug의 세 편을 전문 번역했습니다. 같은 발행일·카테고리·태그·시리즈 ID·1/2/3 순서를 유지하고, 영어 시리즈명·제목·설명·부제·alt·상호 링크를 적용했습니다.
+- 영어 커버 PNG 세 장과 SVG 도식 네 장을 별도 파일로 추가했습니다. 한국어 커버 원본은 바꾸지 않았습니다. 커버의 참고 파일·생성 도구·정확한 프롬프트와 결과 파일은 [생성 기록](ncp-series-20261102/english-cover-generation.md)에 있습니다.
+- 독립 검토에서 전문·수치·코드·조건·추정과 실측·수정 시점의 보존을 대조했습니다. Redis 영구 수정은 전환 후라는 설명을 유지했습니다.
+
+영어 게시 URL:
+
+- https://jieun.dev/en/blog/ncp-account-migration-terraform-nks/
+- https://jieun.dev/en/blog/ncp-account-migration-strategy/
+- https://jieun.dev/en/blog/ncp-migration-safe-rehearsal/
+
+### 기존 변경과 최신 main 통합
+
+- 원격 main에 로컬보다 최신인 VPS 통합·도메인 1/2편·PDF 메타데이터 변경이 있어 내용을 보존하며 병합했습니다. 오래된 도메인 글 삭제·이동을 그대로 적용하면 1편이 사라지고 2편의 링크가 자기 글로 돌아오므로, 최신 도메인 시리즈를 유지했습니다. 도메인 아카이브도 최신 내용을 보존합니다.
+- 기존 FCM 글을 이동시키는 변경은 대상 deadlock 글에 내용이 빠져 있었습니다. 한·영 대상 글의 결론 앞에 실제 FCM 후속 절과 `#fcm-worker-follow-up`을 추가해 큐 책임·배치·실패 처리·관측과 검증 한계를 보존했습니다. 구 URL은 이 절로 이동하고 canonical은 fragment 없는 대상 글 URL입니다.
+- 영어 deadlock 글의 오래된 ‘조회 전환만으로 데드락 제거·75TPS 확인’ 설명은 기존 한국어 정정과 맞췄습니다. 실제 쓰기 제거 시점, 40P01=0 확인, 75TPS·1%는 미확인 목표라는 차이를 유지했습니다.
+- `vps-integrated-draft.md`와 아카이브는 저장소 자료로 포함하고 사이트 빌드에는 포함하지 않습니다. 기존 VPS 이동은 최신 통합 글의 실제 앵커와 연결됩니다.
+
+### 최종 검증 증거
+
+- `npm run og`: 영어 카드 3개 생성, 기존 43개 건너뜀입니다. 앞서 생성한 한국어 3개도 포함합니다.
+- `npm run build`: 캐시를 백업하고 새로 생성한 최종 실행에서 **216개 페이지, 경고·오류 없음**을 확인했습니다.
+- [한국어](ncp-series-20261102/bilingual-final/ko-browser-results.json)·[영어](ncp-series-20261102/bilingual-final/en-browser-results.json): 각 32개, 총 **64개** 화면·OS 설정 조합을 통과했습니다. 본문 대비 14.89:1·굵기 500, 표 색·가로 넘침·도식 수·확대·텍스트 경계·커버 비율·시리즈 현재 편·모바일 메뉴·흰 화면 고정을 검사했습니다.
+- `scripts/test-cover-fit.mjs`: 한·영 각각 기존 커버 3개 × 화면 폭 3개 × OS 설정 2개와 hover를 통과했습니다. 제거한 글은 검사 대상에서 빼고 OS 다크 설정에서도 밝은 화면으로 유지되는지 확인합니다. 부제의 두 문장 검사는 이 테스트가 다루는 커버 행에 한정합니다. 최초 전역 부제 검사에서는 기존 main의 `making-ai-blog-titles-readable`, `preserving-topic-intent-in-search` 한국어 부제가 한 문장이어서 실패했습니다. 두 글의 기존 편집 결과는 이번 작업에서 다시 쓰지 않았습니다.
+- [정적 검사](ncp-series-20261102/bilingual-final/static-results.json): 여섯 글의 **내부 링크·이미지·앵커 308개**, self-canonical·상호 hreflang·x-default·언어별 OG, 이동 페이지 6개와 대상 앵커, 최신 도메인 1편 공개 유지, 자료 파일의 빌드 제외를 통과했습니다.
+- 새 영어 커버 세 장과 모바일 영어 표·도식을 실제로 열어 확인했습니다. 실제 IP·호스트·계정 식별자·인증값을 새 자산에 넣지 않았으며 바뀐 게시물·도식의 비밀값 패턴 검사도 통과했습니다.
+- `git diff --check`, 수정한 검증 스크립트의 `node --check`를 통과했습니다. 별도 lint·typecheck 명령은 레포에 없습니다.
+
+PR 병합 후 main의 GitHub Pages 배포 작업과 실제 공개 여섯 URL을 확인합니다. 검색 색인과 SNS 캐시는 즉시 반영을 보장하는 검증 대상이 아닙니다.

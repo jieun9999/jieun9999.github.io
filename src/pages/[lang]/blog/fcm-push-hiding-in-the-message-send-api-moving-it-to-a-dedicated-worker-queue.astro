@@ -5,7 +5,7 @@ export function getStaticPaths() {
 }
 const lang = Astro.params.lang;
 const target = `/${lang}/blog/there-was-a-deadlock-hiding-in-ai-generated-code-how-we-replaced-unreadcount-with-lastreadat/#fcm-worker-follow-up`;
-const canonical = new URL(target, Astro.site).href;
+const canonical = new URL(target.split('#')[0], Astro.site).href;
 const title = lang === 'ko' ? '통합한 글로 이동합니다' : 'This article has been consolidated';
 ---
 <!doctype html>

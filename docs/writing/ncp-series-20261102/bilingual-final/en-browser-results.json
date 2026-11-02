@@ -1,0 +1,283 @@
+{
+  "language": "en",
+  "checks": [
+    {
+      "page": "home",
+      "width": 320,
+      "prefersDark": false,
+      "lightOnly": true
+    },
+    {
+      "page": "ncp-account-migration-terraform-nks",
+      "width": 320,
+      "prefersDark": false,
+      "contrast": 14.89,
+      "bodyWeight": 500,
+      "diagrams": 1,
+      "lightOnly": true
+    },
+    {
+      "page": "ncp-account-migration-strategy",
+      "width": 320,
+      "prefersDark": false,
+      "contrast": 14.89,
+      "bodyWeight": 500,
+      "diagrams": 1,
+      "lightOnly": true
+    },
+    {
+      "page": "ncp-migration-safe-rehearsal",
+      "width": 320,
+      "prefersDark": false,
+      "contrast": 14.89,
+      "bodyWeight": 500,
+      "diagrams": 2,
+      "lightOnly": true
+    },
+    {
+      "page": "home",
+      "width": 320,
+      "prefersDark": true,
+      "lightOnly": true
+    },
+    {
+      "page": "ncp-account-migration-terraform-nks",
+      "width": 320,
+      "prefersDark": true,
+      "contrast": 14.89,
+      "bodyWeight": 500,
+      "diagrams": 1,
+      "lightOnly": true
+    },
+    {
+      "page": "ncp-account-migration-strategy",
+      "width": 320,
+      "prefersDark": true,
+      "contrast": 14.89,
+      "bodyWeight": 500,
+      "diagrams": 1,
+      "lightOnly": true
+    },
+    {
+      "page": "ncp-migration-safe-rehearsal",
+      "width": 320,
+      "prefersDark": true,
+      "contrast": 14.89,
+      "bodyWeight": 500,
+      "diagrams": 2,
+      "lightOnly": true
+    },
+    {
+      "page": "home",
+      "width": 390,
+      "prefersDark": false,
+      "lightOnly": true
+    },
+    {
+      "page": "ncp-account-migration-terraform-nks",
+      "width": 390,
+      "prefersDark": false,
+      "contrast": 14.89,
+      "bodyWeight": 500,
+      "diagrams": 1,
+      "lightOnly": true
+    },
+    {
+      "page": "ncp-account-migration-strategy",
+      "width": 390,
+      "prefersDark": false,
+      "contrast": 14.89,
+      "bodyWeight": 500,
+      "diagrams": 1,
+      "lightOnly": true
+    },
+    {
+      "page": "ncp-migration-safe-rehearsal",
+      "width": 390,
+      "prefersDark": false,
+      "contrast": 14.89,
+      "bodyWeight": 500,
+      "diagrams": 2,
+      "lightOnly": true
+    },
+    {
+      "page": "home",
+      "width": 390,
+      "prefersDark": true,
+      "lightOnly": true
+    },
+    {
+      "page": "ncp-account-migration-terraform-nks",
+      "width": 390,
+      "prefersDark": true,
+      "contrast": 14.89,
+      "bodyWeight": 500,
+      "diagrams": 1,
+      "lightOnly": true
+    },
+    {
+      "page": "ncp-account-migration-strategy",
+      "width": 390,
+      "prefersDark": true,
+      "contrast": 14.89,
+      "bodyWeight": 500,
+      "diagrams": 1,
+      "lightOnly": true
+    },
+    {
+      "page": "ncp-migration-safe-rehearsal",
+      "width": 390,
+      "prefersDark": true,
+      "contrast": 14.89,
+      "bodyWeight": 500,
+      "diagrams": 2,
+      "lightOnly": true
+    },
+    {
+      "page": "home",
+      "width": 900,
+      "prefersDark": false,
+      "lightOnly": true
+    },
+    {
+      "page": "ncp-account-migration-terraform-nks",
+      "width": 900,
+      "prefersDark": false,
+      "contrast": 14.89,
+      "bodyWeight": 500,
+      "diagrams": 1,
+      "lightOnly": true
+    },
+    {
+      "page": "ncp-account-migration-strategy",
+      "width": 900,
+      "prefersDark": false,
+      "contrast": 14.89,
+      "bodyWeight": 500,
+      "diagrams": 1,
+      "lightOnly": true
+    },
+    {
+      "page": "ncp-migration-safe-rehearsal",
+      "width": 900,
+      "prefersDark": false,
+      "contrast": 14.89,
+      "bodyWeight": 500,
+      "diagrams": 2,
+      "lightOnly": true
+    },
+    {
+      "page": "home",
+      "width": 900,
+      "prefersDark": true,
+      "lightOnly": true
+    },
+    {
+      "page": "ncp-account-migration-terraform-nks",
+      "width": 900,
+      "prefersDark": true,
+      "contrast": 14.89,
+      "bodyWeight": 500,
+      "diagrams": 1,
+      "lightOnly": true
+    },
+    {
+      "page": "ncp-account-migration-strategy",
+      "width": 900,
+      "prefersDark": true,
+      "contrast": 14.89,
+      "bodyWeight": 500,
+      "diagrams": 1,
+      "lightOnly": true
+    },
+    {
+      "page": "ncp-migration-safe-rehearsal",
+      "width": 900,
+      "prefersDark": true,
+      "contrast": 14.89,
+      "bodyWeight": 500,
+      "diagrams": 2,
+      "lightOnly": true
+    },
+    {
+      "page": "home",
+      "width": 1280,
+      "prefersDark": false,
+      "lightOnly": true
+    },
+    {
+      "page": "ncp-account-migration-terraform-nks",
+      "width": 1280,
+      "prefersDark": false,
+      "contrast": 14.89,
+      "bodyWeight": 500,
+      "diagrams": 1,
+      "lightOnly": true
+    },
+    {
+      "page": "ncp-account-migration-strategy",
+      "width": 1280,
+      "prefersDark": false,
+      "contrast": 14.89,
+      "bodyWeight": 500,
+      "diagrams": 1,
+      "lightOnly": true
+    },
+    {
+      "page": "ncp-migration-safe-rehearsal",
+      "width": 1280,
+      "prefersDark": false,
+      "contrast": 14.89,
+      "bodyWeight": 500,
+      "diagrams": 2,
+      "lightOnly": true
+    },
+    {
+      "page": "home",
+      "width": 1280,
+      "prefersDark": true,
+      "lightOnly": true
+    },
+    {
+      "page": "ncp-account-migration-terraform-nks",
+      "width": 1280,
+      "prefersDark": true,
+      "contrast": 14.89,
+      "bodyWeight": 500,
+      "diagrams": 1,
+      "lightOnly": true
+    },
+    {
+      "page": "ncp-account-migration-strategy",
+      "width": 1280,
+      "prefersDark": true,
+      "contrast": 14.89,
+      "bodyWeight": 500,
+      "diagrams": 1,
+      "lightOnly": true
+    },
+    {
+      "page": "ncp-migration-safe-rehearsal",
+      "width": 1280,
+      "prefersDark": true,
+      "contrast": 14.89,
+      "bodyWeight": 500,
+      "diagrams": 2,
+      "lightOnly": true
+    }
+  ],
+  "screenshots": [
+    "home-390.png",
+    "part-1-table-390.png",
+    "roadmap-en-390.png",
+    "part-2-table-390.png",
+    "cutover-gates-en-390.png",
+    "part-3-table-390.png",
+    "rehearsal-isolation-en-390.png",
+    "centrifugo-routing-en-390.png",
+    "home-1280.png",
+    "part-1-table-1280.png",
+    "part-2-table-1280.png",
+    "part-3-table-1280.png"
+  ]
+}

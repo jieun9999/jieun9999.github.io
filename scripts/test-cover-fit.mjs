@@ -65,7 +65,8 @@ try {
     }
     await evaluate(`for (let i = 0; i < 5; i++) document.querySelector('[data-load-more]')?.click();`);
     for (const dark of [false, true]) {
-      await evaluate(`document.documentElement.classList.toggle('dark', ${dark})`);
+      await call('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: dark ? 'dark' : 'light' }] }, sessionId);
+      assert.equal(await evaluate("document.documentElement.classList.contains('dark')"), false, 'Site stays light');
       for (const slug of slugs) {
         const selector = `a.img[href="/${lang}/blog/${slug}/"]`;
         await evaluate(`document.querySelector(${JSON.stringify(selector)}).scrollIntoView({block:'center'})`);
@@ -89,13 +90,14 @@ try {
       }
       assert.equal(await evaluate(`getComputedStyle(document.querySelector('a.img[href="/${lang}/blog/redefining-ai-blog-product-after-beta-feedback/"] img')).objectFit`), 'cover', 'Other covers unchanged');
       assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'), true, 'No horizontal overflow');
-      if (lang === 'ko') assert.equal(await evaluate(`Array.from(document.querySelectorAll('.lead')).every(el => {
+      if (lang === 'ko') assert.equal(await evaluate(`${JSON.stringify(slugs)}.every(slug => {
+        const el = document.querySelector('a.img[href="/${lang}/blog/' + slug + '/"]').closest('.row').querySelector('.lead');
         const sentences = Array.from(new Intl.Segmenter('ko', { granularity: 'sentence' }).segment(el.textContent.trim()));
         return el.scrollHeight <= el.clientHeight + 1 && sentences.length === 2 && sentences.every(s => /니다\\.$/.test(s.segment.trim()));
-      })`), true, 'Korean summaries must show two complete polite sentences');
+      })`), true, 'The tested cover rows must show two complete polite sentences');
     }
   }
-  console.log(`PASS (${lang}): three covers, three widths, two themes, hover; screenshots: ${artifacts}`);
+  console.log(`PASS (${lang}): three covers, three widths, two OS preferences, hover; screenshots: ${artifacts}`);
 } finally {
   ws?.close();
   chrome.kill();
