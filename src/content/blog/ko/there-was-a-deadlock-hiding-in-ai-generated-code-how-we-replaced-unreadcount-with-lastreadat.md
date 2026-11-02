@@ -3,7 +3,7 @@ title: '[메신저 부하 테스트 2편] AI가 생성한 코드에 deadlock이 
 description: '부하 테스트 시작 9분 만에 HTTP 오류율 42.8%, 목표 TPS의 12%. 범인은 AI 보조 코딩 중 무심코 작성한 단 한 줄의 updateMany였습니다.'
 subtitle: "메신저 부하 테스트에서 오류율이 42.8%까지 높아진 원인을 추적하니 읽지 않은 메시지 수를 갱신하는 쿼리에 교착 상태가 있었습니다. 반복 갱신이 필요했던 unreadCount 대신 마지막으로 읽은 시점인 lastReadAt을 사용하는 구조로 전환했습니다."
 pubDate: 2026-05-11
-updatedDate: 2026-10-18
+updatedDate: 2026-11-02
 tags: ['postgresql', 'prisma', 'databases', 'concurrency', 'node-js', 'debugging']
 category: reliability
 cover: /covers/there-was-a-deadlock-hiding-in-ai-generated-code-how-we-replaced-unreadcount-with-lastreadat.webp
@@ -242,6 +242,88 @@ PR #974에는 staging 부하 테스트에서 PostgreSQL 로그의 `40P01` 카운
 > [!NOTE]
 > 2026년 10월 18일 수정: 관련 이슈와 머지된 PR을 대조해 읽음 시점 기반 계산과 실제 전환 단계를 정리했습니다. 초판의 “읽기 API만 전환하면 데드락 유발 지점이 사라진다”는 설명을 바로잡고, 초판 발행일 이후의 쓰기 제거 작업을 반영했습니다.
 
+<a id="fcm-worker-follow-up"></a>
+
+## 후속 개선: FCM 발송을 워커 큐로 분리
+
+데드락을 진단하면서 같은 메시지 전송 핸들러의 다른 책임도 확인했습니다. `POST /messages`와 `POST /dm/:userId/messages`에서는 FCM 푸시를 응답 경로 안에서 직접 실행하고 있었고, 실패는 빈 `.catch(() => {})`에 가려져 있었습니다. 이 절은 별도로 발행했던 FCM 개선 기록을 통합한 내용입니다.
+
+**앞의 부하 테스트에서 실제 실패 원인은 DB 데드락이었으며, 당시 커넥션 풀은 포화되지 않았습니다.** 푸시 분리는 당시 오류율의 원인을 바꿔 설명하는 것이 아니라, fan-out과 동시 접속이 커질 때의 자원 경합과 관측 공백을 함께 줄인 후속 개선입니다.
+
+### 응답 뒤에도 같은 프로세스와 풀을 사용하는 작업
+
+푸시 한 건은 FCM HTTP 호출만으로 끝나지 않았습니다.
+
+```plaintext
+sendPushToUser 내부
+ ├─ pushDevice 조회        (Postgres)
+ ├─ presence 조회          (Redis)
+ ├─ userPreference 조회    (Postgres)
+ ├─ FCM HTTP 전송          (Firebase Admin)
+ └─ invalid token 정리     (Postgres)
+```
+
+이 작업은 메시지 저장과 같은 API 서버 프로세스의 같은 Prisma 커넥션 풀을 사용했습니다. `sendPushToUser(...).catch(() => {})`는 `await`하지도, 호출자에게 반환하지도 않는 floating promise였습니다. HTTP 201을 반환한 뒤에도 같은 프로세스에서 DB·Redis 자원을 사용하므로, 기다리지 않는다고 요청 처리와 자원이 분리되는 것은 아니었습니다.
+
+메시지 한 건이 수신자 N명으로 확산되면 푸시 작업도 늘어납니다. FCM의 지연·부분 장애를 요청 경로에서 처리하면 메시지 저장 쿼리와 자원을 두고 경합할 수 있습니다. 원래 기록의 Firebase 지연 100ms는 이런 영향을 설명하기 위한 예시이며, 실제 측정 결과는 아닙니다.
+
+### API는 큐 적재까지, 워커는 조회·전송·실패 처리까지
+
+FCM 호출을 BullMQ 전용 워커 큐로 옮기고 API가 하는 일을 줄였습니다.
+
+```plaintext
+// 응답 경로: "누구에게 무엇을 보낼지"만 큐에 위임하고 즉시 응답
+await pushQueue.add("send-push", { recipientIds, payload, event });
+// → HTTP 201
+```
+
+API가 보장하는 것은 **푸시 작업의 큐 적재**이며 실제 전달 완료가 아닙니다. 별도 프로세스인 워커가 다음 책임을 맡습니다.
+
+| 워커 책임 | 내용 |
+| --- | --- |
+| 대상 조회 | pushDevice / presence / userPreference |
+| 배치 전송 | FCM multicast, 한 번에 최대 500 토큰 |
+| 실패 처리 | `server-unavailable` 등에 재시도·지수 백오프 |
+| 토큰 정리 | `UNREGISTERED`·invalid 토큰 비활성화 |
+| 안정성 | concurrency 제한, 실패 job 기록(DLQ) |
+| 관측성 | 푸시 전용 메트릭·구조화 로그 |
+
+메시지 저장 경로와 외부 I/O의 프로세스 책임을 분리하고, 큐에서 대상·payload·실패 처리를 관리하도록 했습니다. FCM/APNs는 최종 전달망을 담당합니다. 다만 큐를 넣는 것만으로 최종 전달이나 모든 장애의 격리가 보장되는 것은 아니므로, 적재 실패와 워커 안의 실패를 각각 관측해야 했습니다.
+
+### 빈 catch를 구조화 로그와 Sentry로 교체
+
+채널·DM 메시지 알림에 흩어져 있던 빈 `catch`를 관측 헬퍼로 교체했습니다. 이전에는 FCM·실시간 알림 실패가 사라져 운영자에게 전달되는 신호가 없었습니다. 변경한 실패 처리는 다음과 같습니다.
+
+- rejected promise와 푸시 `success = false`는 `secureLogger.error`로 기록했습니다.
+- FCM 응답의 부분 실패(`failureCount > 0`)는 `secureLogger.warn`으로 기록했습니다. 일부 토큰만 실패하는 경우도 관측 대상입니다.
+- production에서 Firebase Admin 설정이 없으면 푸시 실패를 반환하도록 했습니다. 설정 누락을 조용한 미발송으로 처리하지 않았습니다.
+- Sentry에 프로젝트·앱·화면·라우트 태그와 요청 컨텍스트를 붙여 같은 오류를 Issue로 묶고, 임계치에 따라 Telegram·GitHub Issue 알림과 자동화로 연결했습니다.
+
+```plaintext
+try {
+  await runImportantAction();
+} catch (error) {
+  Sentry.withScope((scope) => {
+    scope.setLevel('error');
+    scope.setTag('screen_name', screenName);
+    scope.setTag('route', route);
+    scope.setContext('request', { method, endpoint, http_status, duration_ms });
+    Sentry.captureException(error);
+  });
+}
+```
+
+응답 경로에서 큐에 넣는 작업도 실패할 수 있습니다. 이 실패를 삼키지 않고 별도 로그와 메트릭으로 남겼습니다.
+
+```plaintext
+enqueuePush(...).catch((err) => {
+  secureLogger.error("push enqueue failed", err, { operation: "push.enqueue", messageId, event });
+  metrics.increment("push_enqueue_failed");
+});
+```
+
+이 개선에서 확인한 변화는 요청 경로에서 푸시 I/O를 분리하고, 사라지던 실패를 검색·알림 가능한 신호로 남긴 것입니다. 별도의 푸시 도달률이나 TPS 개선 실측치는 원래 기록에 없으므로 성과 수치로 추가하지 않았습니다. 빈 `catch`를 없애는 일과 워커로 책임을 옮기는 일은 함께 필요했습니다.
+
 ## 마무리하며
 
 <a id="8-교훈--ai-코딩과-동시성"></a>
@@ -254,6 +336,8 @@ PR #974에는 staging 부하 테스트에서 PostgreSQL 로그의 `40P01` 카운
     
 -   AI가 생성한 코드가 빠르게 안착할수록, **동시성, 격리성, 확장성에 대한 사람의 리뷰**가 더 중요해집니다. 그것이 바로 PR 리뷰의 진짜 가치입니다.
     
+
+FCM 후속 개선에서도 외부 I/O를 분리하는 것과 실패를 관측 가능하게 남기는 것을 함께 적용했습니다.
 
 한 가지 교훈이 더 있습니다. **부하 테스트는 프로덕션 이후가 아니라 이전에 해야 합니다.** 격리된 부하 테스트 환경이 없었다면 이 문제는 100K CCU 트래픽 아래에서 터졌을 것입니다. 저희는 프로덕션에서 deadlock 사이클이 일으키는 5xx 오류를 대응하고 있었을 것입니다. 그 환경 자체가 하나의 장애를 막아준 셈입니다.
 

@@ -1,7 +1,6 @@
 ---
 import { ui, type Lang } from '../i18n/ui';
 import LanguageToggle from './LanguageToggle.astro';
-import ThemeToggle from './ThemeToggle.astro';
 import SearchDialog from './SearchDialog.astro';
 import BrandWordmark from './BrandWordmark.astro';
 
@@ -68,7 +67,6 @@ const menu = [
         <svg width="15" height="15" viewBox="0 0 256 256" aria-hidden="true"><path fill="currentColor" d="M232.49,215.51,185,168a92.12,92.12,0,1,0-17,17l47.53,47.54a12,12,0,0,0,17-17ZM44,112a68,68,0,1,1,68,68A68.07,68.07,0,0,1,44,112Z"/></svg>
       </button>
       <span class="lang-slot"><LanguageToggle lang={lang} alternates={alternates} /></span>
-      <ThemeToggle label={t.toggleTheme} />
     </div>
   </div>
 
@@ -197,7 +195,7 @@ const menu = [
   }
   .lang-slot { display: contents; }
 
-  /* 원형 아이콘 버튼 (검색·테마·언어·햄버거 공용) */
+  /* 원형 아이콘 버튼 (검색·언어·햄버거 공용) */
   .bar :global(.icon-btn) {
     display: inline-flex;
     align-items: center;
@@ -240,7 +238,7 @@ const menu = [
   .mobile-panel { display: none; }
 
   @media (max-width: 809px) {
-    /* 칸 셋은 그대로 — ☰ · 로고 · 🔍☾ 로 로고가 계속 가운데 선다. 높이는 --header-h 가 60px 로 바뀐다 */
+    /* 칸 셋은 그대로 — ☰ · 로고 · 🔍 로 로고가 계속 가운데 선다. 높이는 --header-h 가 60px 로 바뀐다 */
     .brand { font-size: 28px; }
     .menu { display: none; }
     .tools { gap: 8px; }

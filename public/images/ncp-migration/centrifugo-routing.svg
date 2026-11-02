@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="674" viewBox="0 0 420 674" role="img" aria-labelledby="routing-title routing-desc">
+  <title id="routing-title">리허설에서 발견한 Centrifugo 연결 대상과 수정 후 경로</title>
+  <desc id="routing-desc">발견 당시 새 웹은 복사된 CENTRIFUGO_API_URL 설정 때문에 기존 운영 Centrifugo의 공개 주소로 메시지를 발행했습니다. 수정 후 새 웹은 새 클러스터 내부 Centrifugo 주소를 사용하도록 바꿨습니다. 구체적인 운영 접속 주소와 비밀값은 표시하지 않습니다.</desc>
+  <defs>
+    <marker id="routing-arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1 1 L6 4 L1 7" fill="none" stroke="#737373" stroke-width="1.5" />
+    </marker>
+  </defs>
+  <rect width="420" height="674" fill="#FFFFFF" />
+  <g font-family="'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif">
+    <rect width="420" height="64" fill="#172B4D" />
+    <text x="24" y="42" fill="#FFFFFF" font-size="26" font-weight="700">실시간 메시지 연결 대상</text>
+
+    <g fill="#172B4D" font-size="24" font-weight="700">
+      <text x="24" y="106">발견 당시</text>
+      <text x="24" y="406">수정 후</text>
+    </g>
+    <g stroke="#D4D4D4" stroke-width="1">
+      <rect x="24" y="124" width="372" height="56" rx="4" fill="#F5F5F5" />
+      <rect x="24" y="240" width="372" height="64" rx="4" fill="#FFF7DB" />
+      <rect x="24" y="424" width="372" height="56" rx="4" fill="#F5F5F5" />
+      <rect x="24" y="540" width="372" height="84" rx="4" fill="#F5F5F5" />
+    </g>
+    <g fill="#202124" font-size="24" font-weight="600" text-anchor="middle">
+      <text x="210" y="161">새 웹</text>
+      <text x="210" y="281">기존 운영 Centrifugo</text>
+      <text x="210" y="461">새 웹</text>
+      <text x="210" y="604">Centrifugo</text>
+    </g>
+    <g fill="#202124" font-size="22">
+      <text x="228" y="218">복사된 API 설정</text>
+      <text x="24" y="340">기존 서비스 공개 주소를 참조</text>
+      <text x="228" y="518">내부 주소로 수정</text>
+      <text x="210" y="572" text-anchor="middle">새 클러스터 내부</text>
+      <text x="24" y="658">실제 접속 대상을 별도로 확인</text>
+    </g>
+    <g fill="none" stroke="#737373" stroke-width="1.5" marker-end="url(#routing-arrow)">
+      <path d="M210 184 V232" />
+      <path d="M210 484 V532" />
+    </g>
+    <path d="M24 364 H396" fill="none" stroke="#D4D4D4" stroke-width="1" />
+  </g>
+</svg>

@@ -7,7 +7,6 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 
 const slugs = [
-  'fcm-push-hiding-in-the-message-send-api-moving-it-to-a-dedicated-worker-queue',
   'sourcing-keywords-from-search-autocomplete',
   'many-cheap-calls-over-one-good-model',
   'escaping-in-app-browsers-so-login-does-not-lose-users',
@@ -79,7 +78,7 @@ try {
         })()`);
         assert.equal(state.fit, 'contain', `${slug}: image must not crop at ${width}px`);
         assert.ok(Math.abs(state.width / state.height - 16 / 9) < 0.02, 'Keep uniform list frame');
-        assert.equal(state.background, slugs.indexOf(slug) < 2 ? 'rgb(255, 255, 255)' : 'rgb(13, 21, 18)');
+        assert.equal(state.background, slugs.indexOf(slug) < 1 ? 'rgb(255, 255, 255)' : 'rgb(13, 21, 18)');
         await call('Input.dispatchMouseEvent', { type: 'mouseMoved', x: state.x, y: state.y }, sessionId);
         await evaluate(`new Promise(resolve => setTimeout(resolve, 450))`);
         assert.equal(await evaluate(`getComputedStyle(document.querySelector(${JSON.stringify(selector)}).querySelector('img')).transform`), 'none', 'Hover must not crop');
@@ -96,7 +95,7 @@ try {
       })`), true, 'Korean summaries must show two complete polite sentences');
     }
   }
-  console.log(`PASS (${lang}): four covers, three widths, two themes, hover; screenshots: ${artifacts}`);
+  console.log(`PASS (${lang}): three covers, three widths, two themes, hover; screenshots: ${artifacts}`);
 } finally {
   ws?.close();
   chrome.kill();

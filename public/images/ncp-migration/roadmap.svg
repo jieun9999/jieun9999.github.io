@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="690" viewBox="0 0 420 690" role="img" aria-labelledby="roadmap-title roadmap-desc">
+  <title id="roadmap-title">전체 이전 흐름 (2026.10.20–11.02)</title>
+  <desc id="roadmap-desc">현황 파악(10/20) → 방식 결정(10/21) → Terraform·NKS 구성(10/21) → 리허설(10/22) → 운영 전환(10/23) → 기존 계정 정리(11/02)</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 6 4 L 1 7" fill="none" stroke="#737373" stroke-width="1.5" />
+    </marker>
+  </defs>
+  <rect width="420" height="690" fill="#FFFFFF" />
+  <g font-family="'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif">
+    <rect width="420" height="64" fill="#172B4D" />
+    <text x="24" y="42" fill="#FFFFFF" font-size="26" font-weight="700">전체 이전 흐름</text>
+    <text x="24" y="103" fill="#202124" font-size="22">2026.10.20–11.02</text>
+
+    <g fill="#F5F5F5" stroke="#D4D4D4" stroke-width="1">
+      <rect x="94" y="134" width="310" height="64" rx="4" />
+      <rect x="94" y="226" width="310" height="64" rx="4" />
+      <rect x="94" y="318" width="310" height="64" rx="4" />
+      <rect x="94" y="410" width="310" height="64" rx="4" />
+      <rect x="94" y="502" width="310" height="64" rx="4" />
+      <rect x="94" y="594" width="310" height="64" rx="4" />
+    </g>
+    <g fill="#202124" font-size="22" text-anchor="middle">
+      <text x="45" y="174">10/20</text>
+      <text x="45" y="266">10/21</text>
+      <text x="45" y="358">10/21</text>
+      <text x="45" y="450">10/22</text>
+      <text x="45" y="542">10/23</text>
+      <text x="45" y="634">11/02</text>
+    </g>
+    <g fill="#202124" font-size="24" font-weight="600" text-anchor="middle">
+      <text x="249" y="175">현황 파악</text>
+      <text x="249" y="267">방식 결정</text>
+      <text x="249" y="359">Terraform·NKS 구성</text>
+      <text x="249" y="451">리허설</text>
+      <text x="249" y="543">운영 전환</text>
+      <text x="249" y="635">기존 계정 정리</text>
+    </g>
+    <g fill="none" stroke="#737373" stroke-width="1.5" marker-end="url(#arrow)">
+      <path d="M249 201 V220" />
+      <path d="M249 293 V312" />
+      <path d="M249 385 V404" />
+      <path d="M249 477 V496" />
+      <path d="M249 569 V588" />
+    </g>
+  </g>
+</svg>

@@ -14,7 +14,10 @@ export async function getStaticPaths() {
   for (const lang of Object.keys(languages)) {
     byLang[lang] = posts
       .filter((p) => langFromId(p.id) === lang)
-      .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+      .sort((a, b) =>
+        b.data.pubDate.valueOf() - a.data.pubDate.valueOf() ||
+        (b.data.seriesOrder ?? 0) - (a.data.seriesOrder ?? 0),
+      );
   }
 
   return posts.map((post) => {
@@ -35,7 +38,7 @@ export async function getStaticPaths() {
     const list = byLang[lang];
     const i = list.findIndex((p) => p.id === post.id);
     const nav = (p: (typeof posts)[number] | undefined) =>
-      p ? { title: p.data.title, url: `/${lang}/blog/${keyFromId(p.id)}/`, cover: p.data.cover } : null;
+      p ? { title: p.data.title, url: `/${lang}/blog/${keyFromId(p.id)}/`, cover: p.data.cover, coverFit: p.data.coverFit } : null;
     const prev = nav(list[i + 1]); // 이전 글 = 더 오래된 글
     const next = nav(list[i - 1]); // 다음 글 = 더 최신 글
 
@@ -51,7 +54,7 @@ export async function getStaticPaths() {
           order: p.data.seriesOrder ?? 0,
           current: p.id === post.id,
         }));
-      series = { title: post.data.seriesTitle ?? '', parts };
+      series = { id: post.data.series, title: post.data.seriesTitle ?? '', parts };
     }
 
     // canonical: 기본은 self. frontmatter 에 canonicalURL 이 있을 때만 그쪽으로 넘긴다.

@@ -39,7 +39,6 @@ export const ui = {
     // 버튼 라벨 (스크린리더)
     openMenu: 'Open menu',
     closeMenu: 'Close menu',
-    toggleTheme: 'Toggle dark mode',
     switchLang: '한국어로 보기',
     notFound: 'This page could not be found.',
     locale: 'en-US',
@@ -70,7 +69,6 @@ export const ui = {
     noResults: '맞는 글이 없어요.',
     openMenu: '메뉴 열기',
     closeMenu: '메뉴 닫기',
-    toggleTheme: '다크 모드 전환',
     switchLang: 'View in English',
     notFound: '페이지를 찾을 수 없습니다.',
     locale: 'ko-KR',

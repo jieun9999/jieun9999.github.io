@@ -123,10 +123,9 @@ export default defineConfig({
     // 코드블록 업그레이드: 파일명 프레임, 복사 버튼, 줄번호(옵션), 하이라이트, diff
     // (astro-expressive-code 는 markdown 이전에 등록되어야 하므로 sitemap 앞에 둠)
     expressiveCode({
-      themes: ['github-light', 'github-dark'],
-      // html.dark 클래스로 다크 전환 (미디어쿼리 대신)
+      themes: ['github-light'],
+      // OS 설정과 무관하게 밝은 코드 테마를 사용한다.
       useDarkModeMediaQuery: false,
-      themeCssSelector: (theme) => (theme.name === 'github-dark' ? '.dark' : false),
       plugins: [pluginLineNumbers()],
       defaultProps: {
         // 줄번호는 기본 끔 → 원하는 블록에만 showLineNumbers 로 켬
@@ -154,7 +153,12 @@ export default defineConfig({
       // 루트 '/' 는 noindex 스텁이라 사이트맵에 넣지 않는다. 색인하지 말라고 해놓고
       // 사이트맵으로 내미는 건 서로 어긋나는 신호다.
       filter: (page) => page !== `${SITE}/` &&
-        !new URL(page).pathname.endsWith('/blog/isolated-dev-access-for-an-outside-collaborator/'),
+        ![
+          'isolated-dev-access-for-an-outside-collaborator',
+          'part2-four-people-one-dev-machine',
+          'from-shared-subdomains-to-custom-domains-for-search-indexing',
+          'fcm-push-hiding-in-the-message-send-api-moving-it-to-a-dedicated-worker-queue',
+        ].some((slug) => new URL(page).pathname.endsWith(`/blog/${slug}/`)),
       // 글 URL 에만 lastmod 를 붙인다. 태그·목록 페이지는 "언제 바뀌었나"를
       // 정직하게 답할 수 없어 비워둔다(빠진 lastmod 는 크롤러가 그냥 무시한다).
       serialize(item) {

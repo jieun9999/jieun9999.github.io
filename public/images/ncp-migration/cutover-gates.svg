@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="820" viewBox="0 0 420 820" role="img" aria-labelledby="title desc">
+<title id="title">점검 절차와 쓰기 재개 기준</title>
+<desc id="desc">새 환경 사전 검증 → 기존 서비스의 앱·worker 쓰기 중지 → PostgreSQL·Redis 최종 복사 및 대조 → 새 앱 기동과 기본 기능 확인 → Cloudflare 진입점 전환과 쓰기 재개. 새 DB에 쓰기가 쌓인 뒤에는 주소만 되돌려 복구할 수 없습니다.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="7" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M2 1 L7 5 L2 9" fill="none" stroke="#737373" stroke-width="2"/></marker></defs>
+<rect width="420" height="820" fill="#FFFFFF"/>
+<g font-family="'Apple SD Gothic Neo','Malgun Gothic',sans-serif" fill="#202124">
+<rect width="420" height="66" fill="#172B4D"/>
+<text x="20" y="42" fill="#FFFFFF" font-size="25" font-weight="700">점검 절차와 쓰기 재개 기준</text>
+<text x="210" y="103" text-anchor="middle" font-size="21">데이터 대조·기능 확인 후 전환</text>
+<rect x="20" y="126" width="380" height="82" rx="4" fill="#F5F5F5" stroke="#D4D4D4"/>
+<text x="210" y="159" text-anchor="middle" font-size="24" font-weight="600">새 환경 사전 검증</text>
+<text x="210" y="188" text-anchor="middle" font-size="21">복원·접속·기능을 미리 확인</text>
+<path d="M210 212 V228" fill="none" stroke="#737373" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="20" y="234" width="380" height="82" rx="4" fill="#F5F5F5" stroke="#D4D4D4"/>
+<text x="210" y="267" text-anchor="middle" font-size="24" font-weight="600">기존 서비스 쓰기 중지</text>
+<text x="210" y="296" text-anchor="middle" font-size="21">앱·worker·예약 작업 중지</text>
+<path d="M210 320 V336" fill="none" stroke="#737373" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="20" y="342" width="380" height="82" rx="4" fill="#F5F5F5" stroke="#D4D4D4"/>
+<text x="210" y="375" text-anchor="middle" font-size="24" font-weight="600">PostgreSQL·Redis 최종 복사</text>
+<text x="210" y="404" text-anchor="middle" font-size="21">테이블·행 수·키 수 대조</text>
+<path d="M210 428 V444" fill="none" stroke="#737373" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="20" y="450" width="380" height="82" rx="4" fill="#F5F5F5" stroke="#D4D4D4"/>
+<text x="210" y="483" text-anchor="middle" font-size="24" font-weight="600">새 앱 기동과 기능 확인</text>
+<text x="210" y="512" text-anchor="middle" font-size="21">데이터와 기본 동작 확인</text>
+<path d="M210 536 V552" fill="none" stroke="#737373" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="20" y="558" width="380" height="82" rx="4" fill="#F5F5F5" stroke="#D4D4D4"/>
+<text x="210" y="591" text-anchor="middle" font-size="24" font-weight="600">Cloudflare 진입점 전환</text>
+<text x="210" y="620" text-anchor="middle" font-size="21">새 환경에서 사용자 쓰기 재개</text>
+<rect x="20" y="676" width="380" height="122" rx="4" fill="#FFF7DB" stroke="#D4D4D4"/>
+<text x="40" y="708" font-size="22" font-weight="700">되돌리기 판단 기준</text>
+<text x="40" y="742" font-size="22">새 DB에 쓰기가 쌓인 뒤에는</text>
+<text x="40" y="774" font-size="22">주소만 되돌려 복구할 수 없습니다.</text>
+</g></svg>

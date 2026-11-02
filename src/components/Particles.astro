@@ -18,21 +18,13 @@ const { max = 90 } = Astro.props;
     height: 100%;
     pointer-events: none;
     /* 점 색 — 에버그린 6단계에서 점마다 하나씩 무작위로 고른다(스크립트가 읽는다).
-       라이트는 흰 바탕에 맞춘 진한 쪽, 다크는 검은 바탕에 맞춘 밝은 쪽. 배경은 그대로 무채색. */
+       흰 바탕에 맞춘 진한 쪽을 사용한다. 배경은 그대로 무채색. */
     --dot-1: #195e3f;
     --dot-2: #256648;
     --dot-3: #307252;
     --dot-4: #3d8160;
     --dot-5: #4b916e;
     --dot-6: #a9e0c1;
-  }
-  :global(html.dark) .particles {
-    --dot-1: #3e8562;
-    --dot-2: #4f9773;
-    --dot-3: #5da781;
-    --dot-4: #72be96;
-    --dot-5: #8fd4ad;
-    --dot-6: #bcebd1;
   }
 </style>
 
@@ -52,7 +44,7 @@ const { max = 90 } = Astro.props;
     let raf = 0;
     let visible = true;
 
-    // 테마마다 CSS 가 --dot-1..6 을 바꿔 끼운다. 매 프레임 읽지 않고 테마가 바뀔 때만 다시 읽는다.
+    // CSS의 --dot-1..6을 초기화할 때 한 번 읽는다.
     const readPalette = () => {
       const cs = getComputedStyle(canvas);
       palette = [1, 2, 3, 4, 5, 6].map((i) => cs.getPropertyValue(`--dot-${i}`).trim());
@@ -118,13 +110,5 @@ const { max = 90 } = Astro.props;
       visible = entry.isIntersecting;
       if (visible) start();
     }).observe(canvas);
-    // 테마가 바뀌면 팔레트를 다시 읽는다 (움직임을 끈 경우 다시 그려야 한다)
-    new MutationObserver(() => {
-      readPalette();
-      draw();
-    }).observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class'],
-    });
   });
 </script>
